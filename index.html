@@ -1,0 +1,97 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>myLaudo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#09080b;--s1:#100e13;--s2:#16141b;--s3:#1d1a23;--bd:#221f28;--bd2:#2f2b37;
+  --tx:#ececee;--tx2:#9b97a3;--tx3:#605c69;
+  --ac:#bc7ba4;--acT:#dcb9cd;--acTint:rgba(188,123,164,.12);
+  --f:'IBM Plex Sans',system-ui,sans-serif;--m:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:dark;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0;text-align:left}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.app{max-width:480px;margin:0 auto;padding-inline:16px;padding-block:18px 40px;display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-top:6px}
+.brand h1{margin:0;font-size:22px;font-weight:500;letter-spacing:-.02em}
+.brand h1 b{font-weight:600;color:var(--acT)}
+.brand span{font-family:var(--m);font-size:11px;color:var(--tx3)}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px}
+.segm{display:flex;border:1px solid var(--bd2);border-radius:10px;overflow:hidden}
+.segm button{flex:1;text-align:center;font-size:13.5px;padding:10px 4px;color:var(--tx2);border-left:1px solid var(--bd2)}
+.segm button:first-child{border-left:0}
+.segm button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+.pac{border:1px dashed var(--ac);border-radius:12px;background:var(--acTint);padding:11px 14px;display:flex;align-items:center;gap:10px}
+.pac div{flex:1;min-width:0}
+.pac b{display:block;font-weight:500;color:var(--acT);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pac small{font-size:12px;color:var(--tx2)}
+.pac button{font-size:12px;color:var(--tx2);padding:6px 10px;border:1px solid var(--bd2);border-radius:999px;background:var(--bg)}
+.novo{height:50px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:500}
+.list{display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:14px;background:var(--s1);overflow:hidden}
+.list a{display:flex;align-items:center;gap:12px;padding:14px 14px;border-top:1px solid var(--bd)}
+.list a:first-child{border-top:0}
+.list a:active{background:var(--s2)}
+.list .n{flex:1;min-width:0}
+.list .n b{display:block;font-weight:500;font-size:15px}
+.list .n span{font-size:12px;color:var(--tx2)}
+.list .tag{font-family:var(--m);font-size:10.5px;color:var(--tx3);border:1px solid var(--bd2);padding:2px 7px;border-radius:6px;white-space:nowrap}
+.note{font-size:12px;color:var(--tx3);line-height:1.55}
+.note b{color:var(--tx2);font-weight:500}
+</style>
+
+<main class="app">
+  <div class="brand"><h1>my<b>Laudo</b></h1><span id="hoje"></span></div>
+
+  <section>
+    <p class="lbl">Serviço</p>
+    <div class="segm" id="serv">
+      <button type="button" data-s="inst">Instituto</button>
+      <button type="button" data-s="part">Particular</button>
+      <button type="button" data-s="hmc">HMC</button>
+    </div>
+  </section>
+
+  <div class="pac" id="pac" hidden><div><b id="pacNome"></b><small>paciente da vez · escolha o exame</small></div><button type="button" id="pacX">trocar</button></div>
+  <a class="novo" id="novo" href="novo-paciente.html?app">+ Novo paciente</a>
+
+  <section>
+    <p class="lbl">Exame</p>
+    <nav class="list" id="exames">
+      <a href="emitir-laudo-tireoide.html?app"><div class="n"><b>Tireoide</b><span>nódulos, linfonodos, PAAF</span></div><span class="tag">TI-RADS</span></a>
+      <a href="emitir-laudo-mamas.html?app"><div class="n"><b>Mamas e axilas</b><span>nódulos, cistos, CORE</span></div><span class="tag">BI-RADS</span></a>
+      <a href="emitir-laudo-transvaginal.html?app"><div class="n"><b>Transvaginal</b><span>útero, miomas, ovários</span></div><span class="tag">O-RADS</span></a>
+      <a href="emitir-laudo-cervical.html?app"><div class="n"><b>Cervical e salivares</b><span>linfonodos, leito, glândulas</span></div><span class="tag">PAAF</span></a>
+      <a href="emitir-laudo-prostata.html?app"><div class="n"><b>Próstata via abdominal</b><span>bexiga, próstata, pós-miccional</span></div><span class="tag">IPP</span></a>
+    </nav>
+  </section>
+
+  <p class="note"><b>Protótipo.</b> Nada fica salvo: copie o laudo antes de sair da tela. A seta no topo de cada exame volta para cá, e cada exame já abre limpo.</p>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const get=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+const set=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v);}catch(e){}};
+let serv=get('mylaudo.serv')||'hmc';
+function pinta(){
+  document.querySelectorAll('#serv button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===serv));
+  let p=null; try{p=JSON.parse(get('mylaudo.pac')||'null');}catch(e){}
+  const tem=p&&p.nome; $('#pac').hidden=!tem; $('#novo').hidden=!!tem;
+  if(tem) $('#pacNome').textContent=p.nome;
+}
+document.querySelectorAll('#serv button').forEach(b=>b.onclick=()=>{serv=b.dataset.s;set('mylaudo.serv',serv);pinta();});
+$('#pacX').onclick=()=>{set('mylaudo.pac',null);pinta();};
+// HMC não usa nome; nos outros o paciente da vez segue para o exame até você trocar
+document.querySelectorAll('#exames a').forEach(a=>a.addEventListener('click',()=>{
+  set('mylaudo.serv',serv);
+  if(serv==='hmc') set('mylaudo.pac',null);
+  else { let p=null; try{p=JSON.parse(get('mylaudo.pac')||'null');}catch(e){} if(p){p.serv=serv; set('mylaudo.pac',JSON.stringify(p));} }
+}));
+$('#hoje').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+pinta();
+</script>

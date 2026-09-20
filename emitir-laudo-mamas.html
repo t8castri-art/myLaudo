@@ -1,0 +1,503 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Laudo de Mamas e Axilas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#09080b;--s1:#100e13;--s2:#16141b;--s3:#1d1a23;--bd:#221f28;--bd2:#2f2b37;
+  --tx:#ececee;--tx2:#9b97a3;--tx3:#605c69;
+  --ac:#bc7ba4;--acT:#dcb9cd;--acTint:rgba(188,123,164,.12);
+  --ok:#9aaf9c;--okTint:rgba(154,175,156,.12);--alert:#b08183;--alertTint:rgba(176,129,131,.14);
+  --f:'IBM Plex Sans',system-ui,sans-serif;--m:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--acT)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0;text-align:left}
+button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+input{font:inherit;color:inherit}
+svg{display:block;flex:none}
+.wrap{max-width:1380px;margin:0 auto;padding:24px 24px 80px}
+header{margin-bottom:22px}
+header h1{font-size:20px;font-weight:500;margin:0;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
+.stage{display:grid;grid-template-columns:390px minmax(0,1fr);gap:36px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr;justify-items:center}.docs{position:static;width:100%}}
+.docs{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.docs .tabs{display:flex;gap:6px}
+.docs .tabs button{font-size:12.5px;padding:7px 12px;border-radius:999px;border:1px solid var(--bd);color:var(--tx2)}
+.docs .tabs button[aria-pressed="true"]{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.doc{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:16px 18px;font-size:13px;line-height:1.7;color:var(--tx2);white-space:pre-wrap;max-height:calc(100vh - 140px);overflow:auto;scrollbar-width:thin}
+.doc b{color:var(--tx);font-weight:500}
+.docs .cap{font-size:12px;color:var(--tx3);line-height:1.5}
+
+/* ---------- telefone ---------- */
+.phone{width:390px;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px #232028,0 30px 60px rgba(0,0,0,.65);flex:none}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+.view[hidden]{display:none}
+.top{padding:54px 16px 8px;display:flex;align-items:center;gap:10px}
+.iconbtn{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--tx2);background:var(--s1);border:1px solid var(--bd);flex:none}
+.ttl{flex:1;min-width:0}
+.ttl .h{font-size:17px;font-weight:500;line-height:1.2;letter-spacing:-.01em}
+.ttl .s{font-size:12px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;padding:4px 10px;border-radius:999px;background:var(--s2);color:var(--tx2);white-space:nowrap;flex:none;border:1px solid var(--bd);line-height:1.3}
+.pill.ac{background:var(--acTint);color:var(--acT);border-color:transparent}
+.pill.alert{background:var(--alertTint);color:var(--alert);border-color:transparent}
+.body{flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;min-height:0;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.lbl .act{text-transform:none;letter-spacing:0;font-weight:400;color:var(--acT);font-size:12px}
+.card{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:12px 14px;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--bd);color:var(--tx2);line-height:1.2}
+.chip[aria-pressed="true"]{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.chip:disabled{opacity:.4;cursor:default}
+.form{display:grid;grid-template-columns:96px 1fr;gap:8px 10px;align-items:center}
+.form .k{font-size:12.5px;color:var(--tx2)}
+.segm{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.segm button{flex:1;text-align:center;font-size:12px;padding:6px 4px;color:var(--tx2);border-left:1px solid var(--bd2)}
+.segm button:first-child{border-left:0}
+.segm button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+.in{display:flex;gap:6px;align-items:center;font-family:var(--m);font-size:13px}
+.in .x{color:var(--tx3);font-size:11px}
+.cell{width:52px;padding:5px 6px;border-radius:6px;background:var(--s2);border:1px solid var(--bd2);text-align:center;font-family:var(--m);font-size:13px;color:var(--tx);outline:none}
+.cell:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acTint)}
+.cell::placeholder{color:var(--tx3)}
+.p{font-size:13px;line-height:1.6;color:var(--tx2);margin:0}
+.nod{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--s2);width:100%}
+.nod + .nod{margin-top:6px}
+.nod .n{flex:1;min-width:0}
+.nod .n b{font-weight:500;font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nod .n span{font-size:12px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.nod .tag{font-family:var(--m);font-size:11px;padding:3px 7px;border-radius:6px;background:var(--s3);color:var(--tx2);flex:none}
+.nod .tag.alert{background:var(--alertTint);color:var(--alert)}
+.addrow{display:flex;gap:8px;margin-top:8px}
+.addbtn{flex:1;height:42px;border-radius:10px;border:1px dashed var(--bd2);display:flex;align-items:center;justify-content:center;gap:7px;color:var(--acT);font-size:13px;font-weight:500}
+.empty{font-size:12.5px;color:var(--tx3)}
+.side{display:flex;flex-direction:column;gap:8px}
+.side .row{display:flex;align-items:center;gap:10px}
+.side .row .k{font-size:12.5px;color:var(--tx2);width:96px;flex:none}
+.cats{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden;flex:1}
+.cats button{flex:1;text-align:center;font-family:var(--m);font-size:12px;padding:7px 0;color:var(--tx2);border-left:1px solid var(--bd2)}
+.cats button:first-child{border-left:0}
+.cats button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+.cats button.sug{box-shadow:inset 0 -2px 0 var(--ac)}
+.hint{font-size:11px;color:var(--tx3);line-height:1.45;margin-top:6px}
+.result{border:1px solid var(--bd2);border-radius:12px;background:var(--s2);padding:12px 14px;flex:none}
+.result small{display:block;font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:4px}
+.result .t{font-size:12.5px;line-height:1.55;color:var(--tx)}
+.bottom{padding:10px 16px 26px;border-top:1px solid var(--bd);background:var(--bg);display:flex;gap:10px;align-items:center;flex:none}
+.btn{height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;flex:1;letter-spacing:-.005em}
+.btn.primary{border:1px solid var(--ac);color:var(--acT)}
+.btn.secondary{border:1px solid var(--bd2);color:var(--tx2)}
+.btn.ghost{border:0;color:var(--tx3);flex:none;padding:0 12px}
+.btn .n{font-family:var(--m);font-size:11px;padding:1px 6px;border-radius:999px;background:var(--acTint)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sw{width:40px;height:24px;border-radius:999px;background:var(--s3);border:1px solid var(--bd2);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:999px;background:var(--tx3);transition:left .12s,background .12s}
+.sw[aria-pressed="true"]{background:var(--acTint);border-color:var(--ac)}
+.sw[aria-pressed="true"]::after{left:19px;background:var(--acT)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--s3);border:1px solid var(--bd2);color:var(--tx);padding:9px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .15s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:no-preference){.chip,.segm button,.cats button{transition:background .12s,color .12s,border-color .12s}}
+
+/* myLaudo no celular: sem moldura, tela cheia */
+@media (max-width:600px){
+  .wrap{padding-inline:10px;padding-block:8px 40px}
+  header{display:none}
+  .stage{gap:16px}
+  .phone{width:100%;height:auto;border-radius:0;box-shadow:none;overflow:visible}
+  .view{position:static}
+  .top{padding:10px 4px 8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:4}
+  .body{overflow:visible;padding:4px 0 12px}
+  .bottom{position:sticky;bottom:0;padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px))}
+  .doc{max-height:none}
+  .cell,.txtin,.obs{font-size:16px}
+}
+
+/* padrões do app: prévia editável e caixas de texto */
+.doc.editavel{background:#e8e5ea;color:#1a171d;border-color:#cfc9d4;caret-color:#8a3f6c;outline:none}
+.doc.editavel b{color:#000}
+.doc.editavel:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acTint)}
+.editbar{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--acT);border:1px dashed var(--ac);border-radius:10px;padding:8px 10px;background:var(--acTint)}
+.editbar span{flex:1}
+.editbar button{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);white-space:nowrap}
+.obs{width:100%;min-height:58px;resize:vertical;padding:7px 9px;border-radius:7px;background:var(--s2);border:1px solid var(--ac);border-style:dashed;color:var(--tx);font:13px/1.45 var(--f);outline:none;grid-column:1/-1}
+.obs:focus{border-style:solid;box-shadow:0 0 0 2px var(--acTint)}
+.obs::placeholder{color:var(--tx3)}
+/* copiar fica embaixo do editor final */
+.bottom:has(#copiar){display:none}
+.copiar2{height:48px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:500;width:100%}
+/* medidas numa linha só */
+.cell[data-mmc]{width:44px;padding:5px 2px}
+.in:has(.cell[data-mmc]){gap:3px;flex-wrap:nowrap}
+.in:has(.cell[data-mmc]) .x{font-size:10px}
+@media (max-width:600px){.cell[data-mmc]{width:46px}.form{grid-template-columns:88px 1fr}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Laudo de Mamas e Axilas</h1>
+    <p>A tela de emitir o laudo, funcionando. Indicação, mamografia e anamnese abrem o laudo como "Informações clínicas"; o que você não marca entra como negado, para o laudo mostrar que foi perguntado. Cada nódulo tem posição em horário, distância do mamilo, profundidade e medidas; os descritores vêm antes de qualquer classificação; o BI-RADS é um por mama e só aparece na conclusão. Se marcar CORE, o app gera o segundo documento com a mesma descrição do nódulo.</p>
+  </header>
+  <div class="stage">
+    <div class="phone" id="phone"></div>
+    <aside class="docs">
+      <div class="tabs" id="docTabs"></div>
+      <div class="doc" id="docOut"></div>
+      <div class="cap">Frases padrão vieram dos seus modelos do HMC (mama e axilas .docx). A sugestão de BI-RADS conta descritores suspeitos: irregular, não paralelo, margens não circunscritas, sombra posterior, calcificações. Sem nenhum: 3 quando há nódulo sólido, 2 quando só há cisto, 1 quando a mama está limpa.</div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const I={
+  back:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  copy:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+  plus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  chev:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tx3)"><path d="M9 6l6 6-6 6"/></svg>',
+  check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>'
+};
+
+// ---------- léxico ----------
+const LEX = {
+  eco:   [['hipoecoico','hipoecoico'],['isoecoico','isoecoico'],['hiperecoico','hiperecoico'],['heterogêneo','heterogêneo'],['complexo cístico-sólido','complexo cístico-sólido']],
+  forma: [['oval','oval'],['redondo','redondo'],['irregular','irregular']],
+  orient:[['paralelo','paralelo à pele'],['não paralelo','não paralelo à pele']],
+  marg:  [['circunscritas','circunscritas'],['indistintas','indistintas'],['anguladas','anguladas'],['microlobuladas','microlobuladas'],['espiculadas','espiculadas']],
+  post:  [['nenhuma','sem alteração acústica posterior'],['reforço','com reforço acústico posterior'],['sombra','com sombra acústica posterior'],['combinado','com padrão acústico posterior combinado']],
+  calc:  [['sem','sem calcificações'],['com','com calcificações']],
+  cisto: [['simples','cisto simples, de paredes finas e conteúdo anecoico, com reforço acústico posterior'],['complicado','cisto complicado, com ecos internos homogêneos, sem componente sólido']],
+};
+const SUSP = { forma:{irregular:1}, orient:{'não paralelo':1}, marg:{indistintas:1,anguladas:1,microlobuladas:1,espiculadas:2}, post:{sombra:1,combinado:1}, calc:{com:1}, eco:{'complexo cístico-sólido':1,'heterogêneo':1} };
+const HORAS = ['1','2','3','4','5','6','7','8','9','10','11','12','retroareolar'];
+const AXILA = [['normal','Não há evidência de linfonodomegalias.'],['reacional','Linfonodo de aspecto reacional, com hilo preservado, medindo ___ × ___ cm.'],['suspeito','Linfonodo de aspecto atípico, arredondado, com perda do hilo, medindo ___ × ___ cm.']];
+const IND = ['Rotina','Nódulo palpável','Dor mamária','Complementação de mamografia','Seguimento de nódulo'];
+
+// ---------- estado ----------
+const TRANS=[['l16','linear 3–16 MHz'],['l22','minilinear 2–22 MHz'],['c8','convexo 2–8 MHz'],['e9','endocavitário 2–9 MHz']];
+const equipTxt=()=>{const l=TRANS.filter(t=>st.equip.has(t[0])).map(t=>t[1]); if(!l.length) return 'Samsung HM70 EVO.'; return 'Samsung HM70 EVO, transdutor'+(l.length>1?'es ':' ')+l.join(', ').replace(/, ([^,]*)$/,' e $1')+'.';};
+// ---------- serviço: cada um com suas exigências ----------
+const SERV=[['inst','Instituto'],['part','Particular'],['hmc','HMC']];
+const TIPO_T={l16:'linear',l22:'linear',c8:'convexo',e9:'endocavitário'};
+const tiposTxt=()=>[...new Set(TRANS.filter(t=>st.equip.has(t[0])).map(t=>TIPO_T[t[0]]))].join(' e ');
+const linhaTopo=()=>st.serv==='hmc'?[]:[`Paciente: ${st.pac&&st.pac.trim()?st.pac.trim():'___'}`];
+const linhaEquip=()=>[];
+// Técnica carrega aparelho/transdutor, via e caráter
+const transdTxt=()=>{const l=TRANS.filter(t=>st.equip.has(t[0])); const nomes=st.serv==='hmc'?[...new Set(l.map(t=>TIPO_T[t[0]]))]:l.map(t=>t[1]); const j=nomes.join(', ').replace(/, ([^,]*)$/,' e $1'); return 'transdutor'+(nomes.length>1?'es ':' ')+j;};
+const tecnica=corpo=>`Técnica: Exame realizado ${st.serv==='hmc'?'':'em aparelho Samsung HM70 EVO, '}com ${transdTxt()}${st.serv!=='hmc'&&corpo.startsWith(' ')?','+corpo:corpo}${st.serv==='hmc'?`, em caráter ${st.carater==='urgência'?'de urgência':st.carater}`:''}.`;
+const servSub=()=>st.serv==='hmc'?`HMC · ${st.carater}`:`${esc(st.pac&&st.pac.trim()?st.pac:'sem nome')} · ${SERV.find(s=>s[0]===st.serv)[1]}`;
+function servCard(){
+  return `<div class="card"><div class="lbl">Serviço</div>${segm(SERV,st.serv,'serv')}<div class="form" style="margin-top:12px">${st.serv==='hmc'
+    ?`<div class="k">Caráter</div>${segm([['eletivo','eletivo'],['urgência','urgência']],st.carater,'carater')}`
+    :`<div class="k">Paciente</div><div class="in" style="flex:1"><input class="cell" id="pac" style="width:100%;text-align:left" value="${esc(st.pac)}" placeholder="nome completo" autocomplete="off"></div>`}</div></div>`;
+}
+function equipCard(keys){
+  if(st.serv==='hmc'){const k=keys.filter(x=>x!=='l22'); return `<div class="card"><div class="lbl">Transdutor</div>${k.length>1?chips(k.map(x=>[x,TIPO_T[x]]),st.equip,'eq',true):`<div class="p">${TIPO_T[k[0]]}</div>`}</div>`;}
+  return keys.length>1?`<div class="card"><div class="lbl">Equipamento <span class="act">Samsung HM70 EVO</span></div>${chips(TRANS.filter(t=>keys.includes(t[0])),st.equip,'eq',true)}</div>`
+    :`<div class="card"><div class="lbl">Equipamento</div><div class="p">Samsung HM70 EVO · transdutor ${TRANS.find(t=>t[0]===keys[0])[1]}</div></div>`;
+}
+function wireServ(){
+  document.querySelectorAll('#phone [data-serv]').forEach(el=>el.addEventListener('click',()=>{st.serv=el.dataset.serv; if(st.serv==='hmc'&&st.equip.has('l22')){st.equip.delete('l22');st.equip.add('l16');} render();}));
+  document.querySelectorAll('#phone [data-carater]').forEach(el=>el.addEventListener('click',()=>{st.carater=el.dataset.carater;render();}));
+  const pc=document.getElementById('pac'); if(pc) pc.addEventListener('input',()=>{st.pac=pc.value; renderDocs(); const s=document.querySelector('#phone .top .s'); if(s) s.innerHTML=servSub();});
+}
+// Instituto: US + procedimento num laudo só
+function docUnico(proc,sufixo){
+  const p=proc().split('\n'); if(!p.some(l=>l.startsWith('Conclusão:'))) return docUS()+'\n\n'+proc();
+  const us=docUS().split('\n'), get=k=>{const l=p.find(x=>x.startsWith(k+':'));return l?l.slice(k.length+2):'';};
+  const iC=us.indexOf('Conclusão:'), iS=us.findIndex(l=>l.startsWith('Sugestão:'));
+  return [us[0]+' '+sufixo, ...us.slice(1,iC),
+    'Procedimento:', get('Consentimento e preparo'), get('Técnica'), (get('Intercorrências')+' '+get('Orientações')).trim(),'',
+    'Conclusão:', ...us.slice(iC+1,iS<0?us.length:iS).filter(Boolean).map(l=>l.replace(', com indicação de PAAF','')), get('Conclusão'),'',
+    `Sugestão: ${get('Sugestão')||'Retorno ao médico assistente com o resultado histopatológico.'}`].join('\n');
+}
+let seq=1;
+const novoNod = (mama, tipo='nodulo') => ({ id:seq++, mama, tipo, hora:'10', mamilo:'', pele:'', med:['','',''], eco:'hipoecoico', forma:'oval', orient:'paralelo', marg:'circunscritas', post:'nenhuma', calc:'sem', dop:new Set(['ausente']), cisto:'simples' });
+const st = {
+  view:'laudo', edit:null, doc:'us',
+  serv:'part', pac:'Fabiana Martins Santos', carater:'eletivo',
+  ind:'Rotina', equip:new Set(['l16']), textura:'heterogênea', predominio:'fibroglandular', ectasia:false,
+  mmg:{ feita:'trouxe', birads:'2', data:'06/2026' },
+  anam:{ fam:true, famGrau:'1º grau', pessoal:false, bx:true, bxRes:'benigna', cir:false, meno:'pós', trh:false, palp:false, desc:false, gest:false, lact:false },
+  lesoes:[], axila:{D:'normal',E:'normal'}, birads:{D:null,E:null},
+  core:{on:false, alvo:null, agulha:'14G', frag:'5', lab:'próprio'},
+};
+// amostra: o nódulo do seu modelo, na posição do seu exemplo
+const n1=novoNod('D'); Object.assign(n1,{hora:'10',mamilo:'40',pele:'15',med:['9,5','13','6']}); st.lesoes.push(n1);
+
+// ---------- regras ----------
+const lesoesDe = m => st.lesoes.filter(l=>l.mama===m);
+function suspicious(n){ if(n.tipo==='cisto') return 0; return (SUSP.forma[n.forma]||0)+(SUSP.orient[n.orient]||0)+(SUSP.marg[n.marg]||0)+(SUSP.post[n.post]||0)+(SUSP.calc[n.calc]||0)+(SUSP.eco[n.eco]||0); }
+const CATS=['1','2','3','4A','4B','4C','5'];
+function sugerir(m){
+  const ls=lesoesDe(m); if(!ls.length) return '1';
+  const nods=ls.filter(l=>l.tipo==='nodulo'); if(!nods.length) return '2';
+  const s=Math.max(...nods.map(suspicious)); const spic=nods.some(n=>n.marg==='espiculadas');
+  if(s===0) return '3'; if(s>=4||(spic&&s>=3)) return '5'; if(s===1) return '4A'; if(s===2) return '4B'; return '4C';
+}
+const catDe = m => st.birads[m] ?? sugerir(m);
+const rank = c => CATS.indexOf(c);
+const dopTxt = n => { const d=[...n.dop]; if(!d.length||d.includes('ausente')) return 'vascularização ausente ao Doppler'; return 'vascularização '+(d.length===2?'central e periférica':d[0])+' ao Doppler'; };
+const num = v => v && v.trim() ? v.trim() : '___';
+const hora = n => n.hora==='retroareolar' ? 'região retroareolar' : n.hora+'h';
+const rotulo = n => (n.tipo==='cisto'?'C':'N')+(lesoesDe(n.mama).filter(l=>l.tipo===n.tipo).indexOf(n)+1);
+const L = k => Object.fromEntries(LEX[k]);
+function descr(n){
+  const loc = `${rotulo(n)}, ${hora(n)}, distando ${cm(n.mamilo)} cm do mamilo e ${cm(n.pele)} cm da pele: `;
+  if(n.tipo==='cisto') return loc + L('cisto')[n.cisto] + `. Mediu ${n.med.map(cm).join(' × ')} cm.`;
+  return loc + `nódulo ${L('eco')[n.eco]}, ${L('forma')[n.forma]}, ${L('orient')[n.orient]}, com margens ${L('marg')[n.marg]}, ${L('post')[n.post]}, ${L('calc')[n.calc]}, ${dopTxt(n)}. Mediu ${n.med.map(cm).join(' × ')} cm.`;
+}
+const lado = m => m==='D'?'direita':'esquerda';
+const dataCurta=d=>{const m=String(d||'').trim().match(/^(\d{1,2})\/(\d{2,4})$/); return m?m[1].padStart(2,'0')+'/'+m[2].slice(-2):String(d||'').trim();};
+function infoClinica(){
+  const a=st.anam, f=[];
+  if(a.fam) f.push(`História familiar de câncer de mama em parente de ${a.famGrau}.`);
+  if(a.pessoal) f.push('História pessoal de câncer de mama.');
+  if(a.bx) f.push(`Biópsia mamária prévia com resultado ${({benigna:'benigno',maligna:'maligno',desconhecido:'não informado'})[a.bxRes]}.`);
+  if(a.cir) f.push('Cirurgia mamária prévia.');
+  const algum = a.fam||a.pessoal||a.bx||a.cir||a.palp||a.desc||a.gest||a.lact||(a.meno==='pós'&&a.trh);
+  if(!algum && st.ind!=='Rotina') f.unshift('Nega histórico familiar de câncer de mama e biópsia prévia.');
+  if(a.meno==='pós' && a.trh) f.push('Pós-menopausa, em uso de terapia hormonal.');
+  if(a.palp) f.push('Refere nódulo palpável.');
+  if(a.desc) f.push('Refere descarga papilar.');
+  if(a.gest) f.push('Gestação recente.');
+  if(a.lact) f.push('Em amamentação.');
+  const m=st.mmg;
+  if(m.feita==='nao') f.push('Não realizou mamografia.');
+  else if(m.feita==='naotrouxe') f.push('Mamografia prévia não apresentada.');
+  else f.push(`Mamografia${m.data?' de '+dataCurta(m.data):''}: BI-RADS ${m.birads}.`);
+  return f.join(' ');
+}
+function fraseConclusao(m){
+  const c=catDe(m); const ls=lesoesDe(m);
+  if(c==='1') return `Mama ${lado(m)}: exame dentro dos padrões de normalidade. BI-RADS US 1.`;
+  if(c==='2') return `Mama ${lado(m)}: ${ls.filter(l=>l.tipo==='cisto').length>1?'cistos simples':'cisto simples'}. BI-RADS US 2.`;
+  if(c==='3') return `Mama ${lado(m)}: nódulo sólido de aspecto provavelmente benigno. BI-RADS US 3.`;
+  if(c==='5') return `Mama ${lado(m)}: nódulo sólido altamente suspeito. BI-RADS US 5.`;
+  return `Mama ${lado(m)}: nódulo sólido com características suspeitas. BI-RADS US ${c}.`;
+}
+function sugestao(){
+  const mx=Math.max(rank(catDe('D')),rank(catDe('E')));
+  if(mx<=1) return 'Rastreamento de rotina conforme faixa etária.';
+  if(mx===2) return 'Controle ecográfico em 6 meses.';
+  return 'Estudo histopatológico por biópsia percutânea guiada por ultrassonografia.';
+}
+function docUS(){
+  const mamaTxt = m => { const ls=lesoesDe(m); return `Mama ${lado(m)}:\n` + (ls.length? ls.map(descr).join('\n') : 'Não há evidência de nódulos, cistos ou distorções arquiteturais.'); };
+  const ax = m => `Cadeia linfonodal axilar ${lado(m)}: ${Object.fromEntries(AXILA)[st.axila[m]]}`;
+  const ambas = catDe('D')==='1' && catDe('E')==='1';
+  return [
+    'ULTRASSONOGRAFIA DE MAMAS E AXILAS','',
+    ...linhaTopo(),
+    `Indicação: ${st.ind}.`,
+    ...linhaEquip(),
+    tecnica(', com varredura radial e antirradial de ambas as mamas, regiões retroareolares e axilas, e estudo Doppler colorido e PowerDoppler'),
+    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]),'',
+    'Descrição:',
+    'Pele, tecido subcutâneo e complexo areolopapilar de aspecto habitual, sem alterações detectáveis.',
+    `Mamas simétricas, de ecotextura ${st.textura}, com predomínio de tecido ${st.predominio}.`,
+    st.ectasia ? 'Nota-se ectasia ductal, conforme descrito.' : 'Não há evidência de ectasia ductal.','',
+    mamaTxt('D'),'',mamaTxt('E'),'',
+    ax('D'), ax('E'), 'Cadeias paraesternais: não há evidência de linfonodomegalias.','',
+    'Conclusão:',
+    ambas ? 'Exame ecográfico dentro dos padrões de normalidade. BI-RADS US 1 bilateralmente.' : fraseConclusao('D')+'\n'+fraseConclusao('E'),'',
+    `Sugestão: ${sugestao()}`,
+  ].join('\n');
+}
+function docCORE(){
+  const n=st.lesoes.find(l=>l.id===st.core.alvo); if(!n) return 'Escolha o nódulo biopsiado na tela do laudo (cartão Procedimento).';
+  const c=catDe(n.mama);
+  return [
+    'BIÓPSIA PERCUTÂNEA POR AGULHA GROSSA (CORE) GUIADA POR ULTRASSONOGRAFIA','',
+    ...linhaTopo(),
+    `Indicação: Nódulo mamário BI-RADS US ${c} em mama ${lado(n.mama)}.`,
+    'Consentimento e preparo: Paciente esclarecida sobre o procedimento, riscos e benefícios, com termo de consentimento assinado. Antissepsia com clorexidina alcoólica e campos estéreis. Anestesia local com lidocaína 2% sem vasoconstritor.',
+    `Técnica: Sob orientação ultrassonográfica em tempo real com transdutor linear de alta frequência, após pequena incisão cutânea, realizadas passagens com agulha de corte automática ${st.core.agulha}, com obtenção de ${st.core.frag||'___'} fragmentos, acondicionados em formol tamponado a 10%, identificados e encaminhados para estudo histopatológico${st.core.lab==='entregue'?' ao laboratório escolhido pela paciente, com termo de entrega de amostra':''}. Hemostasia por compressão local e curativo compressivo.`,
+    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]),'',
+    `Alvo: ${descr(n)}`,'',
+    'Intercorrências: Procedimento realizado sem intercorrências.',
+    'Orientações: Paciente liberada em bom estado geral, orientada sobre compressão local, gelo, sinais de alerta e retorno com o resultado histopatológico ao médico assistente.','',
+    `Conclusão: Realizada biópsia percutânea por agulha grossa guiada por ultrassonografia de nódulo BI-RADS US ${c} em mama ${lado(n.mama)}, com obtenção de ${st.core.frag||'___'} fragmentos, sem intercorrências. Material encaminhado para estudo histopatológico.`,
+  ].join('\n');
+}
+
+// ---------- render ----------
+function chips(items, cur, attr, multi){ return '<div class="chips">'+items.map(it=>{ const [v,l]=Array.isArray(it)?it:[it,it]; const on = multi? cur.has(v) : cur===v; return `<button type="button" class="chip" data-${attr}="${esc(v)}" aria-pressed="${on}">${esc(l)}</button>`; }).join('')+'</div>'; }
+function segm(items, cur, attr){ return '<div class="segm">'+items.map(it=>{ const [v,l]=Array.isArray(it)?it:[it,it]; return `<button type="button" data-${attr}="${esc(v)}" aria-pressed="${cur===v}">${esc(l)}</button>`; }).join('')+'</div>'; }
+function catsHtml(m){ const sug=sugerir(m), cur=catDe(m); return `<div class="cats" data-mama="${m}">`+CATS.map(c=>`<button type="button" data-cat="${c}" aria-pressed="${cur===c}" class="${c===sug?'sug':''}">${c}</button>`).join('')+'</div>'; }
+
+function viewLaudo(){
+  const mamaCard = m => { const ls=lesoesDe(m); return `<div class="card"><div class="lbl">Mama ${lado(m)} <span class="act">${ls.length?ls.length+(ls.length>1?' achados':' achado'):''}</span></div>`+
+    (ls.length? ls.map(n=>`<button type="button" class="nod" data-open="${n.id}"><div class="n"><b>${rotulo(n)} · ${hora(n)} · ${n.med.map(cm).join(' × ')} cm</b><span>${n.tipo==='cisto'? L('cisto')[n.cisto].split(',')[0] : `${n.eco} · ${n.forma} · margens ${n.marg}`}</span></div><span class="tag ${suspicious(n)?'alert':''}">${n.tipo==='cisto'?'cisto':(suspicious(n)?suspicious(n)+' susp.':'benigno')}</span>${I.chev}</button>`).join('') : '<div class="empty">Não há evidência de nódulos, cistos ou distorções arquiteturais.</div>')+
+    `<div class="addrow"><button type="button" class="addbtn" data-add="nodulo" data-mama="${m}">${I.plus}Adicionar nódulo</button><button type="button" class="addbtn" data-add="cisto" data-mama="${m}">${I.plus}Adicionar cisto</button></div></div>`; };
+  const nods=st.lesoes.filter(l=>l.tipo==='nodulo');
+  return `<div class="view" data-view="laudo">
+    <div class="top">${APP?`<a class="iconbtn" href="index.html" aria-label="Início">${I.back}</a>`:`<div class="iconbtn">${I.back}</div>`}<div class="ttl"><div class="h">US Mamas e axilas</div><div class="s">${servSub()}</div></div><span class="pill ac">rascunho</span></div>
+    <div class="body">
+      ${servCard()}
+      <div class="card"><div class="lbl">Indicação</div>${chips(IND, st.ind, 'ind')}</div>
+      ${equipCard(['l16','l22'])}
+      <div class="card"><div class="lbl">Mamografia</div><div class="form">
+        <div class="k">Realizou</div>${segm([['nao','não'],['trouxe','trouxe'],['naotrouxe','não trouxe']], st.mmg.feita, 'mmg')}
+        ${st.mmg.feita==='trouxe' ? `<div class="k">Resultado</div>${segm([['1','BI-RADS 1'],['2','2'],['3','3'],['4','4'],['5','5'],['0','0']], st.mmg.birads, 'mmgb')}
+        <div class="k">Data</div><div class="in"><input class="cell" style="width:72px" inputmode="numeric" data-f="mmgdata" value="${esc(st.mmg.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>` : ''}
+      </div></div>
+      <div class="card"><div class="lbl">Anamnese <span class="act">o que não marcar entra como negado</span></div>
+        ${chips([['fam','história familiar de CA de mama'],['pessoal','CA de mama prévio'],['bx','biópsia prévia'],['cir','cirurgia mamária'],['palp','nódulo palpável'],['desc','descarga papilar'],['gest','gestação recente'],['lact','amamentando']], new Set(Object.keys(st.anam).filter(k=>st.anam[k]===true)), 'an', true)}
+        <div class="form" style="margin-top:10px">
+          ${st.anam.fam ? `<div class="k">Parente</div>${segm([['1º grau','1º grau'],['2º grau','2º grau']], st.anam.famGrau, 'famgrau')}` : ''}
+          ${st.anam.bx ? `<div class="k">Resultado</div>${segm([['benigna','benigno'],['maligna','maligno'],['desconhecido','não sabe']], st.anam.bxRes, 'bxres')}` : ''}
+          <div class="k">Menopausa</div>${segm([['pré','pré'],['pós','pós']], st.anam.meno, 'meno')}
+          ${st.anam.meno==='pós' ? `<div class="k">TRH</div>${segm([['n','não'],['s','sim']], st.anam.trh?'s':'n', 'trh')}` : ''}
+        </div>
+      </div>
+      <div class="card"><div class="lbl">Mamas</div><div class="form">
+        <div class="k">Ecotextura</div>${segm([['heterogênea','heterogênea'],['homogênea','homogênea']], st.textura, 'textura')}
+        <div class="k">Predomínio</div>${segm([['fibroglandular','fibroglandular'],['gorduroso','gorduroso'],['fibroglandular e gorduroso','misto']], st.predominio, 'predominio')}
+        <div class="k">Ectasia ductal</div>${segm([['n','ausente'],['s','presente']], st.ectasia?'s':'n', 'ectasia')}
+      </div></div>
+      ${mamaCard('D')}${mamaCard('E')}
+      <div class="card"><div class="lbl">Axilas</div><div class="side">
+        <div class="row"><span class="k">Direita</span>${segm(AXILA.map(a=>[a[0],a[0]==='normal'?'sem linfonodomegalia':a[0]]), st.axila.D, 'axd')}</div>
+        <div class="row"><span class="k">Esquerda</span>${segm(AXILA.map(a=>[a[0],a[0]==='normal'?'sem linfonodomegalia':a[0]]), st.axila.E, 'axe')}</div>
+      </div></div>
+      <div class="card"><div class="lbl">Conclusão · BI-RADS por mama <span class="act">${st.birads.D||st.birads.E?'ajustado':'sugerido'}</span></div><div class="side">
+        <div class="row"><span class="k">Direita</span>${catsHtml('D')}</div>
+        <div class="row"><span class="k">Esquerda</span>${catsHtml('E')}</div>
+      </div><div class="hint">O traço marca a sugestão do app pelo achado mais suspeito de cada mama. Toque para trocar; a conclusão e a sugestão de conduta se reescrevem.</div></div>
+      <div class="card"><div class="toggle"><div><div class="lbl" style="margin:0">Procedimento</div><div class="p">CORE biopsy realizada neste atendimento</div></div><button type="button" class="sw" id="coreSw" aria-pressed="${st.core.on}" aria-label="CORE biopsy"></button></div>
+        ${st.core.on ? `<div class="form" style="margin-top:12px">
+          <div class="k">Nódulo</div>${nods.length? chips(nods.map(n=>[String(n.id), rotulo(n)+' · mama '+lado(n.mama)[0].toUpperCase()]), String(st.core.alvo), 'alvo') : '<div class="empty">Adicione um nódulo primeiro.</div>'}
+          <div class="k">Agulha</div>${segm([['14G','14G'],['16G','16G'],['18G','18G']], st.core.agulha, 'agulha')}
+          <div class="k">Fragmentos</div><div class="in"><input class="cell" inputmode="numeric" data-f="frag" value="${esc(st.core.frag)}" placeholder="—"></div>
+          <div class="k">Material</div>${segm([['próprio','laboratório'],['entregue','entregue à paciente']], st.core.lab, 'lab')}
+        </div>` : ''}
+      </div>
+    </div>
+    <div class="bottom"><button type="button" class="btn primary" id="copiar">${I.copy}Copiar laudo${st.core.on&&st.serv!=='inst'?'<span class="n">2 docs</span>':''}</button></div>
+  </div>`;
+}
+function viewNodulo(){
+  const n=st.lesoes.find(l=>l.id===st.edit); if(!n) return '';
+  const isC=n.tipo==='cisto';
+  return `<div class="view" data-view="nodulo">
+    <div class="top"><button type="button" class="iconbtn" data-back="1" aria-label="Voltar">${I.back}</button><div class="ttl"><div class="h">${isC?'Cisto':'Nódulo'} ${rotulo(n)}</div><div class="s">Mama ${lado(n.mama)} · US Mamas e axilas</div></div>${isC?'':`<span class="pill ${suspicious(n)?'alert':''}">${suspicious(n)?suspicious(n)+' suspeito'+(suspicious(n)>1?'s':''):'sem suspeição'}</span>`}</div>
+    <div class="body">
+      <div class="card"><div class="lbl">Localização</div><div class="form">
+        <div class="k">Mama</div>${segm([['D','direita'],['E','esquerda']], n.mama, 'mama')}
+        <div class="k">Horário</div><div>${chips(HORAS.map(h=>[h,h==='retroareolar'?'retroareolar':h+'h']), n.hora, 'hora')}</div>
+        <div class="k">Do mamilo</div><div class="in"><input class="cell" inputmode="numeric" data-mmc="1" data-f="mamilo" value="${esc(n.mamilo)}" placeholder="—"><span class="x">mm</span></div>
+        <div class="k">Da pele</div><div class="in"><input class="cell" inputmode="numeric" data-mmc="1" data-f="pele" value="${esc(n.pele)}" placeholder="—"><span class="x">mm · profundidade</span></div>
+        <div class="k">Medidas</div><div class="in"><input class="cell" inputmode="numeric" data-mmc="1" data-m="0" value="${esc(n.med[0])}" placeholder="—"><span class="x">×</span><input class="cell" inputmode="numeric" data-mmc="1" data-m="1" value="${esc(n.med[1])}" placeholder="—"><span class="x">×</span><input class="cell" inputmode="numeric" data-mmc="1" data-m="2" value="${esc(n.med[2])}" placeholder="—"><span class="x">mm</span></div>
+      </div></div>
+      ${isC ? `<div class="card"><div class="lbl">Tipo</div>${chips(LEX.cisto.map(c=>[c[0],c[0]]), n.cisto, 'cisto')}</div>` : `
+      <div class="card"><div class="lbl">Forma</div>${chips(LEX.forma.map(x=>[x[0],x[0]]), n.forma, 'forma')}</div>
+      <div class="card"><div class="lbl">Orientação</div>${chips(LEX.orient.map(x=>[x[0],x[0]]), n.orient, 'orient')}</div>
+      <div class="card"><div class="lbl">Margens</div>${chips(LEX.marg.map(x=>[x[0],x[0]]), n.marg, 'marg')}</div>
+      <div class="card"><div class="lbl">Padrão ecogênico</div>${chips(LEX.eco.map(x=>[x[0],x[0]]), n.eco, 'eco')}</div>
+      <div class="card"><div class="lbl">Acústica posterior</div>${chips(LEX.post.map(x=>[x[0],x[0]]), n.post, 'post')}</div>
+      <div class="card"><div class="lbl">Calcificações</div>${chips([['sem','ausentes'],['com','presentes']], n.calc, 'calc')}</div>
+      <div class="card"><div class="lbl">Doppler <span class="act">central e periférica podem ir juntas</span></div>${chips([['ausente','ausente'],['central','central'],['periférica','periférica']], n.dop, 'dop', true)}</div>`}
+      <div class="result"><small>Texto no laudo</small><div class="t">${esc(descr(n))}</div></div>
+    </div>
+    <div class="bottom"><button type="button" class="btn ghost" data-remove="${n.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir ${isC?'cisto':'nódulo'}</button></div>
+  </div>`;
+}
+function render(){
+  $('#phone').innerHTML = st.view==='nodulo' ? viewNodulo() : viewLaudo();
+  wire(); renderDocs();
+}
+function renderDocs(){
+  const uni=st.serv==='inst'&&st.core.on; const tabs=[['us',uni?'Laudo US + CORE':'Laudo US mamas e axilas']]; if(st.core.on&&!uni) tabs.push(['core','Laudo CORE biopsy']);
+  if(!st.core.on||uni) st.doc='us';
+  $('#docTabs').innerHTML = tabs.map(t=>`<button type="button" data-doc="${t[0]}" aria-pressed="${st.doc===t[0]}">${t[1]}</button>`).join('');
+  $('#docTabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ st.doc=b.dataset.doc; renderDocs(); }));
+  const txt = uni ? docUnico(docCORE,'COM BIÓPSIA POR AGULHA GROSSA (CORE)') : st.doc==='core' ? docCORE() : docUS();
+  $('#docOut').innerHTML = esc(txt).replace(/^(ULTRASSONOGRAFIA[^\n]*|BIÓPSIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações|Mama direita|Mama esquerda):/gm,'<b>$1:</b>');
+}
+function wire(){
+  wireServ();
+  const ph=$('#phone');
+  const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));
+  // laudo
+  on('[data-ind]', el=>{ st.ind=el.dataset.ind; render(); });
+  on('[data-eq]',el=>{const v=el.dataset.eq; if(st.equip.has(v)&&st.equip.size>1) st.equip.delete(v); else st.equip.add(v); render();});
+  on('[data-mmg]', el=>{ st.mmg.feita=el.dataset.mmg; render(); });
+  on('[data-mmgb]', el=>{ st.mmg.birads=el.dataset.mmgb; render(); });
+  on('[data-an]', el=>{ const k=el.dataset.an; st.anam[k]=!st.anam[k]; render(); });
+  on('[data-famgrau]', el=>{ st.anam.famGrau=el.dataset.famgrau; render(); });
+  on('[data-bxres]', el=>{ st.anam.bxRes=el.dataset.bxres; render(); });
+  on('[data-meno]', el=>{ st.anam.meno=el.dataset.meno; render(); });
+  on('[data-trh]', el=>{ st.anam.trh=el.dataset.trh==='s'; render(); });
+  ph.querySelectorAll('input[data-f="mmgdata"]').forEach(inp=>inp.addEventListener('input',()=>{ st.mmg.data=inp.value; renderDocs(); }));
+  on('[data-textura]', el=>{ st.textura=el.dataset.textura; render(); });
+  on('[data-predominio]', el=>{ st.predominio=el.dataset.predominio; render(); });
+  on('[data-ectasia]', el=>{ st.ectasia=el.dataset.ectasia==='s'; render(); });
+  on('[data-axd]', el=>{ st.axila.D=el.dataset.axd; render(); });
+  on('[data-axe]', el=>{ st.axila.E=el.dataset.axe; render(); });
+  on('[data-open]', el=>{ st.edit=Number(el.dataset.open); st.view='nodulo'; render(); });
+  on('[data-add]', el=>{ const n=novoNod(el.dataset.mama, el.dataset.add); st.lesoes.push(n); st.birads={D:null,E:null}; st.edit=n.id; st.view='nodulo'; render(); });
+  on('.cats button', el=>{ const m=el.parentElement.dataset.mama; st.birads[m] = (st.birads[m]===el.dataset.cat) ? null : el.dataset.cat; render(); });
+  const sw=$('#coreSw'); if(sw) sw.addEventListener('click',()=>{ st.core.on=!st.core.on; if(st.core.on&&!st.core.alvo){ const f=st.lesoes.find(l=>l.tipo==='nodulo'); st.core.alvo=f?f.id:null; st.doc='core'; } render(); });
+  on('[data-alvo]', el=>{ st.core.alvo=Number(el.dataset.alvo); render(); });
+  on('[data-agulha]', el=>{ st.core.agulha=el.dataset.agulha; render(); });
+  on('[data-lab]', el=>{ st.core.lab=el.dataset.lab; render(); });
+  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{ const uni=st.serv==='inst'&&st.core.on; const t = uni ? docUnico(docCORE,'COM BIÓPSIA POR AGULHA GROSSA (CORE)') : docUS() + (st.core.on ? '\n\n' + '='.repeat(40) + '\n\n' + docCORE() : ''); try{ await navigator.clipboard.writeText(t); toast(st.core.on&&!uni?'2 laudos copiados':'Laudo copiado'); }catch(e){ toast('Não deu para copiar aqui; o texto está ao lado'); } });
+  // nódulo
+  on('[data-back]', ()=>{ st.view='laudo'; st.edit=null; render(); });
+  on('[data-remove]', el=>{ st.lesoes=st.lesoes.filter(l=>l.id!==Number(el.dataset.remove)); if(st.core.alvo===Number(el.dataset.remove)) st.core.alvo=null; st.view='laudo'; render(); });
+  const n=st.lesoes.find(l=>l.id===st.edit);
+  if(n){
+    on('[data-mama]', el=>{ n.mama=el.dataset.mama; st.birads={D:null,E:null}; render(); });
+    on('[data-hora]', el=>{ n.hora=el.dataset.hora; render(); });
+    ['forma','orient','marg','eco','post','calc','cisto'].forEach(k=> on(`[data-${k}]`, el=>{ n[k]=el.dataset[k]; st.birads[n.mama]=null; render(); }));
+    on('[data-dop]', el=>{ const v=el.dataset.dop; if(v==='ausente'){ n.dop=new Set(['ausente']); } else { n.dop.delete('ausente'); if(n.dop.has(v)) n.dop.delete(v); else n.dop.add(v); if(!n.dop.size) n.dop.add('ausente'); } render(); });
+    ph.querySelectorAll('input[data-f]').forEach(inp=>inp.addEventListener('input',()=>{ n[inp.dataset.f]=inp.value; renderDocs(); $('.result .t').textContent=descr(n); }));
+    ph.querySelectorAll('input[data-m]').forEach(inp=>inp.addEventListener('input',()=>{ n.med[Number(inp.dataset.m)]=inp.value; renderDocs(); $('.result .t').textContent=descr(n); }));
+  }
+  ph.querySelectorAll('input[data-f="frag"]').forEach(inp=>inp.addEventListener('input',()=>{ st.core.frag=inp.value; renderDocs(); }));
+}
+let tt; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),1800); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),textura:'heterogênea',predominio:'fibroglandular',ectasia:false,mmg:{feita:'nao',birads:'2',data:''},anam:{fam:false,famGrau:'1º grau',pessoal:false,bx:false,bxRes:'benigna',cir:false,meno:'pré',trh:false,palp:false,desc:false,gest:false,lact:false},lesoes:[],axila:{D:'normal',E:'normal'},birads:{D:null,E:null},core:{on:false,alvo:null,agulha:'14G',frag:'5',lab:'próprio'},pac:''}); }
+// ---------- padrões do app: pular para o próximo campo e máscara de data ----------
+function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
+document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;
+  const m=el.dataset.mask;
+  if(m==='mmaa'||m==='ddmmaaaa'){ const max=m==='mmaa'?4:8; const d=el.value.replace(/\D/g,'').slice(0,max);
+    el.value=m==='mmaa'?(d.length>2?d.slice(0,2)+'/'+d.slice(2):d):[d.slice(0,2),d.slice(2,4),d.slice(4)].filter(Boolean).join('/');
+    if(d.length===max) proximo(el); return; }
+  if(el.dataset.mmc && /^\d{2}$/.test(el.value)) proximo(el);   // medida em mm: 2 dígitos e pula
+},true);
+
+// medidas digitadas em mm saem em cm no laudo (20 → 2,0)
+const cm=v=>{const s=String(v||'').trim(); if(!s) return '___'; const n=parseFloat(s.replace(',','.')); if(!isFinite(n)) return '___'; return (n/10).toFixed(/[.,]/.test(s)?2:1).replace('.',',');};
+const fraseP=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?:]$/.test(t)?'':'.');};
+const prevLinha=()=>st.prev.tem==='sim'?[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`]:[];
+document.addEventListener('input',e=>{ if(e.target&&e.target.id==='prevTxt'){ st.prev.txt=e.target.value; renderDocs(); } });
+// prévia editável: o que você escreve nela é o que vai no Copiar
+const EDITS={}; let RAW=false, INR=false, LAST='docUS';
+['docUS','docPAAF','docCORE','docUnico'].forEach(name=>{ const f=window[name]; if(typeof f!=='function') return;
+  window[name]=function(){ if(!RAW){ if(INR) LAST=name; if(EDITS[name]!=null) return EDITS[name]; } const r=RAW; RAW=true; try{ return f.apply(this,arguments); } finally{ RAW=r; } }; });
+{ const _rd=renderDocs; window.renderDocs=function(){ INR=true; try{ _rd(); } finally{ INR=false; } const b=document.getElementById('editBar'); if(b) b.hidden=EDITS[LAST]==null; }; }
+(function(){ const d=document.getElementById('docOut'); if(!d) return; d.setAttribute('contenteditable','true'); d.classList.add('editavel');
+  const bar=document.createElement('div'); bar.id='editBar'; bar.className='editbar'; bar.hidden=true;
+  bar.innerHTML='<span>Texto editado à mão. Mudanças nos cartões não entram mais.</span><button type="button">Refazer pelos cartões</button>';
+  d.parentNode.insertBefore(bar,d); bar.querySelector('button').onclick=()=>{ delete EDITS[LAST]; renderDocs(); };
+  d.addEventListener('input',()=>{ EDITS[LAST]=d.innerText.replace(/\n{3,}/g,'\n\n'); bar.hidden=false; });
+  const cp=document.createElement('button'); cp.type='button'; cp.className='copiar2'; cp.id='copiar2'; cp.textContent='Copiar laudo';
+  d.insertAdjacentElement('afterend',cp);
+  cp.onclick=()=>{ const b=document.getElementById('copiar'); if(b) b.click(); else toast('Conclua o item aberto e volte ao laudo para copiar'); };
+})();
+
+// ---------- myLaudo: modo app (aberto pelo início) ----------
+const APP=(()=>{try{return new URLSearchParams(location.search).has('app');}catch(e){return false;}})();
+if(APP){ limpar(); try{ const s=localStorage.getItem('mylaudo.serv'); if(s) st.serv=s; const p=JSON.parse(localStorage.getItem('mylaudo.pac')||'null'); if(p){ st.pac=p.nome||''; if(p.serv) st.serv=p.serv; } }catch(e){} }
+{ const _r=render; render=function(){ _r(); const v=(st.view||'')+':'+(st.edit||''); if(v!==window._lv){ window._lv=v; if(innerWidth<600) scrollTo(0,0); } }; }
+render();
+</script>

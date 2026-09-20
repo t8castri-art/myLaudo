@@ -1,0 +1,528 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Laudo de Tireoide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#09080b;--s1:#100e13;--s2:#16141b;--s3:#1d1a23;--bd:#221f28;--bd2:#2f2b37;
+  --tx:#ececee;--tx2:#9b97a3;--tx3:#605c69;
+  --ac:#bc7ba4;--acT:#dcb9cd;--acTint:rgba(188,123,164,.12);
+  --ok:#9aaf9c;--okTint:rgba(154,175,156,.12);--alert:#b08183;--alertTint:rgba(176,129,131,.14);
+  --f:'IBM Plex Sans',system-ui,sans-serif;--m:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--acT)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0;text-align:left}
+button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+input{font:inherit;color:inherit}
+svg{display:block;flex:none}
+.wrap{max-width:1380px;margin:0 auto;padding:24px 24px 80px}
+header{margin-bottom:22px}
+header h1{font-size:20px;font-weight:500;margin:0;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
+.stage{display:grid;grid-template-columns:390px minmax(0,1fr);gap:36px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr;justify-items:center}.docs{position:static;width:100%}}
+.docs{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.docs .tabs{display:flex;gap:6px;flex-wrap:wrap}
+.docs .tabs button{font-size:12.5px;padding:7px 12px;border-radius:999px;border:1px solid var(--bd);color:var(--tx2)}
+.docs .tabs button[aria-pressed="true"]{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.doc{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:16px 18px;font-size:13px;line-height:1.7;color:var(--tx2);white-space:pre-wrap;max-height:calc(100vh - 140px);overflow:auto;scrollbar-width:thin}
+.doc b{color:var(--tx);font-weight:500}
+.docs .cap{font-size:12px;color:var(--tx3);line-height:1.5}
+.phone{width:390px;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px #232028,0 30px 60px rgba(0,0,0,.65);flex:none}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+.top{padding:54px 16px 8px;display:flex;align-items:center;gap:10px}
+.iconbtn{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--tx2);background:var(--s1);border:1px solid var(--bd);flex:none}
+.ttl{flex:1;min-width:0}
+.ttl .h{font-size:17px;font-weight:500;line-height:1.2;letter-spacing:-.01em}
+.ttl .s{font-size:12px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;padding:4px 10px;border-radius:999px;background:var(--s2);color:var(--tx2);white-space:nowrap;flex:none;border:1px solid var(--bd);line-height:1.3}
+.pill.ac{background:var(--acTint);color:var(--acT);border-color:transparent}
+.body{flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;min-height:0;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lbl .act{text-transform:none;letter-spacing:0;font-weight:400;color:var(--acT);font-size:12px;text-align:right}
+.card{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:12px 14px;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--bd);color:var(--tx2);line-height:1.2}
+.chip[aria-pressed="true"]{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.form{display:grid;grid-template-columns:96px 1fr;gap:8px 10px;align-items:center}
+.form .k{font-size:12.5px;color:var(--tx2)}
+.segm{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.segm button{flex:1;text-align:center;font-size:12px;padding:6px 4px;color:var(--tx2);border-left:1px solid var(--bd2)}
+.segm button:first-child{border-left:0}
+.segm button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+.in{display:flex;gap:6px;align-items:center;font-family:var(--m);font-size:13px;flex-wrap:wrap}
+.in .x{color:var(--tx3);font-size:11px}
+.in .auto{font-family:var(--f);font-size:10px;color:var(--ok);border:1px solid color-mix(in oklab,var(--ok),transparent 60%);padding:1px 6px;border-radius:999px}
+.cell{width:52px;padding:5px 6px;border-radius:6px;background:var(--s2);border:1px solid var(--bd2);text-align:center;font-family:var(--m);font-size:13px;color:var(--tx);outline:none}
+.cell:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acTint)}
+.cell::placeholder{color:var(--tx3)}
+.p{font-size:13px;line-height:1.6;color:var(--tx2);margin:0}
+.nod{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--s2);width:100%}
+.nod + .nod{margin-top:6px}
+.nod .n{flex:1;min-width:0}
+.nod .n b{font-weight:500;font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nod .n span{font-size:12px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.nod .tag{font-family:var(--m);font-size:11px;padding:3px 7px;border-radius:6px;background:var(--s3);color:var(--tx2);flex:none}
+.nod .tag.alert{background:var(--alertTint);color:var(--alert)}
+.nod .tag.ok{background:var(--okTint);color:var(--ok)}
+.addbtn{width:100%;height:42px;border-radius:10px;border:1px dashed var(--bd2);display:flex;align-items:center;justify-content:center;gap:7px;color:var(--acT);font-size:13px;font-weight:500;margin-top:8px}
+.empty{font-size:12.5px;color:var(--tx3)}
+.hint{font-size:11px;color:var(--tx3);line-height:1.45;margin-top:6px}
+.result{border:1px solid var(--bd2);border-radius:12px;background:var(--s2);padding:12px 14px;flex:none;display:flex;flex-direction:column;gap:6px}
+.result .big{display:flex;align-items:baseline;gap:10px}
+.result .big b{font-size:22px;font-weight:500;letter-spacing:-.01em}
+.result .big span{font-family:var(--m);font-size:12px;color:var(--tx2)}
+.result .rec{font-size:12.5px;color:var(--tx2)}
+.result .rec b{color:var(--tx);font-weight:500}
+.result .txt{font-size:12.5px;line-height:1.55;color:var(--tx);border-top:1px solid var(--bd2);padding-top:8px;margin-top:2px}
+.result small{display:block;font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:3px}
+.result[data-tone="alert"] .big b{color:var(--alert)}
+.result[data-tone="ok"] .big b{color:var(--ok)}
+.bottom{padding:10px 16px 26px;border-top:1px solid var(--bd);background:var(--bg);display:flex;gap:10px;align-items:center;flex:none}
+.btn{height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;flex:1;letter-spacing:-.005em}
+.btn.primary{border:1px solid var(--ac);color:var(--acT)}
+.btn.ghost{border:0;color:var(--tx3);flex:none;padding:0 12px}
+.btn .n{font-family:var(--m);font-size:11px;padding:1px 6px;border-radius:999px;background:var(--acTint)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sw{width:40px;height:24px;border-radius:999px;background:var(--s3);border:1px solid var(--bd2);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:999px;background:var(--tx3);transition:left .12s,background .12s}
+.sw[aria-pressed="true"]{background:var(--acTint);border-color:var(--ac)}
+.sw[aria-pressed="true"]::after{left:19px;background:var(--acT)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--s3);border:1px solid var(--bd2);color:var(--tx);padding:9px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .15s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:no-preference){.chip,.segm button{transition:background .12s,color .12s,border-color .12s}}
+
+/* myLaudo no celular: sem moldura, tela cheia */
+@media (max-width:600px){
+  .wrap{padding-inline:10px;padding-block:8px 40px}
+  header{display:none}
+  .stage{gap:16px}
+  .phone{width:100%;height:auto;border-radius:0;box-shadow:none;overflow:visible}
+  .view{position:static}
+  .top{padding:10px 4px 8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:4}
+  .body{overflow:visible;padding:4px 0 12px}
+  .bottom{position:sticky;bottom:0;padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px))}
+  .doc{max-height:none}
+  .cell,.txtin,.obs{font-size:16px}
+}
+
+/* padrões do app: prévia editável e caixas de texto */
+.doc.editavel{background:#e8e5ea;color:#1a171d;border-color:#cfc9d4;caret-color:#8a3f6c;outline:none}
+.doc.editavel b{color:#000}
+.doc.editavel:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acTint)}
+.editbar{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--acT);border:1px dashed var(--ac);border-radius:10px;padding:8px 10px;background:var(--acTint)}
+.editbar span{flex:1}
+.editbar button{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);white-space:nowrap}
+.obs{width:100%;min-height:58px;resize:vertical;padding:7px 9px;border-radius:7px;background:var(--s2);border:1px solid var(--ac);border-style:dashed;color:var(--tx);font:13px/1.45 var(--f);outline:none;grid-column:1/-1}
+.obs:focus{border-style:solid;box-shadow:0 0 0 2px var(--acTint)}
+.obs::placeholder{color:var(--tx3)}
+/* copiar fica embaixo do editor final */
+.bottom:has(#copiar){display:none}
+.copiar2{height:48px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:500;width:100%}
+/* medidas numa linha só */
+.cell[data-mmc]{width:44px;padding:5px 2px}
+.in:has(.cell[data-mmc]){gap:3px;flex-wrap:nowrap}
+.in:has(.cell[data-mmc]) .x{font-size:10px}
+@media (max-width:600px){.cell[data-mmc]{width:46px}.form{grid-template-columns:88px 1fr}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Laudo de Tireoide</h1>
+    <p>Exames anteriores em box próprio. Anamnese: história familiar, conhecimento de nódulos, tireoidectomia e por quê, levotiroxina e dose, os quatro sintomas. O Doppler da glândula fica dentro do cartão da glândula, com duas opções; cada nódulo tem o próprio chip de Doppler. Linfonodos são blocos como os nódulos. Com a PAAF ligada, você marca quais nódulos e quais linfonodos foram puncionados, e sai o segundo documento.</p>
+  </header>
+  <div class="stage">
+    <div class="phone" id="phone"></div>
+    <aside class="docs">
+      <div class="tabs" id="docTabs"></div>
+      <div class="doc" id="docOut"></div>
+      <div class="cap">ACR TI-RADS 2017, a versão vigente: soma de pontos por baixo, conduta pela maior medida do nódulo (TR3 PAAF ≥ 2,5 cm; TR4 ≥ 1,5; TR5 ≥ 1,0). Todo nódulo encontrado é descrito, cada um em parágrafo próprio, com a composição e só o que pontua, mais o Doppler. Volume total = soma dos lobos (L × AP × T × 0,52).</div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const I={
+  back:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  copy:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+  plus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  chev:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tx3)"><path d="M9 6l6 6-6 6"/></svg>',
+  check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>'
+};
+const CRIT={
+  comp:{k:'Composição',o:[['cística','cístico',0],['espongiforme','espongiforme',0],['mista','misto, cístico e sólido',1],['sólida','sólido',2]]},
+  eco:{k:'Ecogenicidade',o:[['anecoica','anecoico',0],['hiperecoica','hiperecoico',1],['isoecoica','isoecoico',1],['hipoecoica','hipoecoico',2],['muito hipoecoica','muito hipoecoico',3]]},
+  forma:{k:'Forma',o:[['mais largo que alto','mais largo que alto',0],['mais alto que largo','mais alto que largo',3]]},
+  marg:{k:'Margens',o:[['lisas','de margens lisas',0],['mal definidas','de margens mal definidas',0],['lobuladas','de margens lobuladas',2],['irregulares','de margens irregulares',2],['extensão extratireoidiana','com extensão extratireoidiana',3]]},
+  focos:{k:'Focos ecogênicos',o:[['nenhum','',0],['cauda de cometa','com artefatos em cauda de cometa',0],['macrocalcificações','com macrocalcificações',1],['calcificação periférica','com calcificação periférica',2],['microcalcificações','com microcalcificações',3]]},
+};
+const RULES={TR3:{fna:2.5,fu:1.5},TR4:{fna:1.5,fu:1.0},TR5:{fna:1.0,fu:0.5}};
+const IND=['Rotina','Acompanhamento de nódulo','Nódulo palpável','Alteração de função tireoidiana','Pós-operatório','Vigilância ativa'];
+const SINT=['pigarro','rouquidão','disfagia','falta de ar'];
+const LOBO={D:'lobo direito',E:'lobo esquerdo',I:'istmo'};
+const NIVEIS=['I','II','III','IV','V','VI','VII'];
+
+const TRANS=[['l16','linear 3–16 MHz'],['l22','minilinear 2–22 MHz'],['c8','convexo 2–8 MHz'],['e9','endocavitário 2–9 MHz']];
+const equipTxt=()=>{const l=TRANS.filter(t=>st.equip.has(t[0])).map(t=>t[1]); if(!l.length) return 'Samsung HM70 EVO.'; return 'Samsung HM70 EVO, transdutor'+(l.length>1?'es ':' ')+l.join(', ').replace(/, ([^,]*)$/,' e $1')+'.';};
+// ---------- serviço: cada um com suas exigências ----------
+const SERV=[['inst','Instituto'],['part','Particular'],['hmc','HMC']];
+const TIPO_T={l16:'linear',l22:'linear',c8:'convexo',e9:'endocavitário'};
+const tiposTxt=()=>[...new Set(TRANS.filter(t=>st.equip.has(t[0])).map(t=>TIPO_T[t[0]]))].join(' e ');
+const linhaTopo=()=>st.serv==='hmc'?[]:[`Paciente: ${st.pac&&st.pac.trim()?st.pac.trim():'___'}`];
+const linhaEquip=()=>[];
+// Técnica carrega aparelho/transdutor, via e caráter
+const transdTxt=()=>{const l=TRANS.filter(t=>st.equip.has(t[0])); const nomes=st.serv==='hmc'?[...new Set(l.map(t=>TIPO_T[t[0]]))]:l.map(t=>t[1]); const j=nomes.join(', ').replace(/, ([^,]*)$/,' e $1'); return 'transdutor'+(nomes.length>1?'es ':' ')+j;};
+const tecnica=corpo=>`Técnica: Exame realizado ${st.serv==='hmc'?'':'em aparelho Samsung HM70 EVO, '}com ${transdTxt()}${st.serv!=='hmc'&&corpo.startsWith(' ')?','+corpo:corpo}${st.serv==='hmc'?`, em caráter ${st.carater==='urgência'?'de urgência':st.carater}`:''}.`;
+const servSub=()=>st.serv==='hmc'?`HMC · ${st.carater}`:`${esc(st.pac&&st.pac.trim()?st.pac:'sem nome')} · ${SERV.find(s=>s[0]===st.serv)[1]}`;
+function servCard(){
+  return `<div class="card"><div class="lbl">Serviço</div>${segm(SERV,st.serv,'serv')}<div class="form" style="margin-top:12px">${st.serv==='hmc'
+    ?`<div class="k">Caráter</div>${segm([['eletivo','eletivo'],['urgência','urgência']],st.carater,'carater')}`
+    :`<div class="k">Paciente</div><div class="in" style="flex:1"><input class="cell" id="pac" style="width:100%;text-align:left" value="${esc(st.pac)}" placeholder="nome completo" autocomplete="off"></div>`}</div></div>`;
+}
+function equipCard(keys){
+  if(st.serv==='hmc'){const k=keys.filter(x=>x!=='l22'); return `<div class="card"><div class="lbl">Transdutor</div>${k.length>1?chips(k.map(x=>[x,TIPO_T[x]]),st.equip,'eq',true):`<div class="p">${TIPO_T[k[0]]}</div>`}</div>`;}
+  return keys.length>1?`<div class="card"><div class="lbl">Equipamento <span class="act">Samsung HM70 EVO</span></div>${chips(TRANS.filter(t=>keys.includes(t[0])),st.equip,'eq',true)}</div>`
+    :`<div class="card"><div class="lbl">Equipamento</div><div class="p">Samsung HM70 EVO · transdutor ${TRANS.find(t=>t[0]===keys[0])[1]}</div></div>`;
+}
+function wireServ(){
+  document.querySelectorAll('#phone [data-serv]').forEach(el=>el.addEventListener('click',()=>{st.serv=el.dataset.serv; if(st.serv==='hmc'&&st.equip.has('l22')){st.equip.delete('l22');st.equip.add('l16');} render();}));
+  document.querySelectorAll('#phone [data-carater]').forEach(el=>el.addEventListener('click',()=>{st.carater=el.dataset.carater;render();}));
+  const pc=document.getElementById('pac'); if(pc) pc.addEventListener('input',()=>{st.pac=pc.value; renderDocs(); const s=document.querySelector('#phone .top .s'); if(s) s.innerHTML=servSub();});
+}
+// Instituto: US + procedimento num laudo só
+function docUnico(proc,sufixo){
+  const p=proc().split('\n'); if(!p.some(l=>l.startsWith('Conclusão:'))) return docUS()+'\n\n'+proc();
+  const us=docUS().split('\n'), get=k=>{const l=p.find(x=>x.startsWith(k+':'));return l?l.slice(k.length+2):'';};
+  const iC=us.indexOf('Conclusão:'), iS=us.findIndex(l=>l.startsWith('Sugestão:'));
+  return [us[0]+' '+sufixo, ...us.slice(1,iC),
+    'Procedimento:', get('Consentimento e preparo'), get('Técnica'), (get('Intercorrências')+' '+get('Orientações')).trim(),'',
+    'Conclusão:', ...us.slice(iC+1,iS<0?us.length:iS).filter(Boolean).map(l=>l.replace(', com indicação de PAAF','')), get('Conclusão'),'',
+    `Sugestão: ${get('Sugestão')||'Retorno ao médico assistente com o resultado histopatológico.'}`].join('\n');
+}
+const dataCurta=d=>{const m=String(d||'').trim().match(/^(\d{1,2})\/(\d{2,4})$/); return m?m[1].padStart(2,'0')+'/'+m[2].slice(-2):String(d||'').trim();};
+let seq=1;
+const novoNod=()=>({id:seq++,lobo:'D',terco:'médio',med:['','',''],comp:'sólida',eco:'hipoecoica',forma:'mais largo que alto',marg:'lisas',focos:new Set(['nenhum']),dop:new Set(['ausente'])});
+const novoLinf=()=>({id:seq++,nivel:'III',lado:'D',med:['','',''],forma:'ovalado',hilo:'preservado',cort:'fina',extra:'nenhum',dop:'hilar'});
+const st={
+  view:'laudo',edit:null,doc:'us',
+  serv:'inst',pac:'Maria Aparecida de Souza Lima',carater:'eletivo',
+  ind:'Rotina', equip:new Set(['l16']),
+  prev:{tem:'sim',data:'06/25',txt:'US da clínica X evidenciou TI-RADS 5 mais alto que largo em lobo esquerdo medindo 3,0 × 2,1 × 2,4 cm; TI-RADS 4 em lobo direito medindo 1,4 × 0,9 × 1,2 cm; TI-RADS 2 no istmo medindo 0,8 × 0,6 × 0,9 cm'},
+  anam:{fam:'nao',conhece:true,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},
+  gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},
+  med:{istmo:['19','5','11,5'],ld:['47','18','20'],le:['46','16','19']},
+  nods:[],linfs:[],para:'nao',
+  paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},
+};
+const n1=novoNod(); n1.med=['16','11','13']; st.nods.push(n1);
+
+// ---------- regras ----------
+const num=v=>parseFloat(String(v||'').replace(',','.'));
+const fmt=(n,d=1)=>isFinite(n)?n.toFixed(d).replace('.',','):'___';
+const txt=v=>v&&String(v).trim()?String(v).trim():'___';
+const vol=m=>{const a=m.map(v=>num(v)/10);return a.every(isFinite)?a[0]*a[1]*a[2]*0.52:NaN;};
+const pts=n=>['comp','eco','forma','marg'].reduce((s,k)=>s+CRIT[k].o.find(o=>o[0]===n[k])[2],0)+[...n.focos].reduce((s,f)=>s+((CRIT.focos.o.find(o=>o[0]===f)||[0,0,0])[2]),0);
+const tr=p=>p<=1?'TR1':p===2?'TR2':p===3?'TR3':p<=6?'TR4':'TR5';
+const maior=m=>Math.max(...m.map(v=>num(v)/10).filter(isFinite));
+function conduta(n){
+  const t=tr(pts(n)),r=RULES[t],cm=maior(n.med);
+  if(!isFinite(cm)) return {k:'sem',s:'informe as medidas'};
+  if(!r) return {k:'sem',s:'sem PAAF e sem seguimento'};
+  if(cm>=r.fna) return {k:'paaf',s:`PAAF indicada (${t} a partir de ${fmt(r.fna)} cm)`};
+  if(cm>=r.fu) return {k:'seg',s:`seguimento por imagem (${t} entre ${fmt(r.fu)} e ${fmt(r.fna)} cm)`};
+  return {k:'sem',s:`sem PAAF nem seguimento (${t} abaixo de ${fmt(r.fu)} cm)`};
+}
+const rotN=n=>'N'+(st.nods.indexOf(n)+1);
+const rotL=l=>'LN'+(st.linfs.indexOf(l)+1);
+const dopTxt=n=>{const d=[...n.dop]; if(!d.length||d.includes('ausente')) return 'vascularização ausente ao Doppler'; return 'vascularização '+(d.length===2?'central e periférica':d[0])+' ao Doppler';};
+function descrN(n){
+  const parts=[CRIT.comp.o.find(o=>o[0]===n.comp)[1]];
+  ['eco','forma','marg'].forEach(k=>{const o=CRIT[k].o.find(x=>x[0]===n[k]); if(o[2]>0&&o[1]) parts.push(o[1]);});
+  const fo=CRIT.focos.o.filter(o=>n.focos.has(o[0])&&o[2]>0).map(o=>o[1].replace(/^com /,'')); if(fo.length) parts.push('com '+fo.join(', ').replace(/, ([^,]*)$/,' e $1'));
+  parts.push(dopTxt(n));
+  return `${rotN(n)}, terço ${n.terco} do ${LOBO[n.lobo]}: nódulo ${parts.join(', ')}. Mediu ${n.med.map(cm).join(' × ')} cm. ACR ${tr(pts(n)).replace('TR','TI-RADS ')}.`;
+}
+const suspL=l=>(l.forma==='arredondado')+(l.hilo==='apagado')+(l.cort!=='fina')+(l.extra!=='nenhum')+(l.dop!=='hilar');
+function descrL(l){
+  const parts=[l.forma, `com hilo ${l.hilo}`, `cortical ${l.cort}`];
+  if(l.extra!=='nenhum') parts.push(l.extra==='microcalcificações'?'com microcalcificações':'com áreas císticas');
+  parts.push(`vascularização ${l.dop} ao Doppler`);
+  return `${rotL(l)}, nível ${l.nivel} à ${l.lado==='D'?'direita':'esquerda'}: linfonodo ${parts.join(', ')}. Mediu ${l.med.map(cm).join(' × ')} cm. ${suspL(l)?'Com':'Sem'} critérios ultrassonográficos de suspeição.`;
+}
+function infoClinica(){
+  const a=st.anam,f=[];
+  f.push(a.fam==='nao'?'Nega história familiar de câncer de tireoide.':a.fam==='sim1'?'História familiar de câncer de tireoide em parente de 1º grau.':'História familiar de câncer de tireoide.');
+  f.push(a.conhece?'Refere conhecimento prévio de nódulos tireoidianos.':'Sem conhecimento prévio de nódulos tireoidianos.');
+  if(a.tx) f.push(`Tireoidectomia prévia${a.txCa?' por câncer':' por doença benigna'}.`);
+  if(a.levo) f.push(`Em uso de levotiroxina${a.dose?' '+a.dose+' mcg':''}.`);
+  if(a.sint.size) f.push('Refere '+SINT.filter(s=>a.sint.has(s)).join(', ').replace(/, ([^,]*)$/,' e $1')+'.');
+  const p=st.prev;
+  if(st.prev.tem==='nao') f.push('Sem exames anteriores para comparação.');
+  return f.join(' ');
+}
+function conclusao(){
+  const c=[];
+  if(!st.nods.length) c.push('Glândula tireoide sem evidência de nódulos.');
+  st.nods.forEach(n=>{const k=conduta(n).k; c.push(`${rotN(n)}: ACR ${tr(pts(n)).replace('TR','TI-RADS ')} em ${LOBO[n.lobo]}${k==='paaf'?', com indicação de PAAF':k==='seg'?', com indicação de seguimento por imagem':''}.`);});
+  st.linfs.filter(suspL).forEach(l=>c.push(`${rotL(l)}: linfonodo cervical nível ${l.nivel} à ${l.lado==='D'?'direita':'esquerda'} com critérios ultrassonográficos de suspeição.`));
+  return c;
+}
+function sugestao(){
+  const s=[];
+  const p=st.nods.filter(n=>conduta(n).k==='paaf').map(rotN).concat(st.linfs.filter(suspL).map(rotL));
+  if(p.length) s.push(`PAAF guiada por ultrassonografia de ${p.join(' e ')}${st.linfs.some(suspL)?', com dosagem de tireoglobulina no lavado do linfonodo':''}.`);
+  else if(st.nods.some(n=>conduta(n).k==='seg')) s.push('Novo exame em 12 meses.');
+  else s.push('Acompanhamento com médico assistente.');
+  return s.join(' ');
+}
+function docUS(){
+  const g=st.gl,m=st.med,vd=vol(m.ld),ve=vol(m.le);
+  const linfTxt = st.linfs.length ? st.linfs.map(descrL) : ['Cadeias linfonodais cervicais sem linfonodos suspeitos.'];
+  return [
+    'ULTRASSONOGRAFIA DA TIREOIDE','',
+    ...linhaTopo(),
+    `Indicação: ${st.ind}.`,
+    ...linhaEquip(),
+    tecnica(', com varreduras longitudinais, transversais e oblíquas sobre a região cervical anterior e estudo Doppler colorido e PowerDoppler'),
+    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]),
+    ...prevLinha(),'',
+    'Descrição:',
+    `Glândula tireoide tópica, ${g.sim}, com dimensões ${g.dim}, superfície ${g.sup} e ecotextura ${g.eco}, móvel à deglutição. Ao estudo Doppler: ${g.dop==='sem alterações'?'sem alterações detectáveis':'aumento difuso da vascularização parenquimatosa'}.`,'',
+    ...(st.nods.length?st.nods.flatMap(n=>[descrN(n),'']):['Sem evidência de formações nodulares.','']),
+    'Medidas:',
+    `Istmo: ${m.istmo.map(cm).join(' × ')} cm.`,
+    `Lobo direito: ${m.ld.map(cm).join(' × ')} cm.`,
+    `Lobo esquerdo: ${m.le.map(cm).join(' × ')} cm.`,
+    `Volume total: ~${fmt(vd+ve,0)} mL.`,'',
+    st.para==='sim'?'Paratireoide visibilizada adjacente à glândula, de aspecto habitual.':'Paratireoides não visibilizadas ao método.',
+    'Regiões peritireoidianas sem alterações detectáveis.', ...linfTxt,'',
+    'Conclusão:',...conclusao(),'',
+    `Sugestão: ${sugestao()}`,
+  ].join('\n');
+}
+function alvos(){ return [...st.paaf.alvos].map(k=>k[0]==='n'?st.nods.find(x=>x.id===+k.slice(1)):st.linfs.find(x=>x.id===+k.slice(1))).filter(Boolean); }
+function docPAAF(){
+  const A=alvos(); if(!A.length) return 'Marque os nódulos e linfonodos puncionados na tela do laudo (cartão Procedimento).';
+  const nome=x=>x.lobo?`nódulo tireoidiano ACR ${tr(pts(x)).replace('TR','TI-RADS ')} em ${LOBO[x.lobo]}`:`linfonodo cervical nível ${x.nivel} à ${x.lado==='D'?'direita':'esquerda'}`;
+  const temL=A.some(x=>!x.lobo);
+  return [
+    'PUNÇÃO ASPIRATIVA POR AGULHA FINA GUIADA POR ULTRASSONOGRAFIA','',
+    ...linhaTopo(),
+    `Indicação: ${A.map(nome).join('; ')}.`,
+    'Consentimento e preparo: Paciente esclarecido(a) sobre o procedimento, riscos e benefícios, com termo de consentimento assinado. Antissepsia da região cervical com clorexidina alcoólica.',
+    `Técnica: Sob orientação ultrassonográfica em tempo real com transdutor linear de alta frequência, sem anestesia, realizadas ${st.paaf.punc||'___'} punções por alvo com agulha fina ${st.paaf.agulha}, técnica de capilaridade. Material distribuído em lâminas e em meio líquido${temL?', com coleta de lavado da agulha para dosagem de tireoglobulina no linfonodo':''}, identificado e encaminhado ao laboratório${st.paaf.lab==='entregue'?' escolhido pelo(a) paciente, com termo de entrega de amostra':''}.`,
+    `Informações clínicas: ${infoClinica()}`,'',
+    ...A.map(x=>`Alvo: ${x.lobo?descrN(x):descrL(x)}`),'',
+    'Intercorrências: Procedimento realizado sem intercorrências.',
+    'Orientações: Paciente liberado(a) em bom estado geral, orientado(a) sobre compressão local, sinais de alerta e retorno com o resultado citológico ao médico assistente.','',
+    `Conclusão: Realizada PAAF guiada por ultrassonografia de ${A.map(x=>x.lobo?rotN(x):rotL(x)).join(' e ')} (${A.map(nome).join('; ')}), sem intercorrências. Material encaminhado para citologia.`,
+    'Sugestão: Retorno ao médico assistente com o resultado citológico (Bethesda).',
+  ].join('\n');
+}
+
+// ---------- render ----------
+function chips(items,cur,attr,multi){return '<div class="chips">'+items.map(it=>{const [v,l]=Array.isArray(it)?it:[it,it];const on=multi?cur.has(v):cur===v;return `<button type="button" class="chip" data-${attr}="${esc(v)}" aria-pressed="${on}">${esc(l)}</button>`;}).join('')+'</div>';}
+function segm(items,cur,attr){return '<div class="segm">'+items.map(it=>{const [v,l]=Array.isArray(it)?it:[it,it];return `<button type="button" data-${attr}="${esc(v)}" aria-pressed="${cur===v}">${esc(l)}</button>`;}).join('')+'</div>';}
+const cells=(arr,attr)=>arr.map((v,i)=>`<input class="cell" inputmode="numeric" data-mmc="1" data-${attr}="${i}" value="${esc(v)}" placeholder="mm">`).join('<span class="x">×</span>');
+
+function viewLaudo(){
+  const a=st.anam,m=st.med,vd=vol(m.ld),ve=vol(m.le);
+  const porLado={D:0,E:0,I:0}; st.nods.forEach(n=>porLado[n.lobo]++);
+  const alvoChips = st.nods.map(n=>['n'+n.id,rotN(n)+' · '+tr(pts(n))]).concat(st.linfs.map(l=>['l'+l.id,rotL(l)+' · nível '+l.nivel]));
+  return `<div class="view">
+    <div class="top">${APP?`<a class="iconbtn" href="index.html" aria-label="Início">${I.back}</a>`:`<div class="iconbtn">${I.back}</div>`}<div class="ttl"><div class="h">US Tireoide</div><div class="s">${servSub()}</div></div><span class="pill ac">rascunho</span></div>
+    <div class="body">
+      ${servCard()}
+      <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
+      ${equipCard(['l16','l22','c8'])}
+      <div class="card"><div class="lbl">Exames anteriores</div><div class="form">
+        <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
+        ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
+        <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou TI-RADS 5 em lobo esquerdo medindo 3,0 × 2,1 × 2,4 cm; TI-RADS 3 no istmo medindo 0,8 × 0,6 × 0,9 cm">${esc(st.prev.txt||'')}</textarea>`:''}
+      </div></div>
+      <div class="card"><div class="lbl">Anamnese</div><div class="form">
+        <div class="k">Hist. familiar</div>${segm([['nao','não'],['sim','sim'],['sim1','sim, 1º grau']],a.fam,'fam')}
+        <div class="k">Conhece nódulos</div>${segm([['n','não'],['s','sim']],a.conhece?'s':'n','conhece')}
+        <div class="k">Tireoidectomia</div>${segm([['n','não'],['s','sim']],a.tx?'s':'n','tx')}
+        ${a.tx?`<div class="k">Por câncer</div>${segm([['n','não'],['s','sim']],a.txCa?'s':'n','txca')}`:''}
+        <div class="k">Levotiroxina</div>${segm([['n','não'],['s','sim']],a.levo?'s':'n','levo')}
+        ${a.levo?`<div class="k">Dose</div><div class="in"><input class="cell" inputmode="numeric" data-f="dose" value="${esc(a.dose)}" placeholder="—"><span class="x">mcg</span></div>`:''}
+        <div class="k">Sintomas</div>${chips(SINT,a.sint,'sint',true)}
+      </div></div>
+      <div class="card"><div class="lbl">Glândula</div><div class="form">
+        <div class="k">Simetria</div>${segm([['simétrica','simétrica'],['assimétrica','assimétrica']],st.gl.sim,'gsim')}
+        <div class="k">Dimensões</div>${segm([['habituais','habituais'],['aumentadas','aumentadas'],['reduzidas','reduzidas']],st.gl.dim,'gdim')}
+        <div class="k">Superfície</div>${segm([['regular','regular'],['lobulada','lobulada']],st.gl.sup,'gsup')}
+        <div class="k">Ecotextura</div>${segm([['homogênea','homogênea'],['heterogênea','heterogênea']],st.gl.eco,'geco')}
+        <div class="k">Doppler</div>${segm([['sem alterações','sem alterações'],['aumentada','vascularização aumentada']],st.gl.dop,'gdop')}
+      </div></div>
+      <div class="card"><div class="lbl">Medidas <span class="act">volume calculado</span></div><div class="form">
+        <div class="k">Istmo</div><div class="in">${cells(m.istmo,'istmo')}</div>
+        <div class="k">Lobo direito</div><div class="in">${cells(m.ld,'ld')}</div>
+        <div class="k">Lobo esquerdo</div><div class="in">${cells(m.le,'le')}</div>
+        <div class="k">Volume total</div><div class="in"><span class="auto" id="volTot">~ ${fmt(vd+ve,0)} mL</span></div>
+      </div></div>
+      <div class="card"><div class="lbl">Nódulos <span class="act">${st.nods.length||''}</span></div>
+        ${st.nods.length?st.nods.map(n=>{const c=conduta(n);return `<button type="button" class="nod" data-open="n${n.id}"><div class="n"><b>${rotN(n)} · ${({D:'LD',E:'LE',I:'istmo'})[n.lobo]} ${n.lobo==='I'?'':n.terco} · ${n.med.map(cm).join(' × ')} cm</b><span>${c.s}</span></div><span class="tag ${c.k==='paaf'?'alert':c.k==='sem'?'ok':''}">${tr(pts(n))}</span>${I.chev}</button>`;}).join(''):'<div class="empty">Sem evidência de formações nodulares.</div>'}
+        <button type="button" class="addbtn" data-add="n">${I.plus}Adicionar nódulo</button>
+      </div>
+      <div class="card"><div class="lbl">Linfonodos <span class="act">${st.linfs.length||''}</span></div>
+        ${st.linfs.length?st.linfs.map(l=>`<button type="button" class="nod" data-open="l${l.id}"><div class="n"><b>${rotL(l)} · nível ${l.nivel} ${l.lado} · ${l.med.map(cm).join(' × ')} cm</b><span>${l.forma} · hilo ${l.hilo} · ${l.dop}</span></div><span class="tag ${suspL(l)?'alert':'ok'}">${suspL(l)?'suspeito':'reacional'}</span>${I.chev}</button>`).join(''):'<div class="empty">Cadeias linfonodais cervicais sem linfonodos com critérios de suspeição.</div>'}
+        <button type="button" class="addbtn" data-add="l">${I.plus}Adicionar linfonodo</button>
+      </div>
+      <div class="card"><div class="lbl">Paratireoides</div>${segm([['nao','não visibilizadas'],['sim','visibilizada']],st.para,'para')}</div>
+      <div class="card"><div class="toggle"><div><div class="lbl" style="margin:0">Procedimento</div><div class="p">PAAF realizada neste atendimento</div></div><button type="button" class="sw" id="paafSw" aria-pressed="${st.paaf.on}" aria-label="PAAF"></button></div>
+        ${st.paaf.on?`<div class="form" style="margin-top:12px">
+          <div class="k">Puncionados</div>${alvoChips.length?chips(alvoChips,st.paaf.alvos,'alvo',true):'<div class="empty">Adicione um nódulo ou linfonodo primeiro.</div>'}
+          <div class="k">Punções</div><div class="in"><input class="cell" inputmode="numeric" data-f="punc" value="${esc(st.paaf.punc)}" placeholder="—"><span class="x">por alvo</span></div>
+          <div class="k">Agulha</div>${segm([['25G','25G'],['23G','23G'],['27G','27G']],st.paaf.agulha,'agulha')}
+          <div class="k">Material</div>${segm([['próprio','laboratório'],['entregue','entregue ao paciente']],st.paaf.lab,'lab')}
+        </div>`:''}
+      </div>
+    </div>
+    <div class="bottom"><button type="button" class="btn primary" id="copiar">${I.copy}Copiar laudo${st.paaf.on&&st.serv!=='inst'?'<span class="n">2 docs</span>':''}</button></div>
+  </div>`;
+}
+function viewNodulo(n){
+  const p=pts(n),t=tr(p),c=conduta(n);
+  return `<div class="view">
+    <div class="top"><button type="button" class="iconbtn" data-back="1" aria-label="Voltar">${I.back}</button><div class="ttl"><div class="h">Nódulo ${rotN(n)}</div><div class="s">${LOBO[n.lobo]} · terço ${n.terco}</div></div><span class="pill">ACR TI-RADS</span></div>
+    <div class="body">
+      <div class="card"><div class="lbl">Localização e medidas</div><div class="form">
+        <div class="k">Lobo</div>${segm([['D','direito'],['E','esquerdo'],['I','istmo']],n.lobo,'lobo')}
+        <div class="k">Terço</div>${segm([['superior','superior'],['médio','médio'],['inferior','inferior']],n.terco,'terco')}
+        <div class="k">Medidas</div><div class="in">${cells(n.med,'nm')}<span class="x">mm</span></div>
+      </div></div>
+      ${['comp','eco','forma','marg','focos'].map(k=>`<div class="card"><div class="lbl">${CRIT[k].k}${k==='focos'?' <span class="act">marque todos; os pontos somam</span>':''}</div>${chips(CRIT[k].o.map(o=>[o[0],o[0]]),n[k],k,k==='focos')}</div>`).join('')}
+      <div class="card"><div class="lbl">Doppler <span class="act">central e periférica podem ir juntas</span></div>${chips([['ausente','ausente'],['central','central'],['periférica','periférica']],n.dop,'dop',true)}</div>
+      <div class="result" data-tone="${(t==='TR4'||t==='TR5')?'alert':(t==='TR1'||t==='TR2')?'ok':''}">
+        <div class="big"><b>${t}</b><span>${isFinite(maior(n.med))?fmt(maior(n.med))+' cm':'sem medida'}</span></div>
+        <div class="rec"><b>${c.s.charAt(0).toUpperCase()+c.s.slice(1)}</b></div>
+        <div class="txt"><small>Texto no laudo</small>${esc(descrN(n))}</div>
+      </div>
+    </div>
+    <div class="bottom"><button type="button" class="btn ghost" data-remove="n${n.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir nódulo</button></div>
+  </div>`;
+}
+function viewLinf(l){
+  return `<div class="view">
+    <div class="top"><button type="button" class="iconbtn" data-back="1" aria-label="Voltar">${I.back}</button><div class="ttl"><div class="h">Linfonodo ${rotL(l)}</div><div class="s">nível ${l.nivel} · ${l.lado==='D'?'direita':'esquerda'}</div></div><span class="pill ${suspL(l)?'':'ok'}">${suspL(l)?suspL(l)+' critério'+(suspL(l)>1?'s':''):'sem suspeição'}</span></div>
+    <div class="body">
+      <div class="card"><div class="lbl">Localização e medidas</div><div class="form">
+        <div class="k">Nível</div>${chips(NIVEIS,l.nivel,'nivel')}
+        <div class="k">Lado</div>${segm([['D','direita'],['E','esquerda']],l.lado,'llado')}
+        <div class="k">Medidas</div><div class="in">${cells(l.med,'lm')}<span class="x">mm</span></div>
+      </div></div>
+      <div class="card"><div class="lbl">Forma</div>${chips(['ovalado','arredondado'],l.forma,'lforma')}</div>
+      <div class="card"><div class="lbl">Hilo</div>${chips(['preservado','apagado'],l.hilo,'lhilo')}</div>
+      <div class="card"><div class="lbl">Cortical</div>${chips(['fina','espessada','heterogênea'],l.cort,'lcort')}</div>
+      <div class="card"><div class="lbl">Microcalcificações / cístico</div>${chips([['nenhum','nenhum'],['microcalcificações','microcalcificações'],['cístico','áreas císticas']],l.extra,'lextra')}</div>
+      <div class="card"><div class="lbl">Doppler</div>${chips(['hilar','periférica','mista'],l.dop,'ldop')}</div>
+      <div class="result" data-tone="${suspL(l)?'alert':'ok'}"><div class="big"><b>${suspL(l)?'suspeito':'reacional'}</b></div><div class="txt"><small>Texto no laudo</small>${esc(descrL(l))}</div></div>
+    </div>
+    <div class="bottom"><button type="button" class="btn ghost" data-remove="l${l.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir linfonodo</button></div>
+  </div>`;
+}
+function render(){
+  let h=viewLaudo();
+  if(st.view==='nodulo'){const n=st.nods.find(x=>x.id===st.edit); if(n) h=viewNodulo(n);}
+  if(st.view==='linf'){const l=st.linfs.find(x=>x.id===st.edit); if(l) h=viewLinf(l);}
+  $('#phone').innerHTML=h; wire(); renderDocs();
+}
+function renderDocs(){
+  const uni=st.serv==='inst'&&st.paaf.on; const tabs=[['us',uni?'Laudo US + PAAF':'Laudo US tireoide']]; if(st.paaf.on&&!uni) tabs.push(['paaf','Laudo PAAF']); if(!st.paaf.on||uni) st.doc='us';
+  $('#docTabs').innerHTML=tabs.map(t=>`<button type="button" data-doc="${t[0]}" aria-pressed="${st.doc===t[0]}">${t[1]}</button>`).join('');
+  $('#docTabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{st.doc=b.dataset.doc;renderDocs();}));
+  const t=uni?docUnico(docPAAF,'COM PAAF GUIADA'):st.doc==='paaf'?docPAAF():docUS();
+  $('#docOut').innerHTML=esc(t).replace(/^(ULTRASSONOGRAFIA[^\n]*|PUNÇÃO[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Medidas|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/gm,'<b>$1:</b>');
+}
+function wire(){
+  wireServ();
+  const ph=$('#phone'); const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));
+  const inp=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('input',()=>fn(el)));
+  on('[data-ind]',el=>{st.ind=el.dataset.ind;render();});
+  on('[data-eq]',el=>{const v=el.dataset.eq; if(st.equip.has(v)&&st.equip.size>1) st.equip.delete(v); else st.equip.add(v); render();});
+  on('[data-prev]',el=>{st.prev.tem=el.dataset.prev;render();});
+  on('[data-fam]',el=>{st.anam.fam=el.dataset.fam;render();});
+  on('[data-conhece]',el=>{st.anam.conhece=el.dataset.conhece==='s';render();});
+  on('[data-tx]',el=>{st.anam.tx=el.dataset.tx==='s';render();});
+  on('[data-txca]',el=>{st.anam.txCa=el.dataset.txca==='s';render();});
+  on('[data-levo]',el=>{st.anam.levo=el.dataset.levo==='s';render();});
+  on('[data-sint]',el=>{const v=el.dataset.sint;st.anam.sint.has(v)?st.anam.sint.delete(v):st.anam.sint.add(v);render();});
+  on('[data-gsim]',el=>{st.gl.sim=el.dataset.gsim;render();});on('[data-gdim]',el=>{st.gl.dim=el.dataset.gdim;render();});
+  on('[data-gsup]',el=>{st.gl.sup=el.dataset.gsup;render();});on('[data-geco]',el=>{st.gl.eco=el.dataset.geco;render();});on('[data-gdop]',el=>{st.gl.dop=el.dataset.gdop;render();});
+  inp('input[data-istmo]',el=>{st.med.istmo[+el.dataset.istmo]=el.value;renderDocs();});
+  inp('input[data-ld]',el=>{st.med.ld[+el.dataset.ld]=el.value;renderDocs();refreshVol();});
+  inp('input[data-le]',el=>{st.med.le[+el.dataset.le]=el.value;renderDocs();refreshVol();});
+  on('[data-open]',el=>{const k=el.dataset.open;st.edit=+k.slice(1);st.view=k[0]==='n'?'nodulo':'linf';render();});
+  on('[data-add]',el=>{ if(el.dataset.add==='n'){const n=novoNod();st.nods.push(n);st.edit=n.id;st.view='nodulo';} else {const l=novoLinf();st.linfs.push(l);st.edit=l.id;st.view='linf';} render();});
+  on('[data-para]',el=>{st.para=el.dataset.para;render();});
+  const ps=$('#paafSw'); if(ps) ps.addEventListener('click',()=>{st.paaf.on=!st.paaf.on; if(st.paaf.on&&!st.paaf.alvos.size){const f=st.nods.find(n=>conduta(n).k==='paaf')||st.nods[0]; if(f) st.paaf.alvos.add('n'+f.id); st.doc='paaf';} render();});
+  on('[data-alvo]',el=>{const k=el.dataset.alvo;st.paaf.alvos.has(k)?st.paaf.alvos.delete(k):st.paaf.alvos.add(k);render();});
+  on('[data-agulha]',el=>{st.paaf.agulha=el.dataset.agulha;render();});on('[data-lab]',el=>{st.paaf.lab=el.dataset.lab;render();});
+  inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value; if(k==='prevdata')st.prev.data=v;else if(k==='prevn')st.prev.n=v;else if(k==='prevmaior')st.prev.maior=v;else if(k==='dose')st.anam.dose=v;else if(k==='punc')st.paaf.punc=v; renderDocs();});
+  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{const uni=st.serv==='inst'&&st.paaf.on; const t=uni?docUnico(docPAAF,'COM PAAF GUIADA'):docUS()+(st.paaf.on?'\n\n'+'='.repeat(40)+'\n\n'+docPAAF():''); try{await navigator.clipboard.writeText(t);toast(st.paaf.on&&!uni?'2 laudos copiados':'Laudo copiado');}catch(e){toast('Não deu para copiar aqui; o texto está ao lado');}});
+  on('[data-back]',()=>{st.view='laudo';st.edit=null;render();});
+  on('[data-remove]',el=>{const k=el.dataset.remove; if(k[0]==='n') st.nods=st.nods.filter(n=>n.id!==+k.slice(1)); else st.linfs=st.linfs.filter(l=>l.id!==+k.slice(1)); st.paaf.alvos.delete(k); st.view='laudo';render();});
+  const n=st.view==='nodulo'&&st.nods.find(x=>x.id===st.edit);
+  if(n){
+    on('[data-lobo]',el=>{n.lobo=el.dataset.lobo;render();});on('[data-terco]',el=>{n.terco=el.dataset.terco;render();});
+    ['comp','eco','forma','marg'].forEach(k=>on(`[data-${k}]`,el=>{n[k]=el.dataset[k];render();}));
+    on('[data-focos]',el=>{const v=el.dataset.focos; if(v==='nenhum') n.focos=new Set(['nenhum']); else { n.focos.delete('nenhum'); n.focos.has(v)?n.focos.delete(v):n.focos.add(v); if(!n.focos.size) n.focos.add('nenhum'); } render();});
+    on('[data-dop]',el=>{const v=el.dataset.dop; if(v==='ausente'){n.dop=new Set(['ausente']);}else{n.dop.delete('ausente');n.dop.has(v)?n.dop.delete(v):n.dop.add(v);if(!n.dop.size)n.dop.add('ausente');} render();});
+    inp('input[data-nm]',el=>{n.med[+el.dataset.nm]=el.value;renderDocs();const r=$('.result');if(r){const c=conduta(n);r.querySelector('.big span').textContent=isFinite(maior(n.med))?fmt(maior(n.med))+' cm':'sem medida';r.querySelector('.rec b').textContent=c.s.charAt(0).toUpperCase()+c.s.slice(1);r.querySelector('.txt').innerHTML='<small>Texto no laudo</small>'+esc(descrN(n));}});
+  }
+  const l=st.view==='linf'&&st.linfs.find(x=>x.id===st.edit);
+  if(l){
+    on('[data-nivel]',el=>{l.nivel=el.dataset.nivel;render();});on('[data-llado]',el=>{l.lado=el.dataset.llado;render();});
+    on('[data-lforma]',el=>{l.forma=el.dataset.lforma;render();});on('[data-lhilo]',el=>{l.hilo=el.dataset.lhilo;render();});on('[data-lcort]',el=>{l.cort=el.dataset.lcort;render();});on('[data-lextra]',el=>{l.extra=el.dataset.lextra;render();});on('[data-ldop]',el=>{l.dop=el.dataset.ldop;render();});
+    inp('input[data-lm]',el=>{l.med[+el.dataset.lm]=el.value;renderDocs();const r=$('.result .txt');if(r)r.innerHTML='<small>Texto no laudo</small>'+esc(descrL(l));});
+  }
+}
+function refreshVol(){const t=$('#volTot');if(t)t.textContent='~ '+fmt(vol(st.med.ld)+vol(st.med.le),0)+' mL';}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800);}
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},pac:''}); }
+// ---------- padrões do app: pular para o próximo campo e máscara de data ----------
+function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
+document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;
+  const m=el.dataset.mask;
+  if(m==='mmaa'||m==='ddmmaaaa'){ const max=m==='mmaa'?4:8; const d=el.value.replace(/\D/g,'').slice(0,max);
+    el.value=m==='mmaa'?(d.length>2?d.slice(0,2)+'/'+d.slice(2):d):[d.slice(0,2),d.slice(2,4),d.slice(4)].filter(Boolean).join('/');
+    if(d.length===max) proximo(el); return; }
+  if(el.dataset.mmc && /^\d{2}$/.test(el.value)) proximo(el);   // medida em mm: 2 dígitos e pula
+},true);
+
+// medidas digitadas em mm saem em cm no laudo (20 → 2,0)
+const cm=v=>{const s=String(v||'').trim(); if(!s) return '___'; const n=parseFloat(s.replace(',','.')); if(!isFinite(n)) return '___'; return (n/10).toFixed(/[.,]/.test(s)?2:1).replace('.',',');};
+const fraseP=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?:]$/.test(t)?'':'.');};
+const prevLinha=()=>st.prev.tem==='sim'?[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`]:[];
+document.addEventListener('input',e=>{ if(e.target&&e.target.id==='prevTxt'){ st.prev.txt=e.target.value; renderDocs(); } });
+// prévia editável: o que você escreve nela é o que vai no Copiar
+const EDITS={}; let RAW=false, INR=false, LAST='docUS';
+['docUS','docPAAF','docCORE','docUnico'].forEach(name=>{ const f=window[name]; if(typeof f!=='function') return;
+  window[name]=function(){ if(!RAW){ if(INR) LAST=name; if(EDITS[name]!=null) return EDITS[name]; } const r=RAW; RAW=true; try{ return f.apply(this,arguments); } finally{ RAW=r; } }; });
+{ const _rd=renderDocs; window.renderDocs=function(){ INR=true; try{ _rd(); } finally{ INR=false; } const b=document.getElementById('editBar'); if(b) b.hidden=EDITS[LAST]==null; }; }
+(function(){ const d=document.getElementById('docOut'); if(!d) return; d.setAttribute('contenteditable','true'); d.classList.add('editavel');
+  const bar=document.createElement('div'); bar.id='editBar'; bar.className='editbar'; bar.hidden=true;
+  bar.innerHTML='<span>Texto editado à mão. Mudanças nos cartões não entram mais.</span><button type="button">Refazer pelos cartões</button>';
+  d.parentNode.insertBefore(bar,d); bar.querySelector('button').onclick=()=>{ delete EDITS[LAST]; renderDocs(); };
+  d.addEventListener('input',()=>{ EDITS[LAST]=d.innerText.replace(/\n{3,}/g,'\n\n'); bar.hidden=false; });
+  const cp=document.createElement('button'); cp.type='button'; cp.className='copiar2'; cp.id='copiar2'; cp.textContent='Copiar laudo';
+  d.insertAdjacentElement('afterend',cp);
+  cp.onclick=()=>{ const b=document.getElementById('copiar'); if(b) b.click(); else toast('Conclua o item aberto e volte ao laudo para copiar'); };
+})();
+
+// ---------- myLaudo: modo app (aberto pelo início) ----------
+const APP=(()=>{try{return new URLSearchParams(location.search).has('app');}catch(e){return false;}})();
+if(APP){ limpar(); try{ const s=localStorage.getItem('mylaudo.serv'); if(s) st.serv=s; const p=JSON.parse(localStorage.getItem('mylaudo.pac')||'null'); if(p){ st.pac=p.nome||''; if(p.serv) st.serv=p.serv; } }catch(e){} }
+{ const _r=render; render=function(){ _r(); const v=(st.view||'')+':'+(st.edit||''); if(v!==window._lv){ window._lv=v; if(innerWidth<600) scrollTo(0,0); } }; }
+render();
+</script>
