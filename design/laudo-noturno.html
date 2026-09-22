@@ -1,0 +1,398 @@
+<meta charset="utf-8">
+<title>Laudo Noturno</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ---------- Paleta Noturno: carvão com veio de ameixa + acentos da marca, abafados ---------- */
+:root{
+  --bg:#09080b;--s1:#100e13;--s2:#16141b;--s3:#1d1a23;--bd:#221f28;--bd2:#2f2b37;
+  --tx:#ececee;--tx2:#9b97a3;--tx3:#605c69;
+  --ac:#bc7ba4;--acT:#dcb9cd;--acTint:rgba(188,123,164,.12);
+  --ok:#9aaf9c;--okTint:rgba(154,175,156,.12);
+  --alert:#b08183;--alertTint:rgba(176,129,131,.14);
+  --f:'IBM Plex Sans',system-ui,sans-serif;--m:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--acT)}
+svg{display:block;flex:none}
+.wrap{max-width:1380px;margin:0 auto;padding:28px 24px 80px;display:flex;flex-direction:column;gap:28px}
+header h1{font-size:20px;font-weight:500;margin:0;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:78ch}
+
+.tokens{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tk{border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:var(--s1)}
+.tk .c{height:44px}
+.tk .i{padding:8px 10px;font-size:11.5px;color:var(--tx2);line-height:1.45}
+.tk .i b{display:block;color:var(--tx);font-weight:500}
+.tk .i code{font-family:var(--m);font-size:11px;color:var(--tx3)}
+
+.screens{display:flex;gap:36px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.scr{display:flex;flex-direction:column;gap:12px;align-items:center;width:390px}
+.scr .cap{font-size:12.5px;color:var(--tx2);text-align:center;max-width:38ch;line-height:1.5}
+.scr .cap b{color:var(--tx);font-weight:500}
+
+/* ---------- Telefone ---------- */
+.phone{width:390px;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px #232028,0 30px 60px rgba(0,0,0,.65);flex:none}
+.top{padding:54px 16px 8px;display:flex;align-items:center;gap:10px}
+.iconbtn{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--tx2);background:var(--s1);border:1px solid var(--bd);flex:none}
+.ttl{flex:1;min-width:0}
+.ttl .h{font-size:17px;font-weight:500;line-height:1.2;letter-spacing:-.01em}
+.ttl .s{font-size:12px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;padding:4px 10px;border-radius:999px;background:var(--s2);color:var(--tx2);white-space:nowrap;flex:none;display:flex;align-items:center;gap:4px;line-height:1.3;border:1px solid var(--bd)}
+.pill.ac{background:var(--acTint);color:var(--acT);border-color:transparent}
+.chips{display:flex;gap:7px;padding:6px 16px 12px;overflow:hidden;flex:none}
+.chip{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--bd);color:var(--tx2);background:transparent;white-space:nowrap;line-height:1.2}
+.chip.on{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.body{flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px;position:relative;min-height:0}
+.body.scroll{overflow-y:auto;scrollbar-width:none}
+.body.scroll::-webkit-scrollbar{display:none}
+.body::after{content:"";position:sticky;left:0;right:0;bottom:0;height:0;pointer-events:none}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.lbl .act{text-transform:none;letter-spacing:0;font-weight:400;color:var(--acT);font-size:12px}
+.card{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:12px 14px;flex:none}
+.form{display:grid;grid-template-columns:92px 1fr;gap:8px 10px;align-items:center}
+.form .k{font-size:12.5px;color:var(--tx2)}
+.in{display:flex;gap:6px;align-items:center;font-family:var(--m);font-size:13px;font-variant-numeric:tabular-nums}
+.cell{min-width:44px;padding:5px 6px;border-radius:6px;background:var(--s2);border:1px solid var(--bd2);text-align:center}
+.cell.empty{color:var(--tx3);border-style:dashed}
+.in .x{color:var(--tx3);font-size:11px}
+.auto{font-family:var(--f);font-size:10px;color:var(--ok);border:1px solid color-mix(in oklab,var(--ok),transparent 60%);padding:1px 6px;border-radius:999px;flex:none;line-height:1.4}
+.segm{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.segm span{flex:1;text-align:center;font-size:12px;padding:6px 4px;color:var(--tx2);border-left:1px solid var(--bd2)}
+.segm span:first-child{border-left:0}
+.segm span.on{background:var(--acTint);color:var(--acT)}
+.nod{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--s2)}
+.nod + .nod{margin-top:6px}
+.nod .n{flex:1;min-width:0}
+.nod .n b{font-weight:500;font-size:13.5px;display:block}
+.nod .n span{font-size:12px;color:var(--tx2)}
+.nod .tr{font-family:var(--m);font-size:12px;padding:3px 8px;border-radius:6px;background:var(--s3);color:var(--tx2)}
+.nod .tr.alert{background:var(--alertTint);color:var(--alert)}
+.addbtn{height:44px;border-radius:10px;border:1px dashed var(--bd2);display:flex;align-items:center;justify-content:center;gap:8px;color:var(--acT);font-size:13.5px;font-weight:500;margin-top:8px}
+.preview{font-size:12.5px;line-height:1.6;color:var(--tx2);white-space:pre-line}
+.preview b{color:var(--tx);font-weight:500}
+.bottom{padding:10px 16px 26px;border-top:1px solid var(--bd);background:var(--bg);display:flex;gap:10px;align-items:center;flex:none}
+.btn{height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;flex:1;letter-spacing:-.005em}
+.btn.ic{flex:none;width:46px}
+.btn.primary{border:1px solid var(--ac);color:var(--acT);background:transparent}
+.btn.secondary{border:1px solid var(--bd2);color:var(--tx2);background:transparent}
+.btn.ghost{border:0;color:var(--tx3);flex:none;padding:0 12px}
+
+/* ---------- Calculadoras ---------- */
+.calc{display:flex;flex-direction:column;gap:12px}
+.crit{display:flex;flex-direction:column;gap:6px}
+.crit .k{font-size:11.5px;color:var(--tx2)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{appearance:none;font:inherit;font-family:var(--f);font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--bd);background:transparent;color:var(--tx2);cursor:pointer;line-height:1.2}
+.opt[aria-pressed="true"]{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.opt:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.result{border:1px solid var(--bd2);border-radius:12px;background:var(--s2);padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:none}
+.result .big{display:flex;align-items:baseline;gap:10px}
+.result .big b{font-size:22px;font-weight:500;letter-spacing:-.01em}
+.result .big span{font-family:var(--m);font-size:12px;color:var(--tx2)}
+.result .rec{font-size:12.5px;color:var(--tx2)}
+.result .rec b{color:var(--tx);font-weight:500}
+.result .txt{font-size:12.5px;line-height:1.55;color:var(--tx);border-top:1px solid var(--bd2);padding-top:8px;margin-top:2px}
+.result .txt small{display:block;font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:3px}
+.result[data-tone="alert"] .big b{color:var(--alert)}
+.result[data-tone="ok"] .big b{color:var(--ok)}
+.cats{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.cats button{appearance:none;font:inherit;font-family:var(--m);flex:1;font-size:12px;padding:7px 0;color:var(--tx2);background:transparent;border:0;border-left:1px solid var(--bd2);cursor:pointer}
+.cats button:first-child{border-left:0}
+.cats button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+.cats button.sug{box-shadow:inset 0 -2px 0 var(--ac)}
+.cats button:focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
+.hint{font-size:11px;color:var(--tx3);line-height:1.45}
+
+/* ---------- Hoje ---------- */
+.day{padding:54px 20px 12px;display:flex;align-items:flex-end;justify-content:space-between}
+.day .d{font-size:12px;color:var(--tx2)}
+.day .h{font-size:23px;font-weight:500;line-height:1.2;margin-top:2px}
+.ava{width:36px;height:36px;border-radius:999px;background:var(--s2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--tx2)}
+.sec{padding:8px 20px 6px;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+.ag{display:flex;flex-direction:column;padding:0 12px}
+.ag .r{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:8px}
+.ag .t{font-family:var(--m);font-size:12px;color:var(--tx2);width:38px;font-variant-numeric:tabular-nums}
+.ag .bar{width:2px;align-self:stretch;border-radius:2px;background:var(--bd2)}
+.ag .bar.ac{background:var(--ac)}
+.ag .n{flex:1;min-width:0}
+.ag .n b{font-weight:500;font-size:14px;display:block}
+.ag .n span{font-size:12px;color:var(--tx2)}
+.shift{margin:0 20px;height:46px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500}
+.task{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;color:var(--tx)}
+.task .ring{width:16px;height:16px;border-radius:999px;border:1.5px solid var(--tx3);flex:none}
+.fab{position:absolute;left:18px;bottom:92px;display:flex;align-items:center;gap:9px}
+.fab .m{width:54px;height:54px;border-radius:999px;background:var(--s2);border:1px solid var(--ac);display:flex;align-items:center;justify-content:center;color:var(--acT);box-shadow:0 10px 24px rgba(0,0,0,.5)}
+.fab .l{font-size:11.5px;padding:5px 11px;border-radius:999px;background:var(--s1);border:1px solid var(--bd);color:var(--tx2)}
+.tabs{display:flex;justify-content:space-around;align-items:flex-end;padding:8px 8px 22px;border-top:1px solid var(--bd);margin-top:auto}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--tx3);font-size:10.5px;width:64px}
+.tab.on{color:var(--acT)}
+.tab .num{font-family:var(--m);font-size:15px;font-weight:500;line-height:20px}
+@media (prefers-reduced-motion:no-preference){.opt,.cats button{transition:border-color .12s,color .12s,background .12s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Laudo Noturno</h1>
+    <p>Carvão com um veio de ameixa no fundo, Rosa Saudade como único acento, sálvia para o que está pronto e terracota para o que pede atenção. Os chips não mostram pontos: o cálculo acontece por baixo e só o resultado aparece. O texto de cada nódulo é montado com o que pontua, um nódulo por vez.</p>
+  </header>
+
+  <div class="tokens">
+    <div class="tk"><div class="c" style="background:#09080b"></div><div class="i"><b>Fundo</b><code>#09080b</code> carvão com veio de ameixa</div></div>
+    <div class="tk"><div class="c" style="background:#100e13"></div><div class="i"><b>Cartão</b><code>#100e13</code> um degrau acima do fundo</div></div>
+    <div class="tk"><div class="c" style="background:#16141b"></div><div class="i"><b>Campo</b><code>#16141b</code> entradas e chips ativos</div></div>
+    <div class="tk"><div class="c" style="background:#2f2b37"></div><div class="i"><b>Borda forte</b><code>#2f2b37</code> campos e botão secundário</div></div>
+    <div class="tk"><div class="c" style="background:#bc7ba4"></div><div class="i"><b>Acento · Rosa Saudade</b><code>#bc7ba4</code> ação principal, foco, chip escolhido</div></div>
+    <div class="tk"><div class="c" style="background:#9aaf9c"></div><div class="i"><b>Pronto</b><code>#9aaf9c</code> sálvia: preenchido, calculado, categoria baixa</div></div>
+    <div class="tk"><div class="c" style="background:#b08183"></div><div class="i"><b>Atenção</b><code>#b08183</code> terracota: categoria alta, pendência</div></div>
+    <div class="tk"><div class="c" style="background:#ececee"></div><div class="i"><b>Texto</b><code>#ececee · #9b97a3 · #605c69</code> três níveis</div></div>
+  </div>
+
+  <div class="screens">
+
+    <!-- ===================== TELA 1: LAUDO ===================== -->
+    <div class="scr">
+      <div class="phone">
+        <div class="top">
+          <div class="iconbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="ttl"><div class="h">US Tireoide</div><div class="s">Maria Aparecida de Souza Lima · 54 a · Instituto</div></div>
+          <span class="pill ac">rascunho</span>
+        </div>
+        <div class="chips"><span class="chip on">Normal</span><span class="chip">Bócio</span><span class="chip">Nódulo</span><span class="chip">Hashimoto</span><span class="chip">Pós-tireoidectomia</span></div>
+        <div class="body scroll">
+          <div class="card">
+            <div class="lbl">Medidas</div>
+            <div class="form">
+              <div class="k">Istmo</div><div class="in"><span class="cell">1,9</span><span class="x">×</span><span class="cell">0,5</span><span class="x">×</span><span class="cell">1,15</span></div>
+              <div class="k">Lobo direito</div><div class="in"><span class="cell">4,7</span><span class="x">×</span><span class="cell">1,8</span><span class="x">×</span><span class="cell">2,0</span></div>
+              <div class="k">Lobo esquerdo</div><div class="in"><span class="cell">4,6</span><span class="x">×</span><span class="cell">1,6</span><span class="x">×</span><span class="cell">1,9</span></div>
+              <div class="k">Volume</div><div class="in" style="color:var(--tx2)">~ 16 mL <span class="auto">calculado</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="lbl">Glândula</div>
+            <div class="form">
+              <div class="k">Dimensões</div><div class="segm"><span class="on">habituais</span><span>aumentadas</span><span>reduzidas</span></div>
+              <div class="k">Ecotextura</div><div class="segm"><span class="on">homogênea</span><span>heterogênea</span></div>
+              <div class="k">Doppler</div><div class="segm"><span class="on">sem alterações</span><span>aumentado</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="lbl">Nódulos <span class="act">2</span></div>
+            <div class="nod">
+              <div class="n"><b>Nódulo 1 · LD, terço médio</b><span>sólido · hipoecoico · 1,6 × 1,1 × 1,3 cm</span></div>
+              <span class="tr alert">TR4</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tx3)"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+            <div class="nod">
+              <div class="n"><b>Nódulo 2 · LE, terço inferior</b><span>espongiforme · 0,8 × 0,5 × 0,6 cm</span></div>
+              <span class="tr">TR1</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tx3)"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+            <div class="addbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Adicionar nódulo</div>
+          </div>
+          <div class="card">
+            <div class="lbl">Prévia do laudo <span class="act">editar texto</span></div>
+            <div class="preview"><b>Descrição:</b> Glândula tireoide típica, simétrica, com dimensões habituais, superfície regular e ecotextura homogênea. Ao estudo Doppler: sem alterações detectáveis.
+<b>Nódulo 1:</b> sólido, hipoecoico, no terço médio do lobo direito, medindo 1,6 × 1,1 × 1,3 cm. ACR TI-RADS 4.
+<b>Nódulo 2:</b> espongiforme, no terço inferior do lobo esquerdo, medindo 0,8 × 0,5 × 0,6 cm. ACR TI-RADS 1.
+<b>Medidas:</b> Istmo 1,9 × 0,5 × 1,15 cm. Lobo direito 4,7 × 1,8 × 2,0 cm. Lobo esquerdo 4,6 × 1,6 × 1,9 cm. Volume ~16 mL.
+<b>Conclusão:</b> Nódulo no lobo direito classificado como ACR TI-RADS 4, com indicação de PAAF.</div>
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="btn primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copiar laudo</div>
+          <div class="btn secondary ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></div>
+        </div>
+      </div>
+      <div class="cap"><b>1 · Laudo.</b> Dois nódulos na lista, cada um vira um parágrafo próprio na prévia, só com o que pontua. A categoria alta ganha terracota; a baixa fica cinza.</div>
+    </div>
+
+    <!-- ===================== TELA 2: NÓDULO TIREOIDE + TI-RADS ===================== -->
+    <div class="scr">
+      <div class="phone">
+        <div class="top">
+          <div class="iconbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="ttl"><div class="h">Nódulo 1</div><div class="s">US Tireoide · Maria Aparecida</div></div>
+          <span class="pill">ACR TI-RADS</span>
+        </div>
+        <div class="body scroll" style="padding-top:6px">
+          <div class="card">
+            <div class="form">
+              <div class="k">Lobo</div><div class="segm"><span class="on">direito</span><span>esquerdo</span><span>istmo</span></div>
+              <div class="k">Terço</div><div class="segm"><span>superior</span><span class="on">médio</span><span>inferior</span></div>
+              <div class="k">Medidas</div><div class="in"><span class="cell">1,6</span><span class="x">×</span><span class="cell">1,1</span><span class="x">×</span><span class="cell">1,3</span><span class="x">cm</span></div>
+            </div>
+          </div>
+          <div class="result" id="tiRes">
+            <div class="big"><b id="tiTr">TR4</b><span id="tiSz">1,6 cm</span></div>
+            <div class="rec" id="tiRec"></div>
+            <div class="txt"><small>Texto no laudo</small><span id="tiTxt"></span></div>
+          </div>
+          <div class="card calc" id="tiCalc">
+            <div class="crit"><div class="k">Composição</div><div class="opts">
+              <button class="opt" type="button" data-p="0" data-t="cístico">cística</button><button class="opt" type="button" data-p="0" data-t="espongiforme">espongiforme</button><button class="opt" type="button" data-p="1" data-t="misto, cístico e sólido">mista</button><button class="opt" type="button" data-p="2" data-t="sólido" aria-pressed="true">sólida</button></div></div>
+            <div class="crit"><div class="k">Ecogenicidade</div><div class="opts">
+              <button class="opt" type="button" data-p="0" data-t="anecoico">anecoica</button><button class="opt" type="button" data-p="1" data-t="hiperecoico">hiperecoica</button><button class="opt" type="button" data-p="1" data-t="isoecoico">isoecoica</button><button class="opt" type="button" data-p="2" data-t="hipoecoico" aria-pressed="true">hipoecoica</button><button class="opt" type="button" data-p="3" data-t="muito hipoecoico">muito hipoecoica</button></div></div>
+            <div class="crit"><div class="k">Forma</div><div class="opts">
+              <button class="opt" type="button" data-p="0" data-t="mais largo que alto" aria-pressed="true">mais largo que alto</button><button class="opt" type="button" data-p="3" data-t="mais alto que largo">mais alto que largo</button></div></div>
+            <div class="crit"><div class="k">Margens</div><div class="opts">
+              <button class="opt" type="button" data-p="0" data-t="de margens lisas" aria-pressed="true">lisas</button><button class="opt" type="button" data-p="0" data-t="de margens mal definidas">mal definidas</button><button class="opt" type="button" data-p="2" data-t="de margens lobuladas">lobuladas</button><button class="opt" type="button" data-p="2" data-t="de margens irregulares">irregulares</button><button class="opt" type="button" data-p="3" data-t="com extensão extratireoidiana">extensão extratireoidiana</button></div></div>
+            <div class="crit"><div class="k">Focos ecogênicos</div><div class="opts">
+              <button class="opt" type="button" data-p="0" data-t="" aria-pressed="true">nenhum</button><button class="opt" type="button" data-p="0" data-t="com artefatos em cauda de cometa">cauda de cometa</button><button class="opt" type="button" data-p="1" data-t="com macrocalcificações">macrocalcificações</button><button class="opt" type="button" data-p="2" data-t="com calcificação periférica">calcificação periférica</button><button class="opt" type="button" data-p="3" data-t="com microcalcificações">microcalcificações</button></div></div>
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="btn ghost">Remover</div>
+          <div class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>Concluir nódulo</div>
+        </div>
+      </div>
+      <div class="cap"><b>2 · Nódulo de tireoide.</b> Sem pontos nos chips. O resultado fica no alto, e embaixo dele o texto que vai pro laudo, montado só com o que pontua. <b>Toque nos chips</b> pra ver os dois mudarem.</div>
+    </div>
+
+    <!-- ===================== TELA 3: NÓDULO MAMÁRIO + BI-RADS ===================== -->
+    <div class="scr">
+      <div class="phone">
+        <div class="top">
+          <div class="iconbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="ttl"><div class="h">Nódulo 1</div><div class="s">US Mamas · Fabiana Martins</div></div>
+          <span class="pill">BI-RADS</span>
+        </div>
+        <div class="body scroll" style="padding-top:6px">
+          <div class="card">
+            <div class="form">
+              <div class="k">Mama</div><div class="segm"><span class="on">direita</span><span>esquerda</span></div>
+              <div class="k">Posição</div><div class="in"><span class="cell">10</span><span class="x">h</span><span class="cell">3</span><span class="x">cm do mamilo</span></div>
+              <div class="k">Medidas</div><div class="in"><span class="cell">1,2</span><span class="x">×</span><span class="cell">0,7</span><span class="x">×</span><span class="cell">1,0</span><span class="x">cm</span></div>
+            </div>
+          </div>
+          <div class="card calc" id="biCalc">
+            <div class="crit"><div class="k">Forma</div><div class="opts">
+              <button class="opt" type="button" data-s="0" data-t="oval" aria-pressed="true">oval</button><button class="opt" type="button" data-s="0" data-t="redondo">redonda</button><button class="opt" type="button" data-s="1" data-t="irregular">irregular</button></div></div>
+            <div class="crit"><div class="k">Orientação</div><div class="opts">
+              <button class="opt" type="button" data-s="0" data-t="de orientação paralela à pele" aria-pressed="true">paralela</button><button class="opt" type="button" data-s="1" data-t="de orientação não paralela à pele">não paralela</button></div></div>
+            <div class="crit"><div class="k">Margens</div><div class="opts">
+              <button class="opt" type="button" data-s="0" data-t="margens circunscritas" aria-pressed="true">circunscritas</button><button class="opt" type="button" data-s="1" data-t="margens indistintas">indistintas</button><button class="opt" type="button" data-s="1" data-t="margens anguladas">anguladas</button><button class="opt" type="button" data-s="1" data-t="margens microlobuladas">microlobuladas</button><button class="opt" type="button" data-s="2" data-t="margens espiculadas">espiculadas</button></div></div>
+            <div class="crit"><div class="k">Padrão ecogênico</div><div class="opts">
+              <button class="opt" type="button" data-s="0" data-t="anecoico" data-cyst="1">anecoico</button><button class="opt" type="button" data-s="0" data-t="hiperecoico">hiperecoico</button><button class="opt" type="button" data-s="0" data-t="isoecoico">isoecoico</button><button class="opt" type="button" data-s="0" data-t="hipoecoico" aria-pressed="true">hipoecoico</button><button class="opt" type="button" data-s="1" data-t="complexo cístico e sólido">complexo cístico-sólido</button><button class="opt" type="button" data-s="1" data-t="heterogêneo">heterogêneo</button></div></div>
+            <div class="crit"><div class="k">Acústica posterior</div><div class="opts">
+              <button class="opt" type="button" data-s="0" data-t="sem alteração acústica posterior" aria-pressed="true">nenhuma</button><button class="opt" type="button" data-s="0" data-t="com reforço acústico posterior">reforço</button><button class="opt" type="button" data-s="1" data-t="com sombra acústica posterior">sombra</button><button class="opt" type="button" data-s="1" data-t="com padrão acústico posterior combinado">combinado</button></div></div>
+            <div class="crit"><div class="k">Calcificações</div><div class="opts">
+              <button class="opt" type="button" data-s="0" data-t="" aria-pressed="true">ausentes</button><button class="opt" type="button" data-s="1" data-t="com microcalcificações de permeio">no interior</button><button class="opt" type="button" data-s="0" data-t="com macrocalcificações">grosseiras</button></div></div>
+          </div>
+        <div class="result" id="biRes">
+            <div class="big"><b id="biCat">BI-RADS 3</b><span id="biSug">sugestão do app</span></div>
+            <div class="cats" id="biCats">
+              <button type="button" data-c="2">2</button><button type="button" data-c="3">3</button><button type="button" data-c="4A">4A</button><button type="button" data-c="4B">4B</button><button type="button" data-c="4C">4C</button><button type="button" data-c="5">5</button>
+            </div>
+            <div class="hint">BI-RADS não soma pontos. O app sugere pela combinação de achados e marca a sugestão com um traço; a categoria final é sua, toque pra trocar.</div>
+            <div class="txt"><small>Texto no laudo</small><span id="biTxt"></span></div>
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="btn ghost">Remover</div>
+          <div class="btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>Concluir nódulo</div>
+        </div>
+      </div>
+      <div class="cap"><b>3 · Nódulo mamário.</b> Descritores primeiro; o quadro do BI-RADS vem depois, no fim. O app <b>sugere</b> a categoria e você confirma, porque BI-RADS é léxico, não soma.</div>
+    </div>
+
+    <!-- ===================== TELA 4: HOJE ===================== -->
+    <div class="scr">
+      <div class="phone">
+        <div class="day"><div><div class="d">Sábado, 12 de setembro</div><div class="h">Hoje</div></div><div class="ava">LA</div></div>
+        <div class="sec">Instituto da Tireoide · manhã</div>
+        <div class="ag">
+          <div class="r"><div class="t">08:00</div><div class="bar"></div><div class="n"><b>Maria Aparecida de Souza Lima</b><span>US tireoide</span></div></div>
+          <div class="r"><div class="t">08:30</div><div class="bar ac"></div><div class="n"><b>João Batista Ferreira</b><span>US tireoide + PAAF</span></div></div>
+          <div class="r"><div class="t">09:15</div><div class="bar"></div><div class="n"><b>Ana Lúcia Prado</b><span>US cervical</span></div></div>
+          <div class="r"><div class="t">10:00</div><div class="bar ac"></div><div class="n"><b>Rosângela Martins</b><span>CORE biópsia</span></div></div>
+        </div>
+        <div class="sec" style="padding-top:14px">HMC · tarde</div>
+        <div class="shift"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg>Iniciar turno</div>
+        <div class="sec" style="padding-top:16px">Tarefas de hoje</div>
+        <div class="task"><span class="ring"></span>Concluir laudo — M. Aparecida (PAAF)</div>
+        <div class="task"><span class="ring"></span>Registrar pagamento de agosto — HMC</div>
+        <div class="fab"><div class="m"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><span class="l">ditar exame</span></div>
+        <div class="tabs">
+          <div class="tab on"><span class="num">12</span>Hoje</div>
+          <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4.5-6.2"/></svg>Pacientes</div>
+          <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>Tarefas</div>
+          <div class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Início</div>
+        </div>
+      </div>
+      <div class="cap"><b>4 · Hoje.</b> A tela do handoff na paleta nova, com o microfone só aqui e no Início. O acento aparece no procedimento, no turno e na aba ativa.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function pick(group){
+  group.querySelectorAll('.crit').forEach(c=>c.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
+    c.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed','false'));
+    o.setAttribute('aria-pressed','true'); group.dispatchEvent(new Event('change'));
+  })));
+}
+const chosen = group => [...group.querySelectorAll('.crit')].map(c=>c.querySelector('.opt[aria-pressed="true"]')).filter(Boolean);
+const fmt = n => n.toFixed(1).replace('.',',');
+
+/* ---------- ACR TI-RADS: soma de pontos ---------- */
+const TI_SIZE = 1.6;
+const TI_RULES = { TR3:{fna:2.5,fu:1.5}, TR4:{fna:1.5,fu:1.0}, TR5:{fna:1.0,fu:0.5} };
+function tiCat(pts){ if(pts<=1) return 'TR1'; if(pts===2) return 'TR2'; if(pts===3) return 'TR3'; if(pts<=6) return 'TR4'; return 'TR5'; }
+function tiRec(tr, cm){
+  const r = TI_RULES[tr];
+  if(!r) return `<b>Sem PAAF e sem seguimento</b> (${tr}).`;
+  if(cm >= r.fna) return `<b>PAAF indicada</b> (${tr} a partir de ${fmt(r.fna)} cm).`;
+  if(cm >= r.fu) return `<b>Seguimento por imagem</b> (${tr} entre ${fmt(r.fu)} e ${fmt(r.fna)} cm).`;
+  return `<b>Sem PAAF nem seguimento</b> (${tr} abaixo de ${fmt(r.fu)} cm).`;
+}
+function tiRender(){
+  const sel = chosen(document.getElementById('tiCalc'));
+  const pts = sel.reduce((a,o)=>a+Number(o.dataset.p),0);
+  const tr = tiCat(pts);
+  const res = document.getElementById('tiRes');
+  res.dataset.tone = (tr==='TR4'||tr==='TR5') ? 'alert' : (tr==='TR1'||tr==='TR2') ? 'ok' : '';
+  document.getElementById('tiTr').textContent = tr;
+  document.getElementById('tiSz').textContent = `${fmt(TI_SIZE)} cm`;
+  document.getElementById('tiRec').innerHTML = tiRec(tr, TI_SIZE);
+  // composição sempre entra; o resto só se pontua
+  const parts = sel.map((o,i)=> (i===0 || Number(o.dataset.p)>0) ? o.dataset.t : '').filter(Boolean);
+  document.getElementById('tiTxt').textContent = `Nódulo ${parts.join(', ')}, no terço médio do lobo direito, medindo 1,6 × 1,1 × 1,3 cm. ACR ${tr.replace('TR','TI-RADS ')}.`;
+}
+pick(document.getElementById('tiCalc'));
+document.getElementById('tiCalc').addEventListener('change', tiRender);
+tiRender();
+
+/* ---------- BI-RADS: sugestão por combinação, decisão do médico ---------- */
+let biManual = null;
+function biSuggest(sel){
+  const suspicious = sel.reduce((a,o)=>a+Number(o.dataset.s),0);
+  const isCyst = sel.some(o=>o.dataset.cyst==='1') && suspicious===0;
+  const spic = sel.some(o=>o.dataset.t==='margens espiculadas');
+  if(isCyst) return '2';
+  if(suspicious===0) return '3';
+  if(suspicious>=4 || (spic && suspicious>=3)) return '5';
+  if(suspicious===1) return '4A';
+  if(suspicious===2) return '4B';
+  return '4C';
+}
+function biRender(){
+  const sel = chosen(document.getElementById('biCalc'));
+  const sug = biSuggest(sel);
+  const cat = biManual ?? sug;
+  const res = document.getElementById('biRes');
+  res.dataset.tone = (cat==='2'||cat==='3') ? 'ok' : 'alert';
+  document.getElementById('biCat').textContent = `BI-RADS ${cat}`;
+  document.getElementById('biSug').textContent = biManual && biManual!==sug ? `sugestão do app: ${sug}` : 'sugestão do app';
+  document.querySelectorAll('#biCats button').forEach(b=>{ b.setAttribute('aria-pressed',String(b.dataset.c===cat)); b.classList.toggle('sug', b.dataset.c===sug); });
+  const parts = sel.map(o=>o.dataset.t).filter(Boolean);
+  document.getElementById('biTxt').textContent = `Nódulo ${parts.join(', ')}, na mama direita, às 10 horas, a 3 cm do mamilo, medindo 1,2 × 0,7 × 1,0 cm. BI-RADS ${cat}.`;
+}
+pick(document.getElementById('biCalc'));
+document.getElementById('biCalc').addEventListener('change', ()=>{ biManual=null; biRender(); });
+document.querySelectorAll('#biCats button').forEach(b=>b.addEventListener('click',()=>{ biManual=b.dataset.c; biRender(); }));
+biRender();
+</script>

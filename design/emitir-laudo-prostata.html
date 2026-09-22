@@ -1,0 +1,413 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Laudo de Próstata</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#09080b;--s1:#100e13;--s2:#16141b;--s3:#1d1a23;--bd:#221f28;--bd2:#2f2b37;
+  --tx:#ececee;--tx2:#9b97a3;--tx3:#605c69;
+  --ac:#bc7ba4;--acT:#dcb9cd;--acTint:rgba(188,123,164,.12);
+  --ok:#9aaf9c;--okTint:rgba(154,175,156,.12);--alert:#b08183;--alertTint:rgba(176,129,131,.14);
+  --f:'IBM Plex Sans',system-ui,sans-serif;--m:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--acT)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0;text-align:left}
+button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+input{font:inherit;color:inherit}
+svg{display:block;flex:none}
+.wrap{max-width:1380px;margin:0 auto;padding:24px 24px 80px}
+header{margin-bottom:22px}
+header h1{font-size:20px;font-weight:500;margin:0;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
+.stage{display:grid;grid-template-columns:390px minmax(0,1fr);gap:36px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr;justify-items:center}.docs{position:static;width:100%}}
+.docs{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.doc{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:16px 18px;font-size:13px;line-height:1.7;color:var(--tx2);white-space:pre-wrap;max-height:calc(100vh - 140px);overflow:auto;scrollbar-width:thin}
+.doc b{color:var(--tx);font-weight:500}
+.docs .cap{font-size:12px;color:var(--tx3);line-height:1.5}
+.phone{width:390px;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px #232028,0 30px 60px rgba(0,0,0,.65);flex:none}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+.top{padding:54px 16px 8px;display:flex;align-items:center;gap:10px}
+.iconbtn{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--tx2);background:var(--s1);border:1px solid var(--bd);flex:none}
+.ttl{flex:1;min-width:0}
+.ttl .h{font-size:17px;font-weight:500;line-height:1.2;letter-spacing:-.01em}
+.ttl .s{font-size:12px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;padding:4px 10px;border-radius:999px;background:var(--s2);color:var(--tx2);white-space:nowrap;flex:none;border:1px solid var(--bd);line-height:1.3}
+.pill.ac{background:var(--acTint);color:var(--acT);border-color:transparent}
+.body{flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;min-height:0;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lbl .act{text-transform:none;letter-spacing:0;font-weight:400;color:var(--acT);font-size:12px;text-align:right}
+.card{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:12px 14px;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--bd);color:var(--tx2);line-height:1.2}
+.chip[aria-pressed="true"]{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.form{display:grid;grid-template-columns:96px 1fr;gap:8px 10px;align-items:center}
+.form .k{font-size:12.5px;color:var(--tx2)}
+.segm{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.segm button{flex:1;text-align:center;font-size:12px;padding:6px 4px;color:var(--tx2);border-left:1px solid var(--bd2)}
+.segm button:first-child{border-left:0}
+.segm button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+.in{display:flex;gap:6px;align-items:center;font-family:var(--m);font-size:13px;flex-wrap:wrap}
+.in .x{color:var(--tx3);font-size:11px}
+.in .auto{font-family:var(--f);font-size:10px;color:var(--ok);border:1px solid color-mix(in oklab,var(--ok),transparent 60%);padding:1px 6px;border-radius:999px}
+.cell{width:52px;padding:5px 6px;border-radius:6px;background:var(--s2);border:1px solid var(--bd2);text-align:center;font-family:var(--m);font-size:13px;color:var(--tx);outline:none}
+.cell.sm{width:40px}
+.cell:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acTint)}
+.cell::placeholder{color:var(--tx3)}
+.p{font-size:13px;line-height:1.6;color:var(--tx2);margin:0}
+.nod{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--s2);width:100%}
+.nod + .nod{margin-top:6px}
+.nod .n{flex:1;min-width:0}
+.nod .n b{font-weight:500;font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nod .n span{font-size:12px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.nod .tag{font-family:var(--m);font-size:11px;padding:3px 7px;border-radius:6px;background:var(--s3);color:var(--tx2);flex:none}
+.nod .tag.alert{background:var(--alertTint);color:var(--alert)}
+.nod .tag.ok{background:var(--okTint);color:var(--ok)}
+.addbtn{width:100%;height:42px;border-radius:10px;border:1px dashed var(--bd2);display:flex;align-items:center;justify-content:center;gap:7px;color:var(--acT);font-size:13px;font-weight:500;margin-top:8px}
+.empty{font-size:12.5px;color:var(--tx3)}
+.hint{font-size:11px;color:var(--tx3);line-height:1.45;margin-top:6px}
+.cats{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.cats button{flex:1;text-align:center;font-family:var(--m);font-size:12px;padding:7px 0;color:var(--tx2);border-left:1px solid var(--bd2)}
+.cats button:first-child{border-left:0}
+.cats button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+.cats button.sug{box-shadow:inset 0 -2px 0 var(--ac)}
+.result{border:1px solid var(--bd2);border-radius:12px;background:var(--s2);padding:12px 14px;flex:none;display:flex;flex-direction:column;gap:8px}
+.result .big{display:flex;align-items:baseline;gap:10px}
+.result .big b{font-size:22px;font-weight:500;letter-spacing:-.01em}
+.result .big span{font-family:var(--m);font-size:12px;color:var(--tx2)}
+.result .txt{font-size:12.5px;line-height:1.55;color:var(--tx);border-top:1px solid var(--bd2);padding-top:8px}
+.result small{display:block;font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:3px}
+.result[data-tone="alert"] .big b{color:var(--alert)}
+.result[data-tone="ok"] .big b{color:var(--ok)}
+.bottom{padding:10px 16px 26px;border-top:1px solid var(--bd);background:var(--bg);display:flex;gap:10px;align-items:center;flex:none}
+.btn{height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;flex:1;letter-spacing:-.005em}
+.btn.primary{border:1px solid var(--ac);color:var(--acT)}
+.btn.ghost{border:0;color:var(--tx3);flex:none;padding:0 12px}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sw{width:40px;height:24px;border-radius:999px;background:var(--s3);border:1px solid var(--bd2);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:999px;background:var(--tx3);transition:left .12s,background .12s}
+.sw[aria-pressed="true"]{background:var(--acTint);border-color:var(--ac)}
+.sw[aria-pressed="true"]::after{left:19px;background:var(--acT)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--s3);border:1px solid var(--bd2);color:var(--tx);padding:9px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .15s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:no-preference){.chip,.segm button,.cats button{transition:background .12s,color .12s,border-color .12s}}
+
+/* padrões do app: prévia editável e caixas de texto */
+.doc.editavel{background:#e8e5ea;color:#1a171d;border-color:#cfc9d4;caret-color:#8a3f6c;outline:none}
+.doc.editavel b{color:#000}
+.doc.editavel:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acTint)}
+.editbar{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--acT);border:1px dashed var(--ac);border-radius:10px;padding:8px 10px;background:var(--acTint)}
+.editbar span{flex:1}
+.editbar button{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);white-space:nowrap}
+.obs{width:100%;min-height:58px;resize:vertical;padding:7px 9px;border-radius:7px;background:var(--s2);border:1px solid var(--ac);border-style:dashed;color:var(--tx);font:13px/1.45 var(--f);outline:none;grid-column:1/-1}
+.obs:focus{border-style:solid;box-shadow:0 0 0 2px var(--acTint)}
+.obs::placeholder{color:var(--tx3)}
+/* copiar fica embaixo do editor final */
+.bottom:has(#copiar){display:none}
+.copiar2{height:48px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:500;width:100%}
+/* medidas numa linha só */
+.cell[data-mmc]{width:44px;padding:5px 2px}
+.in:has(.cell[data-mmc]){gap:3px;flex-wrap:nowrap}
+.in:has(.cell[data-mmc]) .x{font-size:10px}
+@media (max-width:600px){.cell[data-mmc]{width:46px}.form{grid-template-columns:88px 1fr}}
+</style>
+<style>
+.pm{padding:10px 0;border-top:1px solid var(--bd)}
+.pm:first-of-type{border-top:0;padding-top:0}
+.pm .t{font-size:12px;font-weight:600;color:var(--acT);margin-bottom:6px;letter-spacing:.02em}
+.row2{display:flex;gap:8px;margin-top:8px}
+.row2 .addbtn{margin-top:0}
+.obs{width:100%;min-height:54px;resize:vertical;padding:7px 9px;border-radius:7px;background:var(--s2);border:1px solid var(--ac);border-style:dashed;color:var(--tx);font:13px/1.45 var(--f);outline:none;grid-column:1/-1}
+.obs:focus{border-style:solid;box-shadow:0 0 0 2px var(--acTint)}
+.obs::placeholder{color:var(--tx3)}
+.newbtn{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--bd2);color:var(--tx2);flex:none}
+/* uso real no celular: sem moldura de telefone */
+@media (max-width:600px){
+  .wrap{padding-inline:10px;padding-block:8px 40px}
+  header{display:none}
+  .stage{gap:16px}
+  .phone{width:100%;height:auto;border-radius:0;box-shadow:none;overflow:visible}
+  .view{position:static}
+  .top{padding:10px 4px 8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:4}
+  .body{overflow:visible;padding:4px 0 12px}
+  .bottom{position:sticky;bottom:0;padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px))}
+  .doc{max-height:none}
+  .cell,.txtin,.obs{font-size:16px}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Laudo de Próstata</h1>
+    <p>Ordem do exame: bexiga cheia (volume inicial e parede), junções ureterovesicais, próstata, vesículas seminais e protrusão. Depois o paciente urina e volta: "+ Pós-miccional" mede bexiga e próstata de novo, quantas vezes precisar. Alteração marcada como "sim" abre uma caixa de texto que vai direto para o laudo. No celular a moldura some e a tela vira o app.</p>
+  </header>
+  <div class="stage">
+    <div class="phone" id="phone"></div>
+    <aside class="docs">
+      <div class="doc" id="docOut"></div>
+      <div class="cap">Volume = L × AP × T × 0,52; peso estimado = volume × 1,05. Conclusão usa a última medida da próstata. Aumentada acima de 30 g (discreto até 50, moderado até 80, acentuado acima). Protrusão: grau I &lt; 5 mm, II 5–10 mm, III &gt; 10 mm. Resíduo significativo acima de 50 mL, pela última medida.</div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const I={
+  back:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  copy:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+  plus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+};
+const IND=['Rotina','Sintomas urinários','PSA elevado','Avaliação de volume prostático','Retenção urinária'];
+const SINT=['jato fraco','noctúria','urgência','polaciúria','esvaziamento incompleto','retenção'];
+const JUVOPT=[['livre','livre'],['calculo','cálculo'],['ureterocele','ureterocele'],['dilatada','dilatada']];
+
+const TRANS=[['l16','linear 3–16 MHz'],['l22','minilinear 2–22 MHz'],['c8','convexo 2–8 MHz'],['e9','endocavitário 2–9 MHz']];
+const equipTxt=()=>{const l=TRANS.filter(t=>st.equip.has(t[0])).map(t=>t[1]); if(!l.length) return 'Samsung HM70 EVO.'; return 'Samsung HM70 EVO, transdutor'+(l.length>1?'es ':' ')+l.join(', ').replace(/, ([^,]*)$/,' e $1')+'.';};
+const dataCurta=d=>{const m=String(d||'').trim().match(/^(\d{1,2})\/(\d{2,4})$/); return m?m[1].padStart(2,'0')+'/'+m[2].slice(-2):String(d||'').trim();};
+// ---------- serviço ----------
+const SERV=[['inst','Instituto'],['part','Particular'],['hmc','HMC']];
+const TIPO_T={l16:'linear',l22:'linear',c8:'convexo',e9:'endocavitário'};
+const tiposTxt=()=>[...new Set(TRANS.filter(t=>st.equip.has(t[0])).map(t=>TIPO_T[t[0]]))].join(' e ');
+const linhaTopo=()=>st.serv==='hmc'?[]:[`Paciente: ${st.pac&&st.pac.trim()?st.pac.trim():'___'}`];
+const linhaEquip=()=>[];
+// Técnica carrega aparelho/transdutor, via e caráter
+const transdTxt=()=>{const l=TRANS.filter(t=>st.equip.has(t[0])); const nomes=st.serv==='hmc'?[...new Set(l.map(t=>TIPO_T[t[0]]))]:l.map(t=>t[1]); const j=nomes.join(', ').replace(/, ([^,]*)$/,' e $1'); return 'transdutor'+(nomes.length>1?'es ':' ')+j;};
+const tecnica=corpo=>`Técnica: Exame realizado ${st.serv==='hmc'?'':'em aparelho Samsung HM70 EVO, '}com ${transdTxt()}${st.serv!=='hmc'&&corpo.startsWith(' ')?','+corpo:corpo}${st.serv==='hmc'?`, em caráter ${st.carater==='urgência'?'de urgência':st.carater}`:''}.`;
+const servSub=()=>st.serv==='hmc'?`HMC · ${st.carater}`:`${esc(st.pac&&st.pac.trim()?st.pac:'sem nome')} · ${SERV.find(s=>s[0]===st.serv)[1]}`;
+function servCard(){
+  return `<div class="card"><div class="lbl">Serviço</div>${segm(SERV,st.serv,'serv')}<div class="form" style="margin-top:12px">${st.serv==='hmc'
+    ?`<div class="k">Caráter</div>${segm([['eletivo','eletivo'],['urgência','urgência']],st.carater,'carater')}`
+    :`<div class="k">Paciente</div><div class="in" style="flex:1"><input class="cell" id="pac" style="width:100%;text-align:left" value="${esc(st.pac)}" placeholder="nome completo" autocomplete="off"></div>`}</div></div>`;
+}
+function equipCard(){
+  return st.serv==='hmc'?`<div class="card"><div class="lbl">Transdutor</div><div class="p">convexo</div></div>`
+    :`<div class="card"><div class="lbl">Equipamento</div><div class="p">Samsung HM70 EVO · transdutor convexo 2–8 MHz</div></div>`;
+}
+
+// ---------- estado ----------
+const NOVO=()=>({
+  serv:'hmc',pac:'',carater:'eletivo',
+  ind:'Rotina', equip:new Set(['c8']),
+  anam:{psa:'',psaData:'',sint:new Set(),med:false,medTxt:''},
+  prev:{tem:'nao',data:'',txt:''},
+  bx:{rep:'boa',med:['','',''],parede:'',parAsp:'regular',cont:'anecoico',contTxt:''},
+  juv:{D:'livre',E:'livre'},
+  pr:{med:['','',''],cont:'regulares',text:'homogênea',calc:false,calcTxt:'',ipp:''},
+  vs:'habitual',vsTxt:'',
+  pos:[{bx:['','',''],pr:['','','']}],
+});
+let st=NOVO();
+
+// ---------- regras ----------
+const num=v=>parseFloat(String(v||'').replace(',','.'));
+const fmt=(n,d=0)=>isFinite(n)?n.toFixed(d).replace('.',','):'___';
+const txt=v=>v&&String(v).trim()?String(v).trim():'___';
+const frase=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?]$/.test(t)?'':'.');};
+const vol=m=>{const a=m.map(v=>num(v)/10);return a.every(isFinite)?a[0]*a[1]*a[2]*0.52:NaN;};
+const pesoDe=m=>vol(m)*1.05;
+const prostFinal=()=>{for(let i=st.pos.length-1;i>=0;i--){if(isFinite(vol(st.pos[i].pr)))return st.pos[i].pr;} return st.pr.med;};
+const peso=()=>pesoDe(prostFinal());
+const residuo=()=>{const u=st.pos[st.pos.length-1]; return u?vol(u.bx):NaN;};
+const grauIPP=mm=>!isFinite(mm)||mm<=0?null:mm<5?'I':mm<=10?'II':'III';
+
+function infoClinica(){
+  const a=st.anam,f=[];
+  if(a.psa) f.push(`PSA ${a.psa} ng/mL${a.psaData?' ('+dataCurta(a.psaData)+')':''}.`);
+  if(a.sint.size) f.push('Refere '+SINT.filter(s=>a.sint.has(s)).join(', ').replace(/, ([^,]*)$/,' e $1')+'.');
+  if(a.med) f.push(a.medTxt.trim()?`Em uso de ${a.medTxt.trim().replace(/\.$/,'')}.`:'Em uso de medicação para hiperplasia prostática.');
+  if(st.prev.tem==='nao') f.push('Sem exames anteriores para comparação.');
+  return f.join(' ');
+}
+function juvTxt(){
+  const d=st.juv;
+  if(d.D==='livre'&&d.E==='livre') return 'Junções ureterovesicais livres.';
+  const f=s=>({livre:'livre',calculo:'com cálculo impactado',ureterocele:'com ureterocele',dilatada:'com dilatação do ureter distal'})[d[s]];
+  return `Junção ureterovesical direita ${f('D')}; esquerda ${f('E')}.`;
+}
+function conclusao(){
+  const c=[], g=peso(), ipp=grauIPP(num(st.pr.ipp)), r=residuo();
+  if(isFinite(g)&&g>30) c.push(`Próstata de volume ${g<=50?'discretamente':g<=80?'moderadamente':'acentuadamente'} aumentado (~${fmt(g)} g), compatível com hiperplasia prostática benigna.`);
+  if(ipp) c.push(`Protrusão prostática intravesical grau ${ipp}.`);
+  if(st.pr.calc) c.push('Calcificações prostáticas.');
+  if(st.bx.parAsp!=='regular') c.push(st.bx.parAsp==='trabeculada'?'Bexiga de esforço (paredes espessadas e trabeculadas).':'Espessamento parietal vesical.');
+  if(st.bx.cont==='calculo') c.push('Cálculo vesical.');
+  ['D','E'].forEach(s=>{const v=st.juv[s]; if(v!=='livre') c.push(`${({calculo:'Cálculo impactado',ureterocele:'Ureterocele',dilatada:'Dilatação do ureter distal'})[v]} ${s==='D'?'à direita':'à esquerda'}.`);});
+  if(st.vs!=='habitual') c.push('Alteração em vesículas seminais, conforme descrito.');
+  if(isFinite(r)&&r>50) c.push(`Resíduo pós-miccional significativo (~${fmt(r)} mL${st.pos.length>1?` após ${st.pos.length} micções`:''}).`);
+  return c.length?c:['Exame ecográfico sem alterações.'];
+}
+function sugestao(){
+  const g=peso(), r=residuo();
+  if((isFinite(g)&&g>30)||(isFinite(r)&&r>50)||num(st.anam.psa)>4) return 'Correlação com PSA e avaliação urológica.';
+  return 'Acompanhamento com médico assistente.';
+}
+function docUS(){
+  const b=st.bx, p=st.pr, gi=pesoDe(p.med), ipp=grauIPP(num(p.ipp));
+  const aum=isFinite(peso())&&peso()>30;
+  const contB=b.cont==='anecoico'?'conteúdo anecoico':b.cont==='ecos'?'ecos em suspensão'+(b.contTxt.trim()?' ('+b.contTxt.trim().replace(/\.$/,'')+')':''):'imagem hiperecogênica com sombra acústica, compatível com cálculo'+(b.contTxt.trim()?', '+b.contTxt.trim().replace(/\.$/,''):'');
+  return [
+    'ULTRASSONOGRAFIA DA PRÓSTATA VIA ABDOMINAL','',
+    ...linhaTopo(),
+    `Indicação: ${st.ind}.`,
+    ...linhaEquip(),
+    tecnica(' por via suprapúbica, com avaliação pós-miccional'),
+    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]),
+    ...prevLinha(),'',
+    'Descrição:',
+    `Bexiga com ${b.rep==='boa'?'boa repleção':'repleção parcial'}, paredes ${b.parAsp==='regular'?'regulares':b.parAsp==='trabeculada'?'espessadas e trabeculadas':'espessadas'}, medindo ${txt(b.parede)} mm, e ${contB}. Volume vesical inicial: ~${fmt(vol(b.med))} mL.`,
+    juvTxt(),'',
+    `Próstata ${aum?'de dimensões aumentadas, ':''}com contornos ${p.cont} e textura ${p.text}, sem lesões focais. Mediu ${p.med.map(cm).join(' × ')} cm. Volume: ~${fmt(vol(p.med))} cm³ (peso estimado ~${fmt(gi)} g).`,
+    ...(p.calc?[frase(p.calcTxt)]:[]),'',
+    st.vs==='habitual'?'Vesículas seminais simétricas, de aspecto habitual.':`Vesículas seminais: ${frase(st.vsTxt)}`,
+    ipp?`Protrusão prostática intravesical de ${txt(p.ipp)} mm (grau ${ipp}).`:'Sem protrusão prostática intravesical.','',
+    ...st.pos.flatMap((m,i)=>[`Pós-miccional ${i+1}: resíduo vesical de ~${fmt(vol(m.bx))} mL. Próstata mediu ${m.pr.map(cm).join(' × ')} cm (~${fmt(vol(m.pr))} cm³; peso estimado ~${fmt(pesoDe(m.pr))} g).`]),
+    ...(st.pos.length?['']:[]),
+    'Conclusão:',...conclusao(),'',
+    `Sugestão: ${sugestao()}`,
+  ].join('\n');
+}
+
+// ---------- render ----------
+function chips(items,cur,attr,multi){return '<div class="chips">'+items.map(it=>{const [v,l]=Array.isArray(it)?it:[it,it];const on=multi?cur.has(v):cur===v;return `<button type="button" class="chip" data-${attr}="${esc(v)}" aria-pressed="${on}">${esc(l)}</button>`;}).join('')+'</div>';}
+function segm(items,cur,attr){return '<div class="segm">'+items.map(it=>{const [v,l]=Array.isArray(it)?it:[it,it];return `<button type="button" data-${attr}="${esc(v)}" aria-pressed="${cur===v}">${esc(l)}</button>`;}).join('')+'</div>';}
+const cells=(arr,attr)=>arr.map((v,i)=>`<input class="cell" inputmode="numeric" data-mmc="1" data-${attr}="${i}" value="${esc(v)}" placeholder="mm">`).join('<span class="x">×</span>');
+const obs=(id,val,ph)=>`<textarea class="obs" id="${id}" placeholder="${ph}">${esc(val)}</textarea>`;
+
+function render(){
+  const a=st.anam,b=st.bx,p=st.pr,g=peso(),ipp=grauIPP(num(p.ipp));
+  $('#phone').innerHTML=`<div class="view">
+    <div class="top">${APP?`<a class="iconbtn" href="index.html" aria-label="Início">${I.back}</a>`:`<div class="iconbtn">${I.back}</div>`}<div class="ttl"><div class="h">US Próstata abdominal</div><div class="s">${servSub()}</div></div><button type="button" class="newbtn" id="novo">Novo exame</button></div>
+    <div class="body">
+      ${servCard()}
+      <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
+      ${equipCard()}
+      <div class="card"><div class="lbl">Exames anteriores</div><div class="form">
+        <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
+        ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
+        <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou próstata com 48 g e resíduo de 60 mL">${esc(st.prev.txt||'')}</textarea>`:''}
+      </div></div>
+      <div class="card"><div class="lbl">Anamnese</div><div class="form">
+        <div class="k">PSA</div><div class="in"><input class="cell" inputmode="decimal" data-f="psa" value="${esc(a.psa)}" placeholder="—"><span class="x">ng/mL em</span><input class="cell" style="width:72px" data-f="psadata" value="${esc(a.psaData)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
+        <div class="k">Sintomas</div>${chips(SINT,a.sint,'sint',true)}
+        <div class="k">Medicação HPB</div>${segm([['n','não'],['s','sim']],a.med?'s':'n','med')}
+        ${a.med?obs('medTxt',a.medTxt,'qual? ex.: tansulosina 0,4 mg'):''}
+      </div></div>
+      <div class="card"><div class="lbl">Bexiga · volume inicial <span class="act" id="vbx">~${fmt(vol(b.med))} mL</span></div><div class="form">
+        <div class="k">Repleção</div>${segm([['boa','boa'],['parcial','parcial']],b.rep,'rep')}
+        <div class="k">Medidas</div><div class="in">${cells(b.med,'bm')}<span class="x">mm</span></div>
+        <div class="k">Parede</div><div class="in"><input class="cell" inputmode="decimal" data-f="parede" value="${esc(b.parede)}" placeholder="—"><span class="x">mm</span></div>
+        <div class="k">Aspecto</div>${segm([['regular','regular'],['espessada','espessada'],['trabeculada','trabeculada']],b.parAsp,'parasp')}
+        <div class="k">Conteúdo</div>${segm([['anecoico','anecoico'],['ecos','ecos'],['calculo','cálculo']],b.cont,'bcont')}
+        ${b.cont!=='anecoico'?obs('contTxt',b.contTxt,b.cont==='calculo'?'ex.: medindo 1,2 cm, móvel':'ex.: finos, móveis'):''}
+      </div></div>
+      <div class="card"><div class="lbl">Junções ureterovesicais</div><div class="form">
+        <div class="k">Direita</div>${segm(JUVOPT,st.juv.D,'juvd')}
+        <div class="k">Esquerda</div>${segm(JUVOPT,st.juv.E,'juve')}
+      </div></div>
+      <div class="card"><div class="lbl">Próstata <span class="act" id="vpr">~${fmt(pesoDe(p.med))} g</span></div><div class="form">
+        <div class="k">Medidas</div><div class="in">${cells(p.med,'pm')}<span class="x">mm</span></div>
+        <div class="k">Contornos</div>${segm([['regulares','regulares'],['lobulados','lobulados']],p.cont,'pcont')}
+        <div class="k">Textura</div>${segm([['homogênea','homogênea'],['heterogênea','heterogênea']],p.text,'ptext')}
+        <div class="k">Calcificações</div>${segm([['n','não'],['s','sim']],p.calc?'s':'n','pcalc')}
+        ${p.calc?obs('calcTxt',p.calcTxt,'descreva: ex.: calcificações periuretrais, a maior com 0,4 cm'):''}
+      </div></div>
+      <div class="card"><div class="lbl">Vesículas seminais</div><div class="form">
+        <div class="k">Aspecto</div>${segm([['habitual','habituais'],['alterada','alteradas']],st.vs,'vs')}
+        ${st.vs!=='habitual'?obs('vsTxt',st.vsTxt,'descreva a alteração'):''}
+      </div></div>
+      <div class="card"><div class="lbl">Protrusão intravesical <span class="act" id="ippG">${ipp?'grau '+ipp:'ausente'}</span></div><div class="form">
+        <div class="k">Protrusão</div><div class="in"><input class="cell" inputmode="decimal" data-f="ipp" value="${esc(p.ipp)}" placeholder="0"><span class="x">mm</span></div>
+      </div></div>
+      <div class="card"><div class="lbl">Pós-miccional <span class="act">${st.pos.length?st.pos.length+'×':''}</span></div>
+        ${st.pos.map((m,i)=>`<div class="pm"><div class="t">Pós-mic ${i+1}</div><div class="form">
+          <div class="k">Bexiga</div><div class="in">${cells(m.bx,'b'+i)}<span class="auto" id="rb${i}">~${fmt(vol(m.bx))} mL</span></div>
+          <div class="k">Próstata</div><div class="in">${cells(m.pr,'p'+i)}<span class="auto" id="rp${i}">~${fmt(pesoDe(m.pr))} g</span></div>
+        </div></div>`).join('')||'<div class="empty">Pelo menos uma medida pós-miccional é obrigatória.</div>'}
+        <div class="row2"><button type="button" class="addbtn" id="addPos">${I.plus}Pós-miccional</button>${st.pos.length>1?'<button type="button" class="addbtn" id="rmPos" style="flex:0 0 96px;color:var(--tx3)">Remover</button>':''}</div>
+      </div>
+    </div>
+    <div class="bottom"><button type="button" class="btn primary" id="copiar">${I.copy}Copiar laudo</button></div>
+  </div>`;
+  wire(); renderDocs();
+}
+function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
+async function copiar(t){
+  try{ await navigator.clipboard.writeText(t); return true; }catch(e){}
+  try{ const ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,t.length); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; }
+}
+function wire(){
+  const ph=$('#phone'); const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));
+  const inp=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('input',()=>fn(el)));
+  on('[data-serv]',el=>{st.serv=el.dataset.serv;render();}); on('[data-carater]',el=>{st.carater=el.dataset.carater;render();});
+  const pc=$('#pac'); if(pc) pc.addEventListener('input',()=>{st.pac=pc.value;renderDocs();$('#phone .top .s').innerHTML=servSub();});
+  on('[data-ind]',el=>{st.ind=el.dataset.ind;render();});
+  on('[data-prev]',el=>{st.prev.tem=el.dataset.prev;render();});
+  on('[data-sint]',el=>{const v=el.dataset.sint;st.anam.sint.has(v)?st.anam.sint.delete(v):st.anam.sint.add(v);render();});
+  on('[data-med]',el=>{st.anam.med=el.dataset.med==='s';render(); if(st.anam.med) $('#medTxt').focus();});
+  on('[data-rep]',el=>{st.bx.rep=el.dataset.rep;render();}); on('[data-parasp]',el=>{st.bx.parAsp=el.dataset.parasp;render();});
+  on('[data-bcont]',el=>{st.bx.cont=el.dataset.bcont;render(); if(st.bx.cont!=='anecoico') $('#contTxt').focus();});
+  on('[data-juvd]',el=>{st.juv.D=el.dataset.juvd;render();}); on('[data-juve]',el=>{st.juv.E=el.dataset.juve;render();});
+  on('[data-pcont]',el=>{st.pr.cont=el.dataset.pcont;render();}); on('[data-ptext]',el=>{st.pr.text=el.dataset.ptext;render();});
+  on('[data-pcalc]',el=>{st.pr.calc=el.dataset.pcalc==='s';render(); if(st.pr.calc) $('#calcTxt').focus();});
+  on('[data-vs]',el=>{st.vs=el.dataset.vs;render(); if(st.vs!=='habitual') $('#vsTxt').focus();});
+  [['medTxt',v=>st.anam.medTxt=v],['contTxt',v=>st.bx.contTxt=v],['calcTxt',v=>st.pr.calcTxt=v],['vsTxt',v=>st.vsTxt=v]].forEach(([id,f])=>{const el=document.getElementById(id); if(el) el.addEventListener('input',()=>{f(el.value);renderDocs();});});
+  const ap=$('#addPos'); if(ap) ap.addEventListener('click',()=>{st.pos.push({bx:['','',''],pr:['','','']});render(); const c=ph.querySelectorAll('.pm'); const l=c[c.length-1]; if(l){l.scrollIntoView({block:'center'}); const i=l.querySelector('input'); if(i) i.focus();}});
+  const rp=$('#rmPos'); if(rp) rp.addEventListener('click',()=>{st.pos.pop();render();});
+  $('#novo').addEventListener('click',()=>{const keep={serv:st.serv,carater:st.carater}; st=Object.assign(NOVO(),keep); for(const k in EDITS) delete EDITS[k]; render(); ph.scrollTop=0; window.scrollTo(0,0); toast('Novo exame');});
+  inp('input[data-bm]',el=>{st.bx.med[+el.dataset.bm]=el.value;renderDocs();$('#vbx').textContent=`~${fmt(vol(st.bx.med))} mL`;});
+  inp('input[data-pm]',el=>{st.pr.med[+el.dataset.pm]=el.value;renderDocs();$('#vpr').textContent=`~${fmt(pesoDe(st.pr.med))} g`;});
+  st.pos.forEach((m,i)=>{
+    inp(`input[data-b${i}]`,el=>{m.bx[+el.dataset['b'+i]]=el.value;renderDocs();$('#rb'+i).textContent=`~${fmt(vol(m.bx))} mL`;});
+    inp(`input[data-p${i}]`,el=>{m.pr[+el.dataset['p'+i]]=el.value;renderDocs();$('#rp'+i).textContent=`~${fmt(pesoDe(m.pr))} g`;});
+  });
+  inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value;
+    if(k==='psa')st.anam.psa=v; else if(k==='psadata')st.anam.psaData=v; else if(k==='prevdata')st.prev.data=v; else if(k==='prevvol')st.prev.vol=v; else if(k==='parede')st.bx.parede=v;
+    else if(k==='ipp'){st.pr.ipp=v;const g=grauIPP(num(v));$('#ippG').textContent=g?'grau '+g:'ausente';}
+    renderDocs();});
+  $('#copiar').addEventListener('click',async()=>{toast(await copiar(docUS())?'Laudo copiado':'Não copiou: segure no texto abaixo e copie');});
+}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2000);}
+function limpar(){ st=NOVO(); }
+// ---------- padrões do app: pular para o próximo campo e máscara de data ----------
+function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
+document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;
+  const m=el.dataset.mask;
+  if(m==='mmaa'||m==='ddmmaaaa'){ const max=m==='mmaa'?4:8; const d=el.value.replace(/\D/g,'').slice(0,max);
+    el.value=m==='mmaa'?(d.length>2?d.slice(0,2)+'/'+d.slice(2):d):[d.slice(0,2),d.slice(2,4),d.slice(4)].filter(Boolean).join('/');
+    if(d.length===max) proximo(el); return; }
+  if(el.dataset.mmc && /^\d{2}$/.test(el.value)) proximo(el);   // medida em mm: 2 dígitos e pula
+},true);
+
+// medidas digitadas em mm saem em cm no laudo (20 → 2,0)
+const cm=v=>{const s=String(v||'').trim(); if(!s) return '___'; const n=parseFloat(s.replace(',','.')); if(!isFinite(n)) return '___'; return (n/10).toFixed(/[.,]/.test(s)?2:1).replace('.',',');};
+const fraseP=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?:]$/.test(t)?'':'.');};
+const prevLinha=()=>st.prev.tem==='sim'?[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`]:[];
+document.addEventListener('input',e=>{ if(e.target&&e.target.id==='prevTxt'){ st.prev.txt=e.target.value; renderDocs(); } });
+// prévia editável: o que você escreve nela é o que vai no Copiar
+const EDITS={}; let RAW=false, INR=false, LAST='docUS';
+['docUS','docPAAF','docCORE','docUnico'].forEach(name=>{ const f=window[name]; if(typeof f!=='function') return;
+  window[name]=function(){ if(!RAW){ if(INR) LAST=name; if(EDITS[name]!=null) return EDITS[name]; } const r=RAW; RAW=true; try{ return f.apply(this,arguments); } finally{ RAW=r; } }; });
+{ const _rd=renderDocs; window.renderDocs=function(){ INR=true; try{ _rd(); } finally{ INR=false; } const b=document.getElementById('editBar'); if(b) b.hidden=EDITS[LAST]==null; }; }
+(function(){ const d=document.getElementById('docOut'); if(!d) return; d.setAttribute('contenteditable','true'); d.classList.add('editavel');
+  const bar=document.createElement('div'); bar.id='editBar'; bar.className='editbar'; bar.hidden=true;
+  bar.innerHTML='<span>Texto editado à mão. Mudanças nos cartões não entram mais.</span><button type="button">Refazer pelos cartões</button>';
+  d.parentNode.insertBefore(bar,d); bar.querySelector('button').onclick=()=>{ delete EDITS[LAST]; renderDocs(); };
+  d.addEventListener('input',()=>{ EDITS[LAST]=d.innerText.replace(/\n{3,}/g,'\n\n'); bar.hidden=false; });
+  const cp=document.createElement('button'); cp.type='button'; cp.className='copiar2'; cp.id='copiar2'; cp.textContent='Copiar laudo';
+  d.insertAdjacentElement('afterend',cp);
+  cp.onclick=()=>{ const b=document.getElementById('copiar'); if(b) b.click(); else toast('Conclua o item aberto e volte ao laudo para copiar'); };
+})();
+
+// ---------- myLaudo: modo app (aberto pelo início) ----------
+const APP=(()=>{try{return new URLSearchParams(location.search).has('app');}catch(e){return false;}})();
+if(APP){ limpar(); try{ const s=localStorage.getItem('mylaudo.serv'); if(s) st.serv=s; const p=JSON.parse(localStorage.getItem('mylaudo.pac')||'null'); if(p){ st.pac=p.nome||''; if(p.serv) st.serv=p.serv; } }catch(e){} }
+{ const _r=render; render=function(){ _r(); const v=(st.view||'')+':'+(st.edit||''); if(v!==window._lv){ window._lv=v; if(innerWidth<600) scrollTo(0,0); } }; }
+render();
+</script>

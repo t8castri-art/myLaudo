@@ -1,0 +1,293 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>myLaudo · Novo paciente</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#09080b;--s1:#100e13;--s2:#16141b;--s3:#1d1a23;--bd:#221f28;--bd2:#2f2b37;
+  --tx:#ececee;--tx2:#9b97a3;--tx3:#605c69;
+  --ac:#bc7ba4;--acT:#dcb9cd;--acTint:rgba(188,123,164,.12);
+  --ok:#9aaf9c;--okTint:rgba(154,175,156,.12);--alert:#b08183;
+  --f:'IBM Plex Sans',system-ui,sans-serif;--m:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0;text-align:left}
+button:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+input{font:inherit;color:inherit}
+svg{display:block;flex:none}
+.wrap{max-width:1380px;margin:0 auto;padding-block:24px 80px;padding-inline:24px}
+header{margin-bottom:22px}
+header h1{font-size:20px;font-weight:500;margin:0;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
+.stage{display:grid;grid-template-columns:390px minmax(0,1fr);gap:36px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr;justify-items:center}.docs{position:static;width:100%}}
+.docs{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.docs h2{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin:0}
+.doc{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:16px 18px;font-size:13px;line-height:1.7;color:var(--tx2);white-space:pre-wrap}
+.doc b{color:var(--tx);font-weight:500}
+.doc.quote{font-style:italic;color:var(--tx2)}
+.doc.quote mark{background:var(--acTint);color:var(--acT);font-style:normal;border-radius:3px;padding:0 2px}
+.cap{font-size:12px;color:var(--tx3);line-height:1.55;max-width:70ch}
+.linkbtn{color:var(--acT);font-size:12.5px;text-decoration:underline;text-underline-offset:3px;align-self:flex-start}
+
+/* telefone */
+.phone{width:390px;max-width:100%;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px #232028,0 30px 60px rgba(0,0,0,.65);flex:none}
+.top{padding:54px 16px 8px;display:flex;align-items:center;gap:10px;position:relative;z-index:3}
+.iconbtn{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--tx2);background:var(--s1);border:1px solid var(--bd);flex:none}
+.ttl{flex:1;min-width:0}
+.ttl .h{font-size:17px;font-weight:500;line-height:1.2;letter-spacing:-.01em}
+.ttl .s{font-size:12px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* botão duplo */
+.dual{position:relative;width:40px;height:40px;flex:none}
+.fab{position:absolute;right:0;top:0;width:40px;height:40px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);display:flex;align-items:center;justify-content:center;background:var(--bg);transition:transform .18s,opacity .18s;z-index:2}
+.fab .dot{width:8px;height:8px;border-radius:999px;background:var(--acT)}
+.opt{position:absolute;top:0;right:0;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:0;pointer-events:none;transition:transform .2s,opacity .2s}
+.opt .c{width:40px;height:40px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.opt small{font-size:10px;color:var(--tx2);white-space:nowrap}
+.opt[aria-disabled="true"] .c{border-color:var(--bd2);color:var(--tx3)}
+.opt[aria-disabled="true"] small{color:var(--tx3)}
+.dual.open .fab{transform:scale(.6);opacity:0;pointer-events:none}
+.dual.open .opt{opacity:1;pointer-events:auto}
+.dual.open .opt.a{transform:translateX(-48px)}
+.dual.open .opt.b{transform:translateX(0)}
+.scrim{position:absolute;inset:0;z-index:2;display:none}
+.dual.open ~ .scrim{display:block}
+
+.body{flex:1;overflow-y:auto;padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px;min-height:0;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lbl .act{text-transform:none;letter-spacing:0;font-weight:400;color:var(--acT);font-size:12px}
+.card{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:12px 14px;flex:none}
+.form{display:grid;grid-template-columns:92px 1fr;gap:8px 10px;align-items:center}
+.form .k{font-size:12.5px;color:var(--tx2)}
+.field{display:flex;align-items:center;gap:8px;min-width:0}
+.txtin{width:100%;min-width:0;padding:7px 9px;border-radius:7px;background:var(--s2);border:1px solid var(--bd2);color:var(--tx);font-size:13px;outline:none}
+.txtin.mono{font-family:var(--m);width:112px}
+.txtin:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acTint)}
+.txtin::placeholder{color:var(--tx3)}
+.auto{font-size:10.5px;color:var(--ok);border:1px solid color-mix(in oklab,var(--ok),transparent 60%);padding:1px 7px;border-radius:999px;white-space:nowrap}
+.segm{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.segm button{flex:1;text-align:center;font-size:12px;padding:6px 4px;color:var(--tx2);border-left:1px solid var(--bd2)}
+.segm button:first-child{border-left:0}
+.segm button[aria-pressed="true"]{background:var(--acTint);color:var(--acT)}
+/* marcado pelo ditado, aguardando conferência */
+.dict .txtin,.dict .segm,.dict.prev{border-color:var(--ac);border-style:dashed}
+.review{border:1px dashed var(--ac);border-radius:12px;background:var(--acTint);padding:10px 12px;display:flex;align-items:center;gap:10px;flex:none}
+.review p{margin:0;font-size:12.5px;color:var(--acT);flex:1;line-height:1.4}
+.review button{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--ac);color:var(--acT);white-space:nowrap}
+.prev{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--s2)}
+.prev + .prev{margin-top:6px}
+.prev .n{flex:1;min-width:0}
+.prev .n b{font-weight:500;font-size:13.5px;display:block}
+.prev .n span{font-size:12px;color:var(--tx2);display:block}
+.prev .tag{font-family:var(--m);font-size:11px;padding:3px 7px;border-radius:6px;background:var(--s3);color:var(--tx2);flex:none;font-variant-numeric:tabular-nums}
+.empty{font-size:12.5px;color:var(--tx3)}
+.addbtn{width:100%;height:40px;border-radius:10px;border:1px dashed var(--bd2);display:flex;align-items:center;justify-content:center;gap:7px;color:var(--acT);font-size:13px;font-weight:500;margin-top:8px}
+.bottom{padding:10px 16px 26px;border-top:1px solid var(--bd);background:var(--bg);display:flex;gap:10px;flex:none}
+.btn{height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;flex:1}
+.btn.primary{border:1px solid var(--ac);color:var(--acT)}
+.btn.ghost{border:0;color:var(--tx2);flex:none;padding:0 14px}
+
+/* folha de ditado */
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:5;background:var(--s1);border-top:1px solid var(--bd2);border-radius:22px 22px 0 0;padding:18px 18px 30px;display:flex;flex-direction:column;gap:14px;transform:translateY(100%);transition:transform .22s}
+.sheet.on{transform:none}
+.sheet .row{display:flex;align-items:center;gap:10px}
+.sheet .row b{font-size:14px;font-weight:500;flex:1}
+.sheet .timer{font-family:var(--m);font-size:12px;color:var(--tx2)}
+.bars{display:flex;align-items:center;gap:3px;height:28px}
+.bars i{width:3px;border-radius:2px;background:var(--ac);height:30%;animation:b 1s ease-in-out infinite}
+.bars i:nth-child(2n){animation-delay:.15s}.bars i:nth-child(3n){animation-delay:.3s}.bars i:nth-child(5n){animation-delay:.45s}
+@keyframes b{0%,100%{height:20%}50%{height:100%}}
+.live{font-size:13.5px;line-height:1.55;color:var(--tx);min-height:88px}
+.live .cur{display:inline-block;width:2px;height:15px;background:var(--acT);vertical-align:-2px;margin-left:1px;animation:k 1s steps(1) infinite}
+@keyframes k{50%{opacity:0}}
+.sheet .hint{font-size:11.5px;color:var(--tx3)}
+.stop{height:52px;width:52px;border-radius:999px;border:1px solid var(--ac);display:flex;align-items:center;justify-content:center;align-self:center}
+.stop i{width:16px;height:16px;border-radius:3px;background:var(--acT)}
+@media (prefers-reduced-motion:reduce){.bars i,.live .cur{animation:none}.sheet,.fab,.opt{transition:none}}
+.vf{height:300px;border:1px dashed var(--bd2);border-radius:14px;background:var(--s2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.paper{position:relative;width:62%;height:86%;background:#d9d5dc;border-radius:3px;padding:14px 12px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.paper .ln{height:5px;border-radius:2px;background:#8f8a96}.paper .ln.h{height:8px;width:70%;background:#5e5965}.paper .ln.s{width:55%}.paper .ln.m{width:78%}
+.paper .redact{background:#09080b;color:var(--tx3);font-size:8.5px;letter-spacing:.04em;padding:3px 6px;border-radius:2px;text-transform:uppercase}
+.beam{position:absolute;left:0;right:0;height:2px;background:var(--ac);box-shadow:0 0 12px var(--ac);top:0;opacity:0}
+.beam.go{opacity:1;animation:sc 1.2s ease-in-out}
+@keyframes sc{from{top:0}to{top:100%}}
+@media (prefers-reduced-motion:reduce){.beam.go{animation:none}}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--s3);border:1px solid var(--bd2);color:var(--tx);padding:9px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .15s}
+.toast.on{opacity:1}
+
+/* myLaudo no celular: sem moldura, tela cheia */
+@media (max-width:600px){
+  .wrap{padding-inline:10px;padding-block:8px 40px}
+  header{display:none}
+  .stage{gap:16px}
+  .phone{width:100%;height:auto;border-radius:0;box-shadow:none;overflow:visible}
+  .view{position:static}
+  .top{padding:10px 4px 8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:4}
+  .body{overflow:visible;padding:4px 0 12px}
+  .bottom{position:sticky;bottom:0;padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px))}
+  .doc{max-height:none}
+  .sheet{position:fixed}
+  .cell,.txtin,.obs{font-size:16px}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Novo paciente</h1>
+    <p>O botão redondo no canto se abre em dois: ditado e scanner. O scanner lê laudos antigos e preenche só os exames anteriores; nome e dados pessoais não saem do celular. O que o ditado preenche aparece tracejado até você conferir. A tela abre logo depois de um ditado de exemplo. Para ditar de novo, use "Recomeçar" ao lado.</p>
+  </header>
+  <div class="stage">
+    <div class="phone" id="phone">
+      <div class="top">
+        <button type="button" class="iconbtn" id="voltar" aria-label="Voltar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="ttl"><div class="h">Novo paciente</div><div class="s" id="sub">—</div></div>
+        <div class="dual" id="dual">
+          <button type="button" class="fab" id="fab" aria-label="Ditado ou scanner" aria-expanded="false"><span class="dot"></span></button>
+          <button type="button" class="opt a" id="optDit" tabindex="-1"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><small>ditado</small></button>
+          <button type="button" class="opt b" id="optScan" tabindex="-1"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M7 12h10"/></svg></span><small>scanner</small></button>
+        </div>
+        <div class="scrim" id="scrim"></div>
+      </div>
+      <div class="body" id="body"></div>
+      <div class="bottom"><button type="button" class="btn ghost" id="salvar">Salvar</button><button type="button" class="btn primary" id="iniciar">Salvar e iniciar exame</button></div>
+      <div class="sheet" id="sheet" aria-hidden="true">
+        <div class="row"><div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>Ouvindo</b><span class="timer" id="timer">0:00</span></div>
+        <div class="live" id="live"></div>
+        <div class="hint">Fale nome, nascimento, serviço e exames anteriores, em qualquer ordem.</div>
+        <button type="button" class="stop" id="stop" aria-label="Parar e preencher"><i></i></button>
+      </div>
+      <div class="sheet" id="scan" aria-hidden="true">
+        <div class="row"><b id="scanTit">Scanner</b><span class="timer" id="scanPg">página 1</span></div>
+        <div class="vf" aria-hidden="true"><div class="paper">
+          <div class="ln h"></div><div class="redact">nome · CPF · nascimento</div><div class="ln"></div><div class="ln s"></div>
+          <div class="ln"></div><div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln m"></div><div class="ln"></div><div class="ln s"></div>
+          <div class="beam" id="beam"></div></div></div>
+        <div class="hint">Identificação coberta no próprio celular. Só os achados seguem para leitura.</div>
+        <button type="button" class="stop" id="shot" aria-label="Fotografar laudo"><i style="border-radius:999px"></i></button>
+      </div>
+    </div>
+    <aside class="docs">
+      <h2>Ficha que vai ser salva</h2>
+      <div class="doc" id="ficha"></div>
+      <h2>O que você ditou</h2>
+      <div class="doc quote" id="quote"></div>
+      <button type="button" class="linkbtn" id="reset">Recomeçar e ditar de novo</button>
+      <div class="cap">Protótipo: ditado e scanner aqui são simulados com exemplos. No app, a voz vira texto no próprio iPhone, e esse texto é repartido nos campos. A ficha guarda só identificação, contato e exames anteriores. Anamnese e achados ficam no laudo de cada exame.</div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const FALA='Maria Aparecida de Souza Lima, nascida em doze de março de setenta e dois, Instituto. Trouxe ultrassom de tireoide de março de 2025, um nódulo no lobo direito de um vírgula dois.';
+const MARCAS=['Maria Aparecida de Souza Lima','doze de março de setenta e dois','Instituto','ultrassom de tireoide de março de 2025','um nódulo no lobo direito de um vírgula dois'];
+const EXTRAIDO={nome:'Maria Aparecida de Souza Lima',nasc:'12/03/1972',serv:'inst',prev:[{exame:'US tireoide',data:'03/2025',achado:'1 nódulo, LD',maior:'1,2 cm'}]};
+const VAZIO=()=>({nome:'',nasc:'',sexo:'F',serv:'part',zap:'',email:'',envio:'zap',prev:[],dict:new Set()});
+let st=Object.assign(VAZIO(),EXTRAIDO,{zap:'(65) 9 ····-····',dict:new Set(['nome','nasc','serv','prev'])});
+
+const idade=d=>{const m=String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); if(!m) return ''; const n=new Date(+m[3],+m[2]-1,+m[1]), h=new Date(2026,8,17); let a=h.getFullYear()-n.getFullYear(); if(h<new Date(h.getFullYear(),n.getMonth(),n.getDate())) a--; return a>=0&&a<120?a+' anos':'';};
+const SERV={inst:'Instituto',part:'Particular',hmc:'HMC'};
+const segm=(items,cur,attr)=>'<div class="segm">'+items.map(([v,l])=>`<button type="button" data-${attr}="${v}" aria-pressed="${cur===v}">${l}</button>`).join('')+'</div>';
+const d=k=>st.dict.has(k)?' dict':'';
+
+function render(){
+  const hmc=st.serv==='hmc';
+  $('#sub').textContent=[st.nome||'sem nome',idade(st.nasc),SERV[st.serv]].filter(Boolean).join(' · ');
+  $('#body').innerHTML=`
+    ${st.dict.size?`<div class="review"><p>${st.dict.size} ${st.dict.size>1?'campos vieram':'campo veio'} do ditado ou scanner. Confira os tracejados.</p><button type="button" id="aceitar">Conferido</button></div>`:''}
+    <div class="card"><div class="lbl">Serviço</div><div class="${d('serv')}">${segm([['inst','Instituto'],['part','Particular'],['hmc','HMC']],st.serv,'serv')}</div></div>
+    <div class="card"><div class="lbl">Identificação</div><div class="form">
+      <label class="k" for="nome">Nome</label><div class="field${d('nome')}"><input class="txtin" id="nome" value="${esc(st.nome)}" placeholder="${hmc?'opcional no HMC':'nome completo'}" autocomplete="off"></div>
+      <label class="k" for="nasc">Nascimento</label><div class="field${d('nasc')}"><input class="txtin mono" id="nasc" inputmode="numeric" value="${esc(st.nasc)}" placeholder="dd/mm/aaaa" data-mask="ddmmaaaa"><span class="auto" id="idade" ${idade(st.nasc)?'':'hidden'}>${idade(st.nasc)}</span></div>
+      <span class="k">Sexo</span>${segm([['F','feminino'],['M','masculino']],st.sexo,'sexo')}
+    </div></div>
+    ${hmc?'':`<div class="card"><div class="lbl">Envio do laudo</div><div class="form">
+      <span class="k">Por</span>${segm([['zap','WhatsApp'],['email','e-mail'],['ambos','os dois']],st.envio,'envio')}
+      ${st.envio!=='email'?`<label class="k" for="zap">WhatsApp</label><div class="field"><input class="txtin" id="zap" inputmode="tel" value="${esc(st.zap)}" placeholder="(65) 9 0000-0000"></div>`:''}
+      ${st.envio!=='zap'?`<label class="k" for="email">E-mail</label><div class="field"><input class="txtin" id="email" inputmode="email" value="${esc(st.email)}" placeholder="nome@email.com"></div>`:''}
+    </div></div>`}
+    <div class="card"><div class="lbl">Exames anteriores <span class="act">${st.prev.length||''}</span></div>
+      ${st.prev.length?st.prev.map(p=>`<div class="prev${d('prev')}"><div class="n"><b>${p.exame} · ${p.data}</b><span>${p.achado}</span></div><span class="tag">maior ${p.maior}</span></div>`).join(''):'<div class="empty">Nenhum exame anterior.</div>'}
+      <button type="button" class="addbtn" id="addPrev">+ Adicionar exame anterior</button>
+    </div>`;
+  wire(); ficha();
+}
+function ficha(){
+  const L=[['Nome',st.nome||'—'],['Nascimento',st.nasc?st.nasc+(idade(st.nasc)?' ('+idade(st.nasc)+')':''):'—'],['Sexo',st.sexo==='F'?'feminino':'masculino'],['Serviço',SERV[st.serv]]];
+  if(st.serv!=='hmc') L.push(['Envio',{zap:'WhatsApp '+(st.zap||'—'),email:'e-mail '+(st.email||'—'),ambos:'WhatsApp '+(st.zap||'—')+' · e-mail '+(st.email||'—')}[st.envio]]);
+  $('#ficha').innerHTML=L.map(([k,v])=>`<b>${k}:</b> ${esc(v)}`).join('\n')+'\n\n<b>Exames anteriores:</b>\n'+(st.prev.length?st.prev.map(p=>`${p.exame} de ${p.data.replace(/^(\d{2})\/\d{2}(\d{2})$/,'$1/$2')}: ${p.achado}, maior ${p.maior}.`).join('\n'):'nenhum')+(st.dict.size?'\n\n<span style="color:var(--acT)">Aguardando conferência: '+[...st.dict].map(k=>({nome:'nome',nasc:'nascimento',serv:'serviço',prev:'exame anterior'})[k]).join(', ')+'</span>':'');
+}
+function quote(txt){ let h=esc(txt); MARCAS.forEach(m=>{h=h.replace(esc(m),'<mark>'+esc(m)+'</mark>');}); $('#quote').innerHTML=h||'<span style="color:var(--tx3)">nada ditado ainda</span>'; }
+
+function wire(){
+  document.querySelectorAll('[data-serv]').forEach(b=>b.onclick=()=>{st.serv=b.dataset.serv;st.dict.delete('serv');render();});
+  document.querySelectorAll('[data-sexo]').forEach(b=>b.onclick=()=>{st.sexo=b.dataset.sexo;render();});
+  document.querySelectorAll('[data-envio]').forEach(b=>b.onclick=()=>{st.envio=b.dataset.envio;render();});
+  const bind=(id,k)=>{const el=document.getElementById(id); if(el) el.oninput=()=>{st[k]=el.value; if(st.dict.has(k)){st.dict.delete(k); el.parentElement.classList.remove('dict'); const r=document.querySelector('.review p'); if(r){ if(!st.dict.size) document.querySelector('.review').remove(); else r.textContent=`${st.dict.size} ${st.dict.size>1?'campos vieram':'campo veio'} do ditado ou scanner. Confira os tracejados.`;}} if(k==='nasc'){const i=$('#idade'); i.textContent=idade(st.nasc); i.hidden=!idade(st.nasc);} $('#sub').textContent=[st.nome||'sem nome',idade(st.nasc),SERV[st.serv]].filter(Boolean).join(' · '); ficha();};};
+  bind('nome','nome'); bind('nasc','nasc'); bind('zap','zap'); bind('email','email');
+  const ac=$('#aceitar'); if(ac) ac.onclick=()=>{st.dict.clear();render();toast('Ficha conferida');};
+  $('#addPrev').onclick=()=>toast('Aqui abre o cartão de exame anterior (manual ou por ditado)');
+}
+
+// botão duplo
+const dual=$('#dual'),fab=$('#fab');
+const abrir=v=>{dual.classList.toggle('open',v);fab.setAttribute('aria-expanded',v);$('#optDit').tabIndex=v?0:-1;$('#optScan').tabIndex=v?0:-1; if(v) $('#optDit').focus();};
+fab.onclick=()=>abrir(true);
+$('#scrim').onclick=()=>abrir(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){abrir(false); $('#scan').classList.remove('on'); if($('#sheet').classList.contains('on')) parar(false);}});
+$('#optScan').onclick=()=>{abrir(false);const sh=$('#scan');sh.classList.add('on');sh.setAttribute('aria-hidden','false');$('#scanTit').textContent='Scanner';$('#shot').hidden=false;$('#shot').focus();};
+$('#shot').onclick=()=>{$('#shot').hidden=true;$('#scanTit').textContent='Lendo laudo…';const b=$('#beam');b.classList.remove('go');void b.offsetWidth;b.classList.add('go');
+  setTimeout(()=>{const sh=$('#scan');sh.classList.remove('on');sh.setAttribute('aria-hidden','true');
+    st.prev.push({exame:'US tireoide',data:'09/2024',achado:'2 nódulos, LD e LE',maior:'0,9 cm'});st.dict.add('prev');render();toast('1 exame anterior lido do laudo');},1300);};
+
+// ditado simulado
+let tmr,clock,t0,pos=0;
+$('#optDit').onclick=()=>{abrir(false);ouvir();};
+function ouvir(){
+  const sh=$('#sheet'); sh.classList.add('on'); sh.setAttribute('aria-hidden','false'); pos=0; $('#live').innerHTML='<span class="cur"></span>';
+  t0=Date.now(); clock=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$('#timer').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},250);
+  const words=FALA.split(' ');
+  const reduz=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  tmr=setInterval(()=>{pos=reduz?words.length:pos+1; $('#live').innerHTML=esc(words.slice(0,pos).join(' '))+'<span class="cur"></span>'; if(pos>=words.length){clearInterval(tmr); setTimeout(()=>parar(true),700);}},reduz?10:170);
+  $('#stop').focus();
+}
+function parar(preencher){
+  clearInterval(tmr);clearInterval(clock);
+  const sh=$('#sheet'); sh.classList.remove('on'); sh.setAttribute('aria-hidden','true');
+  const words=FALA.split(' ');
+  if(!preencher) return;
+  if(pos<words.length) pos=words.length; // no protótipo, parar antes ainda usa a fala inteira
+  Object.assign(st,{nome:EXTRAIDO.nome,nasc:EXTRAIDO.nasc,serv:EXTRAIDO.serv,prev:EXTRAIDO.prev.map(p=>({...p})),dict:new Set(['nome','nasc','serv','prev'])});
+  quote(FALA); render(); toast('4 campos preenchidos');
+}
+$('#stop').onclick=()=>parar(true);
+$('#reset').onclick=()=>{st=VAZIO();quote('');render();toast('Toque no botão redondo e escolha ditado');};
+
+$('#salvar').onclick=()=>toast(st.dict.size?'Confira os campos tracejados antes de salvar':'Paciente salvo');
+$('#iniciar').onclick=()=>{ if(st.dict.size) return toast('Confira os campos tracejados antes de salvar');
+  if(!APP) return toast('Salvo. Próximo passo: escolher o exame');
+  try{ localStorage.setItem('mylaudo.pac',JSON.stringify({nome:st.nome,serv:st.serv,nasc:st.nasc})); localStorage.setItem('mylaudo.serv',st.serv); }catch(e){}
+  location.href='index.html'; };
+$('#voltar').onclick=()=>{ if(APP) location.href='index.html'; };
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2000);}
+// ---------- padrões do app: pular para o próximo campo e máscara de data ----------
+function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
+document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;
+  const m=el.dataset.mask;
+  if(m==='mmaa'||m==='ddmmaaaa'){ const max=m==='mmaa'?4:8; const d=el.value.replace(/\D/g,'').slice(0,max);
+    el.value=m==='mmaa'?(d.length>2?d.slice(0,2)+'/'+d.slice(2):d):[d.slice(0,2),d.slice(2,4),d.slice(4)].filter(Boolean).join('/');
+    if(d.length===max) proximo(el); return; }
+  if(el.dataset.mmc && /^\d{2}$/.test(el.value)) proximo(el);   // medida em mm: 2 dígitos e pula
+},true);
+
+const APP=(()=>{try{return new URLSearchParams(location.search).has('app');}catch(e){return false;}})();
+if(APP){ st=VAZIO(); try{ const s=localStorage.getItem('mylaudo.serv'); if(s) st.serv=s; }catch(e){} quote(''); } else quote(FALA);
+render();
+</script>

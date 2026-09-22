@@ -1,0 +1,340 @@
+<meta charset="utf-8">
+<title>Laboratório do Laudo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap">
+<style>
+:root{
+  --lab-bg:#08080a;--lab-s1:#0f0f12;--lab-s2:#151519;--lab-bd:#232328;--lab-bd2:#303037;
+  --lab-tx:#e8e8ea;--lab-tx2:#9a9aa3;--lab-tx3:#606069;--lab-ac:#c9c9d2;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--lab-bg);color:var(--lab-tx);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--lab-ac)}
+.wrap{max-width:1380px;margin:0 auto;padding:28px 24px 80px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+header h1{font-size:20px;font-weight:500;margin:0;letter-spacing:-.01em}
+header p{margin:0;color:var(--lab-tx2);font-size:13px;max-width:62ch}
+.grid{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.panel{position:static}}
+.panel{position:sticky;top:16px;display:flex;flex-direction:column;gap:18px}
+.group{display:flex;flex-direction:column;gap:8px}
+.group>label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--lab-tx3)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{appearance:none;font:inherit;font-size:12.5px;padding:7px 11px;border-radius:999px;border:1px solid var(--lab-bd);background:var(--lab-s1);color:var(--lab-tx2);cursor:pointer;display:flex;align-items:center;gap:7px;min-height:32px}
+.seg button:hover{border-color:var(--lab-bd2);color:var(--lab-tx)}
+.seg button[aria-pressed="true"]{background:var(--lab-s2);border-color:var(--lab-tx2);color:var(--lab-tx)}
+.seg button:focus-visible,.toggle:focus-visible,.share button:focus-visible{outline:2px solid var(--lab-ac);outline-offset:2px}
+.sw{width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.12);display:inline-block;position:relative;overflow:hidden;flex:none}
+.sw i{position:absolute;right:0;bottom:0;width:7px;height:7px;border-radius:3px 0 0 0}
+.note{font-size:12.5px;color:var(--lab-tx2);line-height:1.5;border-left:2px solid var(--lab-bd2);padding:2px 0 2px 10px;min-height:38px}
+.note b{color:var(--lab-tx);font-weight:500}
+.range{display:flex;align-items:center;gap:10px}
+.range input{flex:1;accent-color:var(--lab-ac)}
+.range output{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--lab-tx2);width:52px;text-align:right}
+.hexline{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--lab-tx3);line-height:1.45}
+.share{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--lab-bd);padding-top:16px}
+.share button{appearance:none;font:inherit;font-size:13px;padding:9px 12px;border-radius:8px;border:1px solid var(--lab-bd2);background:var(--lab-s2);color:var(--lab-tx);cursor:pointer}
+.share button:hover{border-color:var(--lab-tx3)}
+.share textarea{font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.45;width:100%;min-height:64px;resize:vertical;background:var(--lab-s1);color:var(--lab-tx2);border:1px solid var(--lab-bd);border-radius:8px;padding:8px}
+.stage{display:flex;flex-direction:column;gap:18px;min-width:0}
+.stage-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.stage-head .t{font-size:13px;color:var(--lab-tx2)}
+.toggle{appearance:none;font:inherit;font-size:12.5px;padding:7px 12px;border-radius:999px;border:1px solid var(--lab-bd);background:var(--lab-s1);color:var(--lab-tx2);cursor:pointer}
+.toggle[aria-pressed="true"]{border-color:var(--lab-tx2);color:var(--lab-tx);background:var(--lab-s2)}
+.single{display:flex;justify-content:center;padding:14px 0 6px;overflow-x:auto}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;justify-items:center}
+.cmp{display:flex;flex-direction:column;align-items:center;gap:10px;width:300px}
+.cmp .cap{font-size:12.5px;color:var(--lab-tx2);display:flex;gap:8px;align-items:center}
+.cmp .cap b{color:var(--lab-tx);font-weight:500}
+.scale{width:300px;height:649px;overflow:hidden;border-radius:36px}
+.scale .phone{transform:scale(.769);transform-origin:top left}
+
+/* ---------- Paletas (aplicadas ao telefone) ---------- */
+.phone[data-pal="A"]{--bg0:#0b0c14;--s1:#11131c;--s2:#171a26;--bd:#232637;--bd2:#2f3348;--tx:#e9e9ed;--tx2:#9c9fb3;--tx3:#676b82;--ac:#9184d9;--acT:#c9c2f2;--acTint:rgba(145,132,217,.14);--acDeep:#2a2650;--ok:#7fc2a0}
+.phone[data-pal="B"]{--bg0:#0d0613;--s1:#150920;--s2:#1c0c27;--bd:#2b1a3a;--bd2:#3a2650;--tx:#f0f2ed;--tx2:#ab9db6;--tx3:#6f6279;--ac:#bc7ba4;--acT:#e6bfd6;--acTint:rgba(188,123,164,.15);--acDeep:#3d1f36;--ok:#9aaf9c}
+.phone[data-pal="C"]{--bg0:#09090b;--s1:#101012;--s2:#17171a;--bd:#232326;--bd2:#303035;--tx:#ededef;--tx2:#9b9ba4;--tx3:#62626b;--ac:#6fbfae;--acT:#a9e1d4;--acTint:rgba(111,191,174,.13);--acDeep:#173731;--ok:#6fbfae}
+.phone[data-pal="D"]{--bg0:#070b12;--s1:#0d121c;--s2:#131a27;--bd:#1e2838;--bd2:#2a3649;--tx:#e6ebf2;--tx2:#94a1b5;--tx3:#5e6b80;--ac:#8fb8d4;--acT:#bfdcee;--acTint:rgba(143,184,212,.14);--acDeep:#1b3040;--ok:#8fc9a7}
+.phone{--depth:0%;--bg:color-mix(in oklab,var(--bg0),#ffffff var(--depth))}
+.phone[data-font="plex"]{--f:'IBM Plex Sans',system-ui,sans-serif;--m:'IBM Plex Mono',ui-monospace,monospace}
+.phone[data-font="geist"]{--f:'Geist',system-ui,sans-serif;--m:'Geist Mono',ui-monospace,monospace}
+.phone[data-font="source"]{--f:'Source Sans 3',system-ui,sans-serif;--m:'Source Code Pro',ui-monospace,monospace}
+
+/* ---------- Telefone ---------- */
+.phone{width:390px;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5;display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px #26262c,0 30px 60px rgba(0,0,0,.6);flex:none}
+.phone svg{display:block;flex:none}
+.top{padding:54px 16px 8px;display:flex;align-items:center;gap:10px}
+.iconbtn{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--tx2);background:var(--s1);border:1px solid var(--bd);flex:none}
+.ttl{flex:1;min-width:0}
+.ttl .h{font-size:17px;font-weight:500;line-height:1.2;letter-spacing:-.01em}
+.ttl .s{font-size:12px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;padding:4px 10px;border-radius:999px;background:var(--acTint);color:var(--acT);white-space:nowrap;flex:none;display:flex;align-items:center;gap:4px;line-height:1.3}
+.pill.ok{background:color-mix(in oklab,var(--ok),transparent 84%);color:var(--ok)}
+.chips{display:flex;gap:7px;padding:6px 16px 12px;overflow:hidden;flex:none}
+.chip{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--bd);color:var(--tx2);background:transparent;white-space:nowrap;line-height:1.2}
+.chip.on{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.body{flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:14px;position:relative;min-height:0}
+.body::after{content:"";position:absolute;left:0;right:0;bottom:0;height:56px;background:linear-gradient(to bottom,transparent,var(--bg));pointer-events:none}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:4px}
+.p{font-size:13.5px;line-height:1.62;color:var(--tx);margin:0}
+.p.muted{color:var(--tx2)}
+.opt{display:inline-block;padding:0 7px;border-radius:5px;border:1px dashed color-mix(in oklab,var(--ac),transparent 35%);color:var(--acT);font-size:12.5px;line-height:20px;vertical-align:1px}
+.meas{display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:var(--s1)}
+.mrow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--bd)}
+.mrow:first-child{border-top:0}
+.mrow .k{font-size:12.5px;color:var(--tx2);width:96px;flex:none}
+.mrow .v{font-family:var(--m);font-size:13px;color:var(--tx);flex:1;display:flex;gap:6px;align-items:center;font-variant-numeric:tabular-nums}
+.cell{min-width:40px;padding:2px 6px;border-radius:5px;background:var(--s2);border:1px solid var(--bd2);text-align:center}
+.cell.empty{color:var(--tx3);border-style:dashed}
+.mrow .u{font-size:11px;color:var(--tx3);flex:none}
+.auto{font-family:var(--f);font-size:10px;color:var(--ok);border:1px solid color-mix(in oklab,var(--ok),transparent 60%);padding:1px 6px;border-radius:999px;flex:none;line-height:1.4}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.card{border:1px solid var(--bd);border-radius:12px;background:var(--s1);padding:12px 14px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--bd)}
+.row:first-child{border-top:0}
+.dot{width:9px;height:9px;border-radius:999px;flex:none;border:1.5px solid var(--tx3)}
+.dot.full{background:var(--ok);border-color:var(--ok)}
+.dot.half{border-color:var(--ac);background:linear-gradient(90deg,var(--ac) 50%,transparent 50%)}
+.rt{flex:1;min-width:0}
+.rt .n{font-size:14px;font-weight:500}
+.rt .m{font-size:12px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{height:3px;border-radius:2px;background:var(--s2);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;width:71%;background:var(--ac)}
+.form{display:grid;grid-template-columns:96px 1fr;gap:8px 10px;align-items:center}
+.form .k{font-size:12.5px;color:var(--tx2)}
+.form .in{display:flex;gap:6px;align-items:center;font-family:var(--m);font-size:13px;font-variant-numeric:tabular-nums}
+.form .in .cell{min-width:44px;padding:5px 6px;border-radius:6px}
+.form .in .cell.focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acTint)}
+.form .in .x{color:var(--tx3);font-size:11px}
+.segm{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.segm span{flex:1;text-align:center;font-size:12px;padding:6px 4px;color:var(--tx2)}
+.segm span.on{background:var(--acTint);color:var(--acT)}
+.preview{font-size:12.5px;line-height:1.6;color:var(--tx2);white-space:pre-line}
+.preview b{color:var(--tx);font-weight:500}
+.bottom{padding:10px 16px 26px;border-top:1px solid var(--bd);background:var(--bg);display:flex;gap:10px;align-items:center;flex:none}
+.btn{height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;flex:1;letter-spacing:-.005em}
+.btn.ic{flex:none;width:46px}
+.btn.primary{border:1px solid var(--ac);color:var(--acT);background:transparent}
+.btn.secondary{border:1px solid var(--bd2);color:var(--tx2);background:transparent}
+.phone[data-btn="fill"] .btn.primary{background:var(--ac);border-color:var(--ac);color:var(--bg0)}
+.phone[data-btn="fill"] .btn.secondary{background:var(--s2);border-color:var(--s2);color:var(--tx)}
+.phone[data-btn="tonal"] .btn.primary{background:var(--acDeep);border-color:transparent;color:var(--acT)}
+.phone[data-btn="tonal"] .btn.secondary{background:var(--s2);border-color:transparent;color:var(--tx)}
+.fab{width:46px;height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--acDeep);border:1px solid var(--ac);color:var(--acT)}
+.phone[data-btn="fill"] .fab{background:var(--ac);color:var(--bg0)}
+@media (prefers-reduced-motion:no-preference){.seg button,.toggle{transition:border-color .12s,color .12s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Laboratório do Laudo</h1>
+    <p>Uma tela só, a do laudo de tireoide sendo preenchido, em quatro paletas escuras, três layouts e três estilos de botão. Combine à vontade e me mande a escolha pelo botão no fim do painel.</p>
+  </header>
+
+  <div class="grid">
+    <aside class="panel">
+      <div class="group">
+        <label>Paleta</label>
+        <div class="seg" id="segPal"></div>
+        <div class="note" id="notePal"></div>
+        <div class="hexline" id="hexPal"></div>
+      </div>
+      <div class="group">
+        <label>Profundidade do fundo</label>
+        <div class="range"><input type="range" id="depth" min="0" max="8" step="1" value="0" aria-label="Profundidade do fundo"><output id="depthOut">máximo</output></div>
+        <div class="hexline">0 = o mais escuro possível. Cada passo clareia 1%. O handoff original (#161826) fica por volta do 6.</div>
+      </div>
+      <div class="group">
+        <label>Layout da tela</label>
+        <div class="seg" id="segLay"></div>
+        <div class="note" id="noteLay"></div>
+      </div>
+      <div class="group">
+        <label>Botão principal</label>
+        <div class="seg" id="segBtn"></div>
+        <div class="note" id="noteBtn"></div>
+      </div>
+      <div class="group">
+        <label>Fonte</label>
+        <div class="seg" id="segFont"></div>
+        <div class="note" id="noteFont"></div>
+      </div>
+      <div class="share">
+        <button id="shareBtn" type="button">Gerar resumo da minha escolha</button>
+        <textarea id="shareOut" readonly aria-label="Resumo da escolha" placeholder="Aparece aqui um resumo pra colar na conversa."></textarea>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <div class="stage-head">
+        <div class="t" id="stageTitle"></div>
+        <button class="toggle" id="cmpToggle" type="button" aria-pressed="false">Comparar as 4 paletas</button>
+      </div>
+      <div class="single" id="single"></div>
+      <div class="compare" id="compare" hidden></div>
+    </section>
+  </div>
+</div>
+
+<script>
+const PAL = {
+  A:{name:'A · Nocturne profundo', bg:'#0b0c14', ac:'#9184d9',
+     note:'<b>A paleta do seu handoff, com o fundo puxado de #161826 para #0b0c14.</b> Ganha continuidade com o que você já desenhou. O risco: lilás sobre azul-escuro fica frio e lembra app de produtividade, não consultório.'},
+  B:{name:'B · Ameixa', bg:'#0d0613', ac:'#bc7ba4',
+     note:'<b>Sua marca: ameixa máxima no fundo e Rosa Saudade como cor de ação.</b> O app fica com a sua cara. O risco: rosa como cor de botão em tela clínica pode cansar ao longo de um turno. A sálvia entra como cor de "preenchido".'},
+  C:{name:'C · Carvão', bg:'#09090b', ac:'#6fbfae',
+     note:'<b>Quase preto neutro com acento verde-água.</b> O fundo mais escuro dos quatro e o maior contraste, bom para sala de exame com luz baixa. O risco: é a mais genérica, tem menos identidade.'},
+  D:{name:'D · Marinho', bg:'#070b12', ac:'#8fb8d4',
+     note:'<b>Azul-noite com o azul da marca clareado.</b> Sóbrio, clínico, discreto. O risco: o acento tem pouca saturação, então botão e lacuna chamam menos atenção.'}
+};
+const LAY = {
+  1:{name:'1 · Documento com lacunas', note:'<b>O laudo aparece como texto final e você toca nas lacunas tracejadas.</b> Mais rápido para quem já conhece o modelo de cor. O risco: editar texto corrido em tela pequena cansa o polegar.'},
+  2:{name:'2 · Seções', note:'<b>Uma linha por seção, mostrando o que está pendente.</b> Bom para conferir o que falta antes de assinar. O risco: mais toques até chegar no texto final.'},
+  3:{name:'3 · Variáveis + prévia', note:'<b>Você preenche só o que muda (medidas, achados) e o texto se monta sozinho.</b> É o layout que melhor casa com ditado e automação. O risco: menos liberdade para escrever fora do padrão.'}
+};
+const BTN = {
+  outline:{name:'Contorno', note:'O do handoff: borda na cor de acento, fundo transparente. Discreto, mas o botão principal quase não se distingue do secundário.'},
+  fill:{name:'Preenchido', note:'Fundo sólido na cor de acento. Não deixa dúvida de qual é a ação principal. Texto escuro sobre o acento pode ficar duro em paleta de acento claro.'},
+  tonal:{name:'Tonal', note:'Fundo tingido da cor de acento, sem borda. Meio-termo: destaca sem gritar e mantém o fundo escuro dominante.'}
+};
+const FONT = {
+  plex:{name:'IBM Plex', note:'Técnica e neutra, com mono da mesma família para medidas. Passa ideia de instrumento.'},
+  geist:{name:'Geist', note:'Mais moderna e compacta, mono muito legível em números pequenos. Um pouco mais "software".'},
+  source:{name:'Source Sans', note:'Mais humana e arredondada, ocupa menos largura, boa para texto corrido de laudo.'}
+};
+
+const I = {
+  back:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  dots:'<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  mic:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  copy:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+  share:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>',
+  chev:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  chevd:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  check:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>'
+};
+
+function topBar(status){
+  return `<div class="top">
+    <div class="iconbtn">${I.back}</div>
+    <div class="ttl"><div class="h">US Tireoide</div><div class="s">Maria Aparecida de Souza Lima · 54 a · Instituto</div></div>
+    ${status}
+    <div class="iconbtn">${I.dots}</div>
+  </div>`;
+}
+const chips = `<div class="chips"><span class="chip on">Normal</span><span class="chip">Bócio</span><span class="chip">Nódulo · TI-RADS</span><span class="chip">Hashimoto</span><span class="chip">Pós-tireoidectomia</span></div>`;
+const bottom = `<div class="bottom">
+  <div class="fab">${I.mic}</div>
+  <div class="btn primary">${I.copy}Copiar laudo</div>
+  <div class="btn secondary ic">${I.share}</div>
+</div>`;
+
+function layout1(){
+  return topBar(`<span class="pill">pendente</span>`) + chips + `<div class="body">
+    <div><div class="lbl">Indicação</div><p class="p">Rotina / Acompanhamento.</p></div>
+    <div><div class="lbl">Técnica</div><p class="p muted">Ultrassonografia realizada com transdutor linear de alta frequência, com varreduras longitudinais, transversais e oblíquas sobre a região cervical anterior.</p></div>
+    <div><div class="lbl">Descrição</div><p class="p">Glândula tireoide típica, <span class="opt">simétrica</span>, com dimensões <span class="opt">habituais</span>, superfície regular e ecotextura <span class="opt">homogênea</span>, sem evidência de formações nodulares. Paratireoides não visibilizadas ao método.</p></div>
+    <div><div class="lbl">Medidas</div>
+      <div class="meas">
+        <div class="mrow"><div class="k">Istmo</div><div class="v"><span class="cell">1,9</span>×<span class="cell">0,5</span>×<span class="cell">1,15</span></div><div class="u">cm</div></div>
+        <div class="mrow"><div class="k">Lobo direito</div><div class="v"><span class="cell">4,7</span>×<span class="cell">1,8</span>×<span class="cell">2,0</span></div><div class="u">cm</div></div>
+        <div class="mrow"><div class="k">Lobo esquerdo</div><div class="v"><span class="cell empty">—</span>×<span class="cell empty">—</span>×<span class="cell empty">—</span></div><div class="u">cm</div></div>
+        <div class="mrow"><div class="k">Volume total</div><div class="v">~ 16 mL</div><div class="auto">calculado</div></div>
+      </div>
+    </div>
+    <div><div class="lbl">Conclusão</div><p class="p">Exame ultrassonográfico da tireoide dentro dos padrões de normalidade, sem evidência de nódulos.</p>
+      <div class="quick"><span class="chip">+ correlação laboratorial</span><span class="chip">+ novo exame em 12 meses</span></div>
+    </div>
+    <div><div class="lbl">Sugestão</div><p class="p muted">Acompanhamento com médico assistente.</p></div>
+  </div>` + bottom;
+}
+
+function layout2(){
+  const row=(dot,n,m)=>`<div class="row"><span class="dot ${dot}"></span><div class="rt"><div class="n">${n}</div><div class="m">${m}</div></div><span style="color:var(--tx3)">${I.chev}</span></div>`;
+  return topBar(`<span class="pill">5 de 7</span>`) + chips + `<div class="body">
+    <div class="card" style="padding:10px 14px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--tx2)"><span>Modelo: Tireoide normal</span><span>faltam 2 seções</span></div><div class="prog"><i></i></div></div>
+    <div class="card" style="padding:0">
+      ${row('full','Indicação','Rotina / Acompanhamento.')}
+      ${row('full','Técnica','Transdutor linear de alta frequência, varreduras…')}
+      ${row('full','Descrição','Típica, simétrica, dimensões habituais, homogênea…')}
+      <div class="row" style="align-items:flex-start"><span class="dot half" style="margin-top:5px"></span><div class="rt"><div class="n" style="display:flex;justify-content:space-between;align-items:center">Medidas <span style="color:var(--tx3)">${I.chevd}</span></div>
+        <div class="meas" style="margin-top:8px">
+          <div class="mrow"><div class="k">Istmo</div><div class="v"><span class="cell">1,9</span>×<span class="cell">0,5</span>×<span class="cell">1,15</span></div></div>
+          <div class="mrow"><div class="k">Lobo direito</div><div class="v"><span class="cell">4,7</span>×<span class="cell">1,8</span>×<span class="cell">2,0</span></div></div>
+          <div class="mrow"><div class="k">Lobo esquerdo</div><div class="v"><span class="cell empty">—</span>×<span class="cell empty">—</span>×<span class="cell empty">—</span></div></div>
+        </div></div></div>
+      ${row('full','Regiões peritireoidianas','Sem alterações detectáveis.')}
+      ${row('','Conclusão','Escolher: normal · bócio · nodular · tireoidite')}
+      ${row('full','Sugestão','Acompanhamento com médico assistente.')}
+    </div>
+  </div>` + bottom;
+}
+
+function layout3(){
+  return topBar(`<span class="pill ok">${I.check}pronto</span>`) + chips + `<div class="body">
+    <div class="card">
+      <div class="lbl">Variáveis</div>
+      <div class="form">
+        <div class="k">Istmo</div><div class="in"><span class="cell">1,9</span><span class="x">×</span><span class="cell">0,5</span><span class="x">×</span><span class="cell">1,15</span></div>
+        <div class="k">Lobo direito</div><div class="in"><span class="cell">4,7</span><span class="x">×</span><span class="cell">1,8</span><span class="x">×</span><span class="cell">2,0</span></div>
+        <div class="k">Lobo esquerdo</div><div class="in"><span class="cell focus">4,6</span><span class="x">×</span><span class="cell empty">—</span><span class="x">×</span><span class="cell empty">—</span></div>
+        <div class="k">Volume</div><div class="in" style="color:var(--tx2)">~ 16 mL <span class="auto">calculado</span></div>
+        <div class="k">Ecotextura</div><div class="segm"><span class="on">homogênea</span><span>heterogênea</span></div>
+        <div class="k">Doppler</div><div class="segm"><span class="on">sem alterações</span><span>aumentado</span></div>
+        <div class="k">Nódulos</div><div class="segm"><span class="on">ausentes</span><span>presentes</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lbl" style="display:flex;justify-content:space-between;align-items:center">Prévia do laudo <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--ac)">editar texto</span></div>
+      <div class="preview"><b>Descrição:</b> Glândula tireoide típica, simétrica, com dimensões habituais, superfície regular e ecotextura homogênea, sem evidência de formações nodulares. Ao estudo Doppler: sem alterações detectáveis.
+<b>Medidas:</b> Istmo 1,9 × 0,5 × 1,15 cm. Lobo direito 4,7 × 1,8 × 2,0 cm. Lobo esquerdo 4,6 × ___ × ___ cm. Volume total estimado ~16 mL.
+<b>Conclusão:</b> Exame ultrassonográfico da tireoide dentro dos padrões de normalidade, sem evidência de nódulos.</div>
+    </div>
+  </div>` + bottom;
+}
+const LAYOUT = {1:layout1,2:layout2,3:layout3};
+
+const st = {pal:'A',lay:1,btn:'outline',font:'plex',depth:0,cmp:false};
+try{ Object.assign(st, JSON.parse(localStorage.getItem('lab-laudo')||'{}')); }catch(e){}
+function save(){ try{ localStorage.setItem('lab-laudo', JSON.stringify(st)); }catch(e){} }
+
+function phone(pal){
+  return `<div class="phone" data-pal="${pal}" data-btn="${st.btn}" data-font="${st.font}" style="--depth:${st.depth}%">${LAYOUT[st.lay]()}</div>`;
+}
+function seg(el, map, key, swatch){
+  el.innerHTML = Object.entries(map).map(([k,v])=>`<button type="button" data-k="${k}" aria-pressed="${String(st[key])===k}">${swatch?`<span class="sw" style="background:${v.bg}"><i style="background:${v.ac}"></i></span>`:''}${v.name}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ st[key]= key==='lay'?Number(b.dataset.k):b.dataset.k; save(); render(); }));
+}
+function render(){
+  seg(document.getElementById('segPal'),PAL,'pal',true);
+  seg(document.getElementById('segLay'),LAY,'lay');
+  seg(document.getElementById('segBtn'),BTN,'btn');
+  seg(document.getElementById('segFont'),FONT,'font');
+  document.getElementById('notePal').innerHTML = PAL[st.pal].note;
+  document.getElementById('hexPal').textContent = `fundo ${PAL[st.pal].bg} · acento ${PAL[st.pal].ac}`;
+  document.getElementById('noteLay').innerHTML = LAY[st.lay].note;
+  document.getElementById('noteBtn').innerHTML = BTN[st.btn].note;
+  document.getElementById('noteFont').innerHTML = FONT[st.font].note;
+  const d=document.getElementById('depth'); d.value=st.depth;
+  document.getElementById('depthOut').textContent = st.depth===0?'máximo':`+${st.depth}%`;
+  document.getElementById('stageTitle').textContent = `${PAL[st.pal].name} · Layout ${LAY[st.lay].name} · botão ${BTN[st.btn].name.toLowerCase()} · ${FONT[st.font].name}`;
+  document.getElementById('cmpToggle').setAttribute('aria-pressed',String(st.cmp));
+  const single=document.getElementById('single'), cmp=document.getElementById('compare');
+  single.hidden = st.cmp; cmp.hidden = !st.cmp;
+  if(st.cmp){
+    cmp.innerHTML = Object.keys(PAL).map(k=>`<div class="cmp"><div class="scale">${phone(k)}</div><div class="cap"><span class="sw" style="background:${PAL[k].bg}"><i style="background:${PAL[k].ac}"></i></span><b>${PAL[k].name}</b><span>${PAL[k].bg}</span></div></div>`).join('');
+    single.innerHTML='';
+  } else {
+    single.innerHTML = phone(st.pal);
+    cmp.innerHTML='';
+  }
+}
+document.getElementById('depth').addEventListener('input',e=>{ st.depth=Number(e.target.value); save(); render(); });
+document.getElementById('cmpToggle').addEventListener('click',()=>{ st.cmp=!st.cmp; save(); render(); });
+document.getElementById('shareBtn').addEventListener('click',()=>{
+  const txt = `Minha escolha no Laboratório do Laudo: paleta ${PAL[st.pal].name} (fundo ${PAL[st.pal].bg}, ${st.depth===0?'profundidade máxima':'fundo +'+st.depth+'%'}) · layout ${LAY[st.lay].name} · botão ${BTN[st.btn].name.toLowerCase()} · fonte ${FONT[st.font].name}.`;
+  const out=document.getElementById('shareOut'); out.value=txt;
+  try{ navigator.clipboard.writeText(txt); }catch(e){}
+  out.focus(); out.select();
+});
+render();
+</script>
