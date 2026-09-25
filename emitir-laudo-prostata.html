@@ -156,6 +156,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -285,6 +286,7 @@ function render(){
   $('#phone').innerHTML=`<div class="view">
     <div class="top">${APP?`<a class="iconbtn" href="index.html" aria-label="Início">${I.back}</a>`:`<div class="iconbtn">${I.back}</div>`}<div class="ttl"><div class="h">US Próstata abdominal</div><div class="s">${servSub()}</div></div><button type="button" class="newbtn" id="novo">Novo exame</button></div>
     <div class="body">
+      ${ditadoCard(st.dit||(st.dit={fala:''}),'prostata')}
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard()}
@@ -343,6 +345,7 @@ async function copiar(t){
   try{ const ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,t.length); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; }
 }
 function wire(){
+  if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'prostata',{"ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.psa": "[data-f=\"psa\"]", "anam.psaData": "[data-f=\"psadata\"]", "anam.sint": "sint", "anam.med": "med", "anam.medTxt": "#medTxt", "bx.rep": "rep", "bx.med": "bm", "bx.parede": "[data-f=\"parede\"]", "bx.parAsp": "parasp", "bx.cont": "bcont", "juv.D": "juvd", "juv.E": "juve", "pr.med": "pm", "pr.cont": "pcont", "pr.text": "ptext", "pr.calc": "pcalc", "pr.calcTxt": "#calcTxt", "pr.ipp": "[data-f=\"ipp\"]", "vs": "vs", "pos.0.bx": "b0", "pos.0.pr": "p0"},render,toast,st);
   const ph=$('#phone'); const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));
   const inp=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('input',()=>fn(el)));
   on('[data-serv]',el=>{st.serv=el.dataset.serv;render();}); on('[data-carater]',el=>{st.carater=el.dataset.carater;render();});
