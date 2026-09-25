@@ -153,6 +153,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -340,6 +341,7 @@ function viewLaudo(){
   return `<div class="view" data-view="laudo">
     <div class="top">${APP?`<a class="iconbtn" href="index.html" aria-label="Início">${I.back}</a>`:`<div class="iconbtn">${I.back}</div>`}<div class="ttl"><div class="h">US Mamas e axilas</div><div class="s">${servSub()}</div></div><span class="pill ac">rascunho</span></div>
     <div class="body">
+      ${ditadoCard(st.dit||(st.dit={fala:''}),'mamas')}
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND, st.ind, 'ind')}</div>
       ${equipCard(['l16','l22'])}
@@ -422,6 +424,7 @@ function renderDocs(){
   $('#docOut').innerHTML = esc(txt).replace(/^(ULTRASSONOGRAFIA[^\n]*|BIÓPSIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações|Mama direita|Mama esquerda):/gm,'<b>$1:</b>');
 }
 function wire(){
+  if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'mamas',{"ind": "ind", "mmg.feita": "mmg", "mmg.birads": "mmgb", "mmg.data": "[data-f=\"mmgdata\"]", "anam.fam": "[data-an=\"fam\"]", "anam.pessoal": "[data-an=\"pessoal\"]", "anam.bx": "[data-an=\"bx\"]", "anam.cir": "[data-an=\"cir\"]", "anam.palp": "[data-an=\"palp\"]", "anam.desc": "[data-an=\"desc\"]", "anam.gest": "[data-an=\"gest\"]", "anam.lact": "[data-an=\"lact\"]", "anam.famGrau": "famgrau", "anam.bxRes": "bxres", "anam.meno": "meno", "anam.trh": "trh", "textura": "textura", "predominio": "predominio", "ectasia": "ectasia", "axila.D": "axd", "axila.E": "axe"},render,toast,st);
   wireServ();
   const ph=$('#phone');
   const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));

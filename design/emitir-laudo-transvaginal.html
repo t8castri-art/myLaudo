@@ -146,6 +146,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -314,6 +315,7 @@ function viewLaudo(){
   return `<div class="view">
     <div class="top">${APP?`<a class="iconbtn" href="index.html" aria-label="Início">${I.back}</a>`:`<div class="iconbtn">${I.back}</div>`}<div class="ttl"><div class="h">US Transvaginal</div><div class="s">${servSub()}</div></div><span class="pill ac">rascunho</span></div>
     <div class="body">
+      ${ditadoCard(st.dit||(st.dit={fala:''}),'transvaginal')}
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard(['e9'])}
@@ -403,6 +405,7 @@ function render(){
 }
 function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
 function wire(){
+  if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'transvaginal',{"ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.dum": "[data-f=\"dum\"]", "anam.meno": "meno", "anam.g": "[data-f=\"g\"]", "anam.p": "[data-f=\"p\"]", "anam.a": "[data-f=\"a\"]", "anam.ces": "ces", "ut.pos": "upos", "ut.cont": "ucont", "ut.med": "um", "ut.mio": "umio", "ut.endo": "[data-f=\"endo\"]", "ut.endoAsp": "uendo", "ut.colo": "ucolo", "ut.diu": "diu", "ut.diuDist": "[data-f=\"diudist\"]", "ov.D.visto": "ovD", "ov.D.med": "omD", "ov.D.asp": "oaD", "ov.E.visto": "ovE", "ov.E.med": "omE", "ov.E.asp": "oaE", "liq": "liq"},render,toast,st);
   wireServ();
   const ph=$('#phone'); const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));
   const inp=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('input',()=>fn(el)));

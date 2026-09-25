@@ -90,7 +90,13 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para uma IA (ditado ou scanner), o app remove nome, nascimento, CPF, telefone e e-mail; a IA recebe só achados. Os dados ficam no aparelho.
 
 ## Próximos passos combinados
-1. **Ditado** (primeira versão no ar em 24/09): botão de microfone no topo do nódulo e do linfonodo (tireoide) e do linfonodo e da lesão do leito (cervical). Código em `design/ditado.js`, compartilhado pelas telas. Ele fala **frase corrida, tudo de uma vez**: localização (terço e lado) + características + **medidas em cm por último** ("2,0 por 1,4 por 1,2"). O reconhecimento é por regras, no aparelho, sem IA; "sem X" anula X. Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm. Campos vindos do ditado ficam tracejados, e o cartão lista o que ele não falou. Se o microfone do site falhar, usa-se o do teclado na mesma caixa. Falta: salivares, lesão cervical, glândula e anamnese por voz; ver como se comporta no iPhone.
+1. **Ditado** (no ar desde 24–25/09, código em `design/ditado.js`, compartilhado pelas telas; reconhecimento por regras, no aparelho, sem IA; "sem X" / "nega X" anulam X).
+   - **Ditado do exame**: cartão no topo das 5 telas. Preenche indicação, anamnese, exames anteriores, órgão e medidas. Ignora nódulos e lesões.
+   - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical). Frase corrida: localização + características + **medidas em cm por último**.
+   - Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm.
+   - **Tracejado = veio do ditado e já está no laudo.** Não precisa tocar para confirmar; só toca para trocar. O que não foi dito fica no padrão, que conta como ausente. O aviso só aparece quando falta o essencial do item (nódulo: lobo, terço, composição, ecogenicidade, medidas).
+   - Se o microfone do site falhar, usa-se o do teclado na mesma caixa.
+   - Falta ditado de item em: mama (nódulo e cisto), mioma, lesão anexial, lesão salivar e lesão cervical.
 2. **Ícone**: laboratório em `design/laboratorio-do-icone.html` (gerado por `ferramentas/icone/lab_icone.py`). Decidido: calipers em **X**, traço fino, rosa + sálvia, degradê esfumaçado que termina em preto. Reprovados: feixe, colchetes, logo dele no ícone, Saturno, traçado livre, cruz "+". Na mesa: nódulo medido, só os calipers, elipse medida, Doppler de 1 e de 2 ondas (subida sistólica rápida), campo trapezoidal e **campo minimalista** (fundo preto, degradê só dentro do feixe, nódulo medido dentro). Falta ele escolher; depois gerar `apple-touch-icon.png` 180×180 e ligar no `index.html`.
 3. Exames que faltam para cobrir o HMC: rins e vias, carótidas, depois abdome superior e total.
 4. Depois (não agora): agenda (Google Calendar do Instituto e do particular) e integração DICOM com o aparelho.

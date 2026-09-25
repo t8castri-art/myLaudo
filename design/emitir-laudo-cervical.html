@@ -315,6 +315,7 @@ function viewLaudo(){
   return `<div class="view">
     <div class="top">${APP?`<a class="iconbtn" href="index.html" aria-label="Início">${I.back}</a>`:`<div class="iconbtn">${I.back}</div>`}<div class="ttl"><div class="h">US Cervical e salivares</div><div class="s">${servSub()}</div></div><span class="pill ac">rascunho</span></div>
     <div class="body">
+      ${ditadoCard(st.dit||(st.dit={fala:''}),'cervical')}
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard(['l16','l22','c8'])}
@@ -394,6 +395,7 @@ function renderDocs(){
   $('#docOut').innerHTML=esc(t).replace(/^(ULTRASSONOGRAFIA[^\n]*|PUNÇÃO[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/gm,'<b>$1:</b>');
 }
 function wire(){
+  if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'cervical',{"ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.ca": "ca", "anam.tx": "tx", "anam.txCa": "txca", "anam.levo": "levo", "anam.dose": "[data-f=\"dose\"]", "anam.sint": "sint", "glst.parD": "glparD", "glst.parE": "glparE", "glst.subD": "glsubD", "glst.subE": "glsubE"},render,toast,st);
   wireServ();
   const ph=$('#phone'); const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));
   const inp=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('input',()=>fn(el)));
