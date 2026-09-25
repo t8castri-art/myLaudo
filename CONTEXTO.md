@@ -9,6 +9,21 @@ App **pessoal** para gerar laudos de ultrassom no celular (iPhone). Não é prod
 - Este repositório (`mylaudo-dev`, privado) guarda as fontes, o laboratório do ícone e este contexto.
 - Ele instala o site no iPhone: Safari → Compartilhar → Adicionar à Tela de Início → "Abrir como App Web".
 
+## Duas máquinas: PC com Windows e MacBook
+
+O trabalho anda nas duas, e o GitHub é quem sincroniza. O histórico de conversa NÃO vai junto: cada máquina tem a sua. Este arquivo é a memória compartilhada.
+
+**Sempre que começar uma sessão, seja onde for:**
+1. `git pull` antes de qualquer coisa.
+2. Trabalhe normalmente.
+3. `git commit` e `git push` ao terminar, mesmo que a mudança seja pequena.
+
+Se esquecer o pull e der conflito, não force nada: pare e resolva arquivo por arquivo.
+
+**Quando mudar alguma regra do app** (texto do laudo, comportamento de tela, decisão de design), atualize este CONTEXTO.md na mesma sessão. É ele que ensina a próxima conversa, na outra máquina.
+
+**Publicar o site** continua sendo à parte: copie de `design/` para o repositório público `t8castri-art/myLaudo` (`mylaudo.html` vira `index.html`) e dê push lá também.
+
 ## Como trabalhar com ele
 - **Ritmo devagar.** Mostre, pergunte, e só então empilhe a próxima decisão.
 - **Mínimo de palavras** no texto do laudo. Nunca repita a mesma informação duas vezes.
