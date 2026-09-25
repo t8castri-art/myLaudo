@@ -125,9 +125,9 @@ function ditadoLeito(fala){
 // ---------- tela: cartão de ditado ----------
 const DITADO_NOMES={lobo:'lobo',terco:'terço',comp:'composição',eco:'ecogenicidade',forma:'forma',marg:'margens',focos:'focos ecogênicos',dop:'Doppler',med:'medidas',nivel:'nível',lado:'lado',hilo:'hilo',cort:'cortical',extra:'microcalcificações / cístico'};
 const DITADO_TIPOS={
-  nod:{parse:ditadoNodulo,campos:['lobo','terco','comp','eco','forma','marg','focos','dop','med'],ex:'terço superior do lobo direito, nódulo sólido hipoecoico, margens irregulares, com microcalcificações, vascularização central, 2,0 por 1,4 por 1,2'},
-  linf:{parse:ditadoLinf,campos:['nivel','lado','forma','hilo','cort','extra','dop','med'],ex:'nível três à direita, linfonodo arredondado, sem hilo, cortical espessada, fluxo periférico, 1,2 por 0,8 por 0,9'},
-  leito:{parse:ditadoLeito,campos:['lado','comp','eco','marg','dop','med'],ex:'leito direito, lesão sólida hipoecoica, margens irregulares, fluxo central, 0,8 por 0,6 por 0,5'},
+  nod:{parse:ditadoNodulo,campos:['lobo','terco','comp','eco','med'],ex:'terço superior do lobo direito, nódulo sólido hipoecoico, margens irregulares, com microcalcificações, vascularização central, 2,0 por 1,4 por 1,2'},
+  linf:{parse:ditadoLinf,campos:['nivel','lado','med'],ex:'nível três à direita, linfonodo arredondado, sem hilo, cortical espessada, fluxo periférico, 1,2 por 0,8 por 0,9'},
+  leito:{parse:ditadoLeito,campos:['lado','comp','med'],ex:'leito direito, lesão sólida hipoecoica, margens irregulares, fluxo central, 0,8 por 0,6 por 0,5'},
 };
 const DITADO_CSS=`
 .dit{display:flex;gap:10px;align-items:flex-start}
@@ -148,11 +148,11 @@ const DITADO_STOP='<svg width="16" height="16" viewBox="0 0 24 24" fill="current
 const ditEsc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 function ditadoCard(item,tipo){
-  const T=DITADO_TIPOS[tipo], falta=item.fala?T.campos.filter(k=>!(item.dict&&item.dict.has(k))):[];
+  const T=DITADO_TIPOS[tipo], falta=item.fala?T.campos.filter(k=>!(item.dict&&item.dict.has(k))&&!(k==='terco'&&item.lobo==='I')):[];
   return `<div class="card"><div class="lbl">Ditado <span class="act">fale tudo de uma vez</span></div>
     <div class="dit"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>
     <textarea class="fala" id="falaTxt" rows="3" placeholder="ex.: ${ditEsc(T.ex)}">${ditEsc(item.fala||'')}</textarea></div>
-    ${item.fala?`<div class="dit-falta">${falta.length?`Não ouvi <b>${falta.map(k=>DITADO_NOMES[k]).join(', ')}</b>: ficou o padrão, confira.`:'Todos os campos vieram do ditado. Confira os tracejados.'}</div>`:''}</div>`;
+    ${item.fala?`<div class="dit-falta">${falta.length?`Não ouvi <b>${falta.map(k=>DITADO_NOMES[k]).join(', ')}</b>. Confira.`:'Confira os tracejados. O que não foi dito conta como ausente.'}</div>`:''}</div>`;
 }
 // liga o microfone e a caixa; attrs = campo → data-atributo dos chips daquele campo
 let DITADO_REC=null, DITADO_ATUAL=null;
