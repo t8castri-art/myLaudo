@@ -143,6 +143,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -362,7 +363,7 @@ const sheet=(title,sub,pill,bodyHtml,txtHtml,tone,removeKey,label)=>`<div class=
   <div class="body">${bodyHtml}<div class="result" data-tone="${tone}"><div class="txt" style="border:0;padding:0"><small>Texto no laudo</small>${esc(txtHtml)}</div></div></div>
   <div class="bottom"><button type="button" class="btn ghost" data-remove="${removeKey}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir ${label}</button></div></div>`;
 function viewLinf(l){ return sheet(`Linfonodo ${rotL(l)}`,`nível ${l.nivel} · ${lado(l.lado)}`,`<span class="pill ${suspL(l)?'':'ok'}">${suspL(l)?suspL(l)+' critério'+(suspL(l)>1?'s':''):'sem suspeição'}</span>`,
-  `<div class="card"><div class="lbl">Localização e medidas</div><div class="form"><div class="k">Nível</div>${chips(NIVEIS,l.nivel,'nivel')}<div class="k">Lado</div>${segm([['D','direita'],['E','esquerda']],l.lado,'llado')}<div class="k">Medidas</div><div class="in">${cells(l.med,'lm')}<span class="x">mm</span></div></div></div>
+  ditadoCard(l,'linf')+`<div class="card"><div class="lbl">Localização e medidas</div><div class="form"><div class="k">Nível</div>${chips(NIVEIS,l.nivel,'nivel')}<div class="k">Lado</div>${segm([['D','direita'],['E','esquerda']],l.lado,'llado')}<div class="k">Medidas</div><div class="in">${cells(l.med,'lm')}<span class="x">mm</span></div></div></div>
    <div class="card"><div class="lbl">Forma</div>${chips(['ovalado','arredondado'],l.forma,'lforma')}</div><div class="card"><div class="lbl">Hilo</div>${chips(['preservado','apagado'],l.hilo,'lhilo')}</div><div class="card"><div class="lbl">Cortical</div>${chips(['fina','espessada','heterogênea'],l.cort,'lcort')}</div><div class="card"><div class="lbl">Microcalcificações / cístico</div>${chips([['nenhum','nenhum'],['microcalcificações','microcalcificações'],['cístico','áreas císticas']],l.extra,'lextra')}</div><div class="card"><div class="lbl">Doppler</div>${chips(['hilar','periférica','mista'],l.dop,'ldop')}</div>`,
   descrL(l),suspL(l)?'alert':'ok','l'+l.id,'linfonodo'); }
 function viewSal(s){ return sheet(`Lesão ${rotS(s)}`,GL[s.gl],'<span class="pill">salivar</span>',
@@ -372,7 +373,7 @@ function viewSal(s){ return sheet(`Lesão ${rotS(s)}`,GL[s.gl],'<span class="pil
    :`<div class="card"><div class="form"><div class="k">Medidas</div><div class="in">${cells(s.med,'sm')}<span class="x">mm</span></div></div></div><div class="card"><div class="lbl">Contornos</div>${chips(['regulares','lobulados','irregulares'],s.cont,'scont')}</div><div class="card"><div class="lbl">Ecogenicidade</div>${chips(['hipoecoico','heterogêneo','cístico'],s.eco,'seco')}</div><div class="card"><div class="lbl">Doppler</div>${chips(['ausente','periférica','central'],s.dop,'sdop')}</div>`}`,
   descrS(s),'','s'+s.id,'lesão'); }
 function viewLeito(t){ return sheet(`Lesão do leito ${rotT(t)}`,`leito ${t.lado==='I'?'istmo':lado(t.lado)}`,`<span class="pill ${suspT(t)>=2?'':'ok'}">${suspT(t)>=2?'suspeita':'a acompanhar'}</span>`,
-  `<div class="card"><div class="form"><div class="k">Lado</div>${segm([['D','direito'],['E','esquerdo'],['I','istmo']],t.lado,'tlado')}<div class="k">Medidas</div><div class="in">${cells(t.med,'tm')}<span class="x">mm</span></div></div></div>
+  ditadoCard(t,'leito')+`<div class="card"><div class="form"><div class="k">Lado</div>${segm([['D','direito'],['E','esquerdo'],['I','istmo']],t.lado,'tlado')}<div class="k">Medidas</div><div class="in">${cells(t.med,'tm')}<span class="x">mm</span></div></div></div>
    <div class="card"><div class="lbl">Composição</div>${chips(['sólida','mista','cística'],t.comp,'tcomp')}</div><div class="card"><div class="lbl">Ecogenicidade</div>${chips(['isoecoica','hipoecoica','muito hipoecoica'],t.eco,'teco')}</div><div class="card"><div class="lbl">Margens</div>${chips(['regulares','irregulares','mal definidas'],t.marg,'tmarg')}</div><div class="card"><div class="lbl">Doppler <span class="act">central e periférica podem ir juntas</span></div>${chips([['ausente','ausente'],['central','central'],['periférica','periférica']],t.dop,'tdop',true)}</div>`,
   descrT(t),suspT(t)>=2?'alert':'','t'+t.id,'lesão'); }
 function viewCerv(c){ return sheet(`Lesão cervical ${rotC(c)}`,REG[c.reg],'<span class="pill">partes moles</span>',
@@ -416,6 +417,8 @@ function wire(){
     set('tlado',v=>cur.lado=v); set('tcomp',v=>cur.comp=v); set('teco',v=>cur.eco=v); set('tmarg',v=>cur.marg=v);
     on('[data-tdop]',el=>{const v=el.dataset.tdop; if(v==='ausente'){cur.dop=new Set(['ausente']);}else{cur.dop.delete('ausente');cur.dop.has(v)?cur.dop.delete(v):cur.dop.add(v);if(!cur.dop.size)cur.dop.add('ausente');} render();});
     set('creg',v=>cur.reg=v); set('cplano',v=>cur.plano=v); set('cdop',v=>cur.dop=v); set('ctipo',v=>cur.tipo=v); set('cdx',v=>cur.dx=v);
+    if(st.view==='linf') ditadoLigar(cur,'linf',{nivel:'nivel',lado:'llado',forma:'lforma',hilo:'lhilo',cort:'lcort',extra:'lextra',dop:'ldop',med:'lm'},render,toast);
+    if(st.view==='leito') ditadoLigar(cur,'leito',{lado:'tlado',comp:'tcomp',eco:'teco',marg:'tmarg',dop:'tdop',med:'tm'},render,toast);
     ['lm','sm','tm','cm'].forEach(a=>inp(`input[data-${a}]`,el=>{cur.med[+el.dataset[a]]=el.value;refresh();}));
   }
   inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value; if(k==='prevdata')st.prev.data=v; else if(k==='dose')st.anam.dose=v; else if(k==='punc')st.paaf.punc=v; else if(k==='mm'&&cur)cur.mm=v; refresh();});

@@ -147,6 +147,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -396,6 +397,7 @@ function viewNodulo(n){
   return `<div class="view">
     <div class="top"><button type="button" class="iconbtn" data-back="1" aria-label="Voltar">${I.back}</button><div class="ttl"><div class="h">Nódulo ${rotN(n)}</div><div class="s">${LOBO[n.lobo]} · terço ${n.terco}</div></div><span class="pill">ACR TI-RADS</span></div>
     <div class="body">
+      ${ditadoCard(n,'nod')}
       <div class="card"><div class="lbl">Localização e medidas</div><div class="form">
         <div class="k">Lobo</div>${segm([['D','direito'],['E','esquerdo'],['I','istmo']],n.lobo,'lobo')}
         <div class="k">Terço</div>${segm([['superior','superior'],['médio','médio'],['inferior','inferior']],n.terco,'terco')}
@@ -416,6 +418,7 @@ function viewLinf(l){
   return `<div class="view">
     <div class="top"><button type="button" class="iconbtn" data-back="1" aria-label="Voltar">${I.back}</button><div class="ttl"><div class="h">Linfonodo ${rotL(l)}</div><div class="s">nível ${l.nivel} · ${l.lado==='D'?'direita':'esquerda'}</div></div><span class="pill ${suspL(l)?'':'ok'}">${suspL(l)?suspL(l)+' critério'+(suspL(l)>1?'s':''):'sem suspeição'}</span></div>
     <div class="body">
+      ${ditadoCard(l,'linf')}
       <div class="card"><div class="lbl">Localização e medidas</div><div class="form">
         <div class="k">Nível</div>${chips(NIVEIS,l.nivel,'nivel')}
         <div class="k">Lado</div>${segm([['D','direita'],['E','esquerda']],l.lado,'llado')}
@@ -478,12 +481,14 @@ function wire(){
     ['comp','eco','forma','marg'].forEach(k=>on(`[data-${k}]`,el=>{n[k]=el.dataset[k];render();}));
     on('[data-focos]',el=>{const v=el.dataset.focos; if(v==='nenhum') n.focos=new Set(['nenhum']); else { n.focos.delete('nenhum'); n.focos.has(v)?n.focos.delete(v):n.focos.add(v); if(!n.focos.size) n.focos.add('nenhum'); } render();});
     on('[data-dop]',el=>{const v=el.dataset.dop; if(v==='ausente'){n.dop=new Set(['ausente']);}else{n.dop.delete('ausente');n.dop.has(v)?n.dop.delete(v):n.dop.add(v);if(!n.dop.size)n.dop.add('ausente');} render();});
+    ditadoLigar(n,'nod',{lobo:'lobo',terco:'terco',comp:'comp',eco:'eco',forma:'forma',marg:'marg',focos:'focos',dop:'dop',med:'nm'},render,toast);
     inp('input[data-nm]',el=>{n.med[+el.dataset.nm]=el.value;renderDocs();const r=$('.result');if(r){const c=conduta(n);r.querySelector('.big span').textContent=isFinite(maior(n.med))?fmt(maior(n.med))+' cm':'sem medida';r.querySelector('.rec b').textContent=c.s.charAt(0).toUpperCase()+c.s.slice(1);r.querySelector('.txt').innerHTML='<small>Texto no laudo</small>'+esc(descrN(n));}});
   }
   const l=st.view==='linf'&&st.linfs.find(x=>x.id===st.edit);
   if(l){
     on('[data-nivel]',el=>{l.nivel=el.dataset.nivel;render();});on('[data-llado]',el=>{l.lado=el.dataset.llado;render();});
     on('[data-lforma]',el=>{l.forma=el.dataset.lforma;render();});on('[data-lhilo]',el=>{l.hilo=el.dataset.lhilo;render();});on('[data-lcort]',el=>{l.cort=el.dataset.lcort;render();});on('[data-lextra]',el=>{l.extra=el.dataset.lextra;render();});on('[data-ldop]',el=>{l.dop=el.dataset.ldop;render();});
+    ditadoLigar(l,'linf',{nivel:'nivel',lado:'llado',forma:'lforma',hilo:'lhilo',cort:'lcort',extra:'lextra',dop:'ldop',med:'lm'},render,toast);
     inp('input[data-lm]',el=>{l.med[+el.dataset.lm]=el.value;renderDocs();const r=$('.result .txt');if(r)r.innerHTML='<small>Texto no laudo</small>'+esc(descrL(l));});
   }
 }

@@ -33,6 +33,7 @@ Se esquecer o pull e der conflito, não force nada: pare e resolva arquivo por a
 ## Estrutura
 ```
 design/               fontes das telas (é aqui que se edita)
+  ditado.js           ditado por item: fala → chips e medidas (vai junto para o site)
   mylaudo.html        início: serviço, + novo paciente, lista de exames  → vira site/index.html
   novo-paciente.html  cadastro com botão duplo ditado/scanner
   emitir-laudo-*.html tireoide, mamas, transvaginal, cervical, prostata
@@ -89,7 +90,7 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para uma IA (ditado ou scanner), o app remove nome, nascimento, CPF, telefone e e-mail; a IA recebe só achados. Os dados ficam no aparelho.
 
 ## Próximos passos combinados
-1. **Ditado de verdade**, começando pela tireoide: aperta gravar, fala, os chips vão marcando, termina revisando o texto e copia. Precisa rodar no site próprio (dentro do claude.ai o microfone é bloqueado). Perguntas pendentes para ele: como fala a medida ("vinte por catorze por doze"?) e se prefere frase corrida por nódulo ou por partes.
+1. **Ditado** (primeira versão no ar em 24/09): botão de microfone no topo do nódulo e do linfonodo (tireoide) e do linfonodo e da lesão do leito (cervical). Código em `design/ditado.js`, compartilhado pelas telas. Ele fala **frase corrida, tudo de uma vez**: localização (terço e lado) + características + **medidas em cm por último** ("2,0 por 1,4 por 1,2"). O reconhecimento é por regras, no aparelho, sem IA; "sem X" anula X. Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm. Campos vindos do ditado ficam tracejados, e o cartão lista o que ele não falou. Se o microfone do site falhar, usa-se o do teclado na mesma caixa. Falta: salivares, lesão cervical, glândula e anamnese por voz; ver como se comporta no iPhone.
 2. **Ícone**: laboratório em `design/laboratorio-do-icone.html` (gerado por `ferramentas/icone/lab_icone.py`). Decidido: calipers em **X**, traço fino, rosa + sálvia, degradê esfumaçado que termina em preto. Reprovados: feixe, colchetes, logo dele no ícone, Saturno, traçado livre, cruz "+". Na mesa: nódulo medido, só os calipers, elipse medida, Doppler de 1 e de 2 ondas (subida sistólica rápida), campo trapezoidal e **campo minimalista** (fundo preto, degradê só dentro do feixe, nódulo medido dentro). Falta ele escolher; depois gerar `apple-touch-icon.png` 180×180 e ligar no `index.html`.
 3. Exames que faltam para cobrir o HMC: rins e vias, carótidas, depois abdome superior e total.
 4. Depois (não agora): agenda (Google Calendar do Instituto e do particular) e integração DICOM com o aparelho.
