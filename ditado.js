@@ -141,7 +141,18 @@ const DITADO_CSS=`
 .dit-falta{font-size:11.5px;color:var(--tx3);margin-top:8px;line-height:1.45}
 .dit-falta b{color:var(--alert);font-weight:500}
 .dit-on{outline:1px dashed var(--ac);outline-offset:2px}
-@media (max-width:600px){.fala{font-size:16px}}`;
+@media (max-width:600px){.fala{font-size:16px}}
+/* mão esquerda: microfone fixo no canto inferior esquerdo, texto num painel acima dele */
+.ditfab{position:fixed;left:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;align-items:center;gap:8px}
+.ditfab .mic{width:58px;height:58px;background:var(--bg);box-shadow:0 6px 18px rgba(0,0,0,.55)}
+.ditfab .mic.on{background:var(--ac)}
+.ditver{font-size:12px;padding:7px 12px;border-radius:999px;border:1px solid var(--bd2);background:var(--s2);color:var(--tx2)}
+.ditpan{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:21;background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.6);max-width:520px}
+.ditpan .fala{width:100%;background:var(--s1)}
+.ditpan .ditok{margin-top:10px;font-size:13px;padding:8px 16px;border-radius:999px;border:1px solid var(--ac);color:var(--acT)}
+body.dit-flut .bottom{padding-left:84px}
+body.dit-flut .body{padding-bottom:96px}
+body.dit-flut .docs{padding-bottom:84px}`;
 if(typeof document!=='undefined') (function(){ const s=document.createElement('style'); s.textContent=DITADO_CSS; document.head.appendChild(s); })();
 const DITADO_MIC='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
 const DITADO_STOP='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
@@ -339,10 +350,15 @@ Object.assign(DITADO_TIPOS,{
 
 // ---------- tela: cartões de ditado ----------
 function ditadoCard(item,tipo){
-  const T=DITADO_TIPOS[tipo];
+  const T=DITADO_TIPOS[tipo], flut=typeof window!=='undefined'&&window.DITADO_FLUT;
   let aviso='';
   if(item.fala&&T.laudo){ const n=item.dict?item.dict.size:0; aviso=n?`Entendi ${n} ${n>1?'campos':'campo'}. Os tracejados já estão no laudo; toque só no que quiser trocar. Nódulos e outros achados têm ditado próprio.`:'<b>Não reconheci nenhum campo.</b> Ajuste a frase na caixa.'; }
   else if(item.fala){ const falta=T.campos.filter(k=>!(item.dict&&item.dict.has(k))&&!(k==='terco'&&item.lobo==='I')); aviso=falta.length?`Não ouvi <b>${falta.map(k=>DITADO_NOMES[k]).join(', ')}</b>. O resto já está no laudo.`:'Os tracejados já estão no laudo; toque só no que quiser trocar. O que não foi dito conta como ausente.'; }
+  if(flut){ document.body.classList.add('dit-flut');
+    return `<div class="ditpan" id="ditPan"${item.painel?'':' hidden'}><div class="lbl">${T.laudo?'Ditado do exame':'Ditado do item'} <span class="act">fale tudo de uma vez</span></div>
+      <textarea class="fala" id="falaTxt" rows="3" placeholder="ex.: ${ditEsc(T.ex)}">${ditEsc(item.fala||'')}</textarea>
+      ${aviso?`<div class="dit-falta">${aviso}</div>`:''}<button type="button" class="ditok" id="ditFechar">Fechar</button></div>
+      <div class="ditfab"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>${item.fala&&!item.painel?'<button type="button" class="ditver" id="ditAbrir">ver ditado</button>':''}</div>`; }
   return `<div class="card"><div class="lbl">${T.laudo?'Ditado do exame':'Ditado'} <span class="act">fale tudo de uma vez</span></div>
     <div class="dit"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>
     <textarea class="fala" id="falaTxt" rows="3" placeholder="ex.: ${ditEsc(T.ex)}">${ditEsc(item.fala||'')}</textarea></div>
@@ -361,11 +377,15 @@ function ditadoLigar(item,tipo,attrs,rerender,avisar,alvo){
   alvo=alvo||item; DITADO_ATUAL={item,attrs};
   if(item.dict) item.dict.forEach(k=>{ const a=attrs[k]; if(!a) return;
     document.querySelectorAll('#phone '+ditSel(a)).forEach(el=>{ if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.getAttribute('aria-pressed')==='true') el.classList.add('dit-on'); }); });
-  const aplicar=()=>{ const r=T.parse(item.fala); Object.keys(r).forEach(k=>ditSet(alvo,k,r[k])); item.dict=new Set(Object.keys(r)); rerender(); };
+  const aplicar=()=>{ const r=T.parse(item.fala); Object.keys(r).forEach(k=>ditSet(alvo,k,r[k])); item.dict=new Set(Object.keys(r)); item.painel=true; rerender(); };
+  const pan=document.getElementById('ditPan'), fe=document.getElementById('ditFechar'), ab=document.getElementById('ditAbrir');
+  if(fe) fe.addEventListener('click',()=>{ if(DITADO_REC) DITADO_REC.abort(); item.painel=false; rerender(); });
+  if(ab) ab.addEventListener('click',()=>{ item.painel=true; rerender(); });
   box.addEventListener('change',()=>{ item.fala=box.value.trim(); aplicar(); });
   btn.addEventListener('click',()=>{
     if(DITADO_REC){ DITADO_REC.stop(); return; }
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(pan) pan.hidden=false;
     if(!SR){ box.focus(); avisar('Toque no microfone do teclado para ditar'); return; }
     const rec=new SR(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
     rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; box.value=s.replace(/\s+/g,' ').trim(); };

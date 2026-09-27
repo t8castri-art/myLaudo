@@ -1,0 +1,51 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mão esquerda</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#09080b;--s1:#100e13;--s2:#16141b;--bd:#221f28;--bd2:#2f2b37;--tx:#ececee;--tx2:#9b97a3;--tx3:#605c69;--ac:#bc7ba4;--acT:#dcb9cd;--acTint:rgba(188,123,164,.12);--f:'IBM Plex Sans',system-ui,sans-serif}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:20px;font-weight:500;margin:0}
+.sub{color:var(--tx2);font-size:13px;margin:4px 0 16px;max-width:70ch}
+ul{margin:0 0 20px;padding-left:18px;color:var(--tx2);font-size:13px}
+ul b{color:var(--tx);font-weight:500}
+.tabs{display:none;gap:6px;margin-bottom:12px}
+.tabs button{font:inherit;font-size:13px;padding:8px 14px;border-radius:999px;border:1px solid var(--bd);background:none;color:var(--tx2);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--acTint);border-color:transparent;color:var(--acT)}
+.pair{display:flex;gap:24px;justify-content:center}
+.col{display:flex;flex-direction:column;gap:8px;align-items:center}
+.col .t{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+.col .t b{color:var(--acT);font-weight:600}
+iframe{width:390px;height:780px;border:0;border-radius:32px;background:var(--bg);box-shadow:0 0 0 1px #232028,0 24px 50px rgba(0,0,0,.6)}
+@media (max-width:840px){
+  .tabs{display:flex}
+  .pair{display:block}
+  .col{display:none}
+  .col.on{display:flex}
+  iframe{width:100%;height:calc(100vh - 150px);border-radius:16px}
+}
+</style>
+<div class="wrap">
+  <h1>Mão esquerda · tireoide</h1>
+  <p class="sub">A mesma tela, a atual e a nova, com o mesmo exemplo. Mexa nas duas para comparar.</p>
+  <ul>
+    <li><b>Microfone</b> fixo no canto inferior esquerdo. Ele dita o exame ou o nódulo aberto, e o texto aparece num painel acima dele.</li>
+    <li><b>Exames anteriores, Anamnese e Glândula</b>: os botões ficam à esquerda e o nome do campo passa para a direita.</li>
+    <li><b>Nódulo e linfonodo</b>: "Concluir" vai para a esquerda, perto do polegar, e "Remover" para a ponta direita.</li>
+    <li><b>Paratireoide visibilizada</b> pergunta se está normal ou alterada e abre o texto pronto, que você pode editar.</li>
+  </ul>
+  <div class="tabs"><button type="button" data-t="a" aria-pressed="false">Atual</button><button type="button" data-t="n" aria-pressed="true">Nova</button></div>
+  <div class="pair">
+    <div class="col" id="a"><div class="t">Atual</div><iframe src="emitir-laudo-tireoide.html" title="Versão atual"></iframe></div>
+    <div class="col on" id="n"><div class="t"><b>Nova</b> · mão esquerda</div><iframe src="emitir-laudo-tireoide-v2.html" title="Versão nova"></iframe></div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  document.querySelectorAll('.col').forEach(c=>c.classList.toggle('on',c.id===b.dataset.t));
+}));
+</script>
