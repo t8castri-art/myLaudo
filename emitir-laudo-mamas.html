@@ -153,6 +153,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
@@ -345,36 +346,36 @@ function viewLaudo(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND, st.ind, 'ind')}</div>
       ${equipCard(['l16','l22'])}
-      <div class="card"><div class="lbl">Mamografia</div><div class="form">
+      <div class="card"><div class="lbl">Mamografia</div><div class="form dir">
         <div class="k">Realizou</div>${segm([['nao','não'],['trouxe','trouxe'],['naotrouxe','não trouxe']], st.mmg.feita, 'mmg')}
         ${st.mmg.feita==='trouxe' ? `<div class="k">Resultado</div>${segm([['1','BI-RADS 1'],['2','2'],['3','3'],['4','4'],['5','5'],['0','0']], st.mmg.birads, 'mmgb')}
         <div class="k">Data</div><div class="in"><input class="cell" style="width:72px" inputmode="numeric" data-f="mmgdata" value="${esc(st.mmg.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>` : ''}
       </div></div>
       <div class="card"><div class="lbl">Anamnese <span class="act">o que não marcar entra como negado</span></div>
         ${chips([['fam','história familiar de CA de mama'],['pessoal','CA de mama prévio'],['bx','biópsia prévia'],['cir','cirurgia mamária'],['palp','nódulo palpável'],['desc','descarga papilar'],['gest','gestação recente'],['lact','amamentando']], new Set(Object.keys(st.anam).filter(k=>st.anam[k]===true)), 'an', true)}
-        <div class="form" style="margin-top:10px">
+        <div class="form dir" style="margin-top:10px">
           ${st.anam.fam ? `<div class="k">Parente</div>${segm([['1º grau','1º grau'],['2º grau','2º grau']], st.anam.famGrau, 'famgrau')}` : ''}
           ${st.anam.bx ? `<div class="k">Resultado</div>${segm([['benigna','benigno'],['maligna','maligno'],['desconhecido','não sabe']], st.anam.bxRes, 'bxres')}` : ''}
           <div class="k">Menopausa</div>${segm([['pré','pré'],['pós','pós']], st.anam.meno, 'meno')}
           ${st.anam.meno==='pós' ? `<div class="k">TRH</div>${segm([['n','não'],['s','sim']], st.anam.trh?'s':'n', 'trh')}` : ''}
         </div>
       </div>
-      <div class="card"><div class="lbl">Mamas</div><div class="form">
+      <div class="card"><div class="lbl">Mamas</div><div class="form dir">
         <div class="k">Ecotextura</div>${segm([['heterogênea','heterogênea'],['homogênea','homogênea']], st.textura, 'textura')}
         <div class="k">Predomínio</div>${segm([['fibroglandular','fibroglandular'],['gorduroso','gorduroso'],['fibroglandular e gorduroso','misto']], st.predominio, 'predominio')}
         <div class="k">Ectasia ductal</div>${segm([['n','ausente'],['s','presente']], st.ectasia?'s':'n', 'ectasia')}
       </div></div>
       ${mamaCard('D')}${mamaCard('E')}
-      <div class="card"><div class="lbl">Axilas</div><div class="side">
+      <div class="card"><div class="lbl">Axilas</div><div class="side dir">
         <div class="row"><span class="k">Direita</span>${segm(AXILA.map(a=>[a[0],a[0]==='normal'?'sem linfonodomegalia':a[0]]), st.axila.D, 'axd')}</div>
         <div class="row"><span class="k">Esquerda</span>${segm(AXILA.map(a=>[a[0],a[0]==='normal'?'sem linfonodomegalia':a[0]]), st.axila.E, 'axe')}</div>
       </div></div>
-      <div class="card"><div class="lbl">Conclusão · BI-RADS por mama <span class="act">${st.birads.D||st.birads.E?'ajustado':'sugerido'}</span></div><div class="side">
+      <div class="card"><div class="lbl">Conclusão · BI-RADS por mama <span class="act">${st.birads.D||st.birads.E?'ajustado':'sugerido'}</span></div><div class="side dir">
         <div class="row"><span class="k">Direita</span>${catsHtml('D')}</div>
         <div class="row"><span class="k">Esquerda</span>${catsHtml('E')}</div>
       </div><div class="hint">O traço marca a sugestão do app pelo achado mais suspeito de cada mama. Toque para trocar; a conclusão e a sugestão de conduta se reescrevem.</div></div>
       <div class="card"><div class="toggle"><div><div class="lbl" style="margin:0">Procedimento</div><div class="p">CORE biopsy realizada neste atendimento</div></div><button type="button" class="sw" id="coreSw" aria-pressed="${st.core.on}" aria-label="CORE biopsy"></button></div>
-        ${st.core.on ? `<div class="form" style="margin-top:12px">
+        ${st.core.on ? `<div class="form dir" style="margin-top:12px">
           <div class="k">Nódulo</div>${nods.length? chips(nods.map(n=>[String(n.id), rotulo(n)+' · mama '+lado(n.mama)[0].toUpperCase()]), String(st.core.alvo), 'alvo') : '<div class="empty">Adicione um nódulo primeiro.</div>'}
           <div class="k">Agulha</div>${segm([['14G','14G'],['16G','16G'],['18G','18G']], st.core.agulha, 'agulha')}
           <div class="k">Fragmentos</div><div class="in"><input class="cell" inputmode="numeric" data-f="frag" value="${esc(st.core.frag)}" placeholder="—"></div>
@@ -408,7 +409,7 @@ function viewNodulo(){
       <div class="card"><div class="lbl">Doppler <span class="act">central e periférica podem ir juntas</span></div>${chips([['ausente','ausente'],['central','central'],['periférica','periférica']], n.dop, 'dop', true)}</div>`}
       <div class="result"><small>Texto no laudo</small><div class="t">${esc(descr(n))}</div></div>
     </div>
-    <div class="bottom"><button type="button" class="btn ghost" data-remove="${n.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir ${isC?'cisto':'nódulo'}</button></div>
+    <div class="bottom"><button type="button" class="btn primary" data-back="1">${I.check}Concluir ${isC?'cisto':'nódulo'}</button><button type="button" class="btn ghost" data-remove="${n.id}">Remover</button></div>
   </div>`;
 }
 function render(){

@@ -146,6 +146,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
@@ -307,7 +308,7 @@ const cells=(arr,attr)=>arr.map((v,i)=>`<input class="cell" inputmode="numeric" 
 
 function viewLaudo(){
   const a=st.anam,u=st.ut;
-  const ovCard=s=>{const o=st.ov[s];return `<div class="card"><div class="lbl">Ovário ${ladoM(s)}</div><div class="form">
+  const ovCard=s=>{const o=st.ov[s];return `<div class="card"><div class="lbl">Ovário ${ladoM(s)}</div><div class="form dir">
     <div class="k">Visibilizado</div>${segm([['s','sim'],['n','não']],o.visto?'s':'n','ov'+s)}
     ${o.visto?`<div class="k">Medidas</div><div class="in">${cells(o.med,'om'+s)}<span class="auto">~${fmt(vol(o.med))} cm³</span></div>
     <div class="k">Aspecto</div>${segm([['habitual','habitual'],['policístico','policístico'],['atrófico','atrófico']],o.asp,'oa'+s)}`:''}
@@ -319,17 +320,17 @@ function viewLaudo(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard(['e9'])}
-      <div class="card"><div class="lbl">Exames anteriores</div><div class="form">
+      <div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
         <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
         ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
         <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou mioma intramural de 2,1 cm em parede posterior">${esc(st.prev.txt||'')}</textarea>`:''}
       </div></div>
-      <div class="card"><div class="lbl">Anamnese</div><div class="form">
+      <div class="card"><div class="lbl">Anamnese</div><div class="form dir">
         <div class="k">DUM</div><div class="in">${a.meno?'':`<input class="cell" style="width:92px" data-f="dum" value="${esc(a.dum)}" placeholder="dd/mm/aaaa" data-mask="ddmmaaaa" inputmode="numeric">`}<button type="button" class="chip" data-meno="1" aria-pressed="${a.meno}">menopausa</button></div>
         <div class="k">G · P · A</div><div class="in"><input class="cell sm" inputmode="numeric" data-f="g" value="${esc(a.g)}" placeholder="G"><input class="cell sm" inputmode="numeric" data-f="p" value="${esc(a.p)}" placeholder="P"><input class="cell sm" inputmode="numeric" data-f="a" value="${esc(a.a)}" placeholder="A"></div>
         ${num(a.p)>0?`<div class="k">Partos</div>${segm([['s','cesárea'],['n','vaginal']],a.ces?'s':'n','ces')}`:''}
       </div></div>
-      <div class="card"><div class="lbl">Útero <span class="act">volume calculado</span></div><div class="form">
+      <div class="card"><div class="lbl">Útero <span class="act">volume calculado</span></div><div class="form dir">
         <div class="k">Posição</div>${segm([['anteversão','antevertido'],['retroversão','retrovertido'],['medioversão','médio']],u.pos,'upos')}
         <div class="k">Contornos</div>${segm([['regulares','regulares'],['lobulados','lobulados']],u.cont,'ucont')}
         <div class="k">Medidas</div><div class="in">${cells(u.med,'um')}<span class="auto">~${fmt(vol(u.med),0)} cm³</span></div>
@@ -371,7 +372,7 @@ function viewMioma(m){
         <div class="txt"><small>Texto no laudo</small>${esc(descrMioma(m))}</div>
       </div>
     </div>
-    <div class="bottom"><button type="button" class="btn ghost" data-remove="m${m.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir mioma</button></div>
+    <div class="bottom"><button type="button" class="btn primary" data-back="1">${I.check}Concluir mioma</button><button type="button" class="btn ghost" data-remove="m${m.id}">Remover</button></div>
   </div>`;
 }
 function viewLes(l){
@@ -393,7 +394,7 @@ function viewLes(l){
         <div class="txt"><small>Texto no laudo</small>${esc(descrLes(l))}</div>
       </div>
     </div>
-    <div class="bottom"><button type="button" class="btn ghost" data-remove="l${l.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir lesão</button></div>
+    <div class="bottom"><button type="button" class="btn primary" data-back="1">${I.check}Concluir lesão</button><button type="button" class="btn ghost" data-remove="l${l.id}">Remover</button></div>
   </div>`;
 }
 function render(){
