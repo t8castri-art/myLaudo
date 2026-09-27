@@ -129,6 +129,13 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 .in:has(.cell[data-mmc]){gap:3px;flex-wrap:nowrap}
 .in:has(.cell[data-mmc]) .x{font-size:10px}
 @media (max-width:600px){.cell[data-mmc]{width:46px}.form{grid-template-columns:88px 1fr}}
+/* mão esquerda: controles à esquerda, rótulo à direita */
+.form.dir{direction:rtl;grid-template-columns:92px 1fr}
+.form.dir>*{direction:ltr}
+.form.dir>.k{text-align:right}
+.form.dir .obs{grid-column:1/-1}
+/* paratireoide: descrição escolhida */
+.para-txt{margin-top:10px}
 </style>
 
 <div class="wrap">
@@ -147,6 +154,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
@@ -169,6 +177,9 @@ const RULES={TR3:{fna:2.5,fu:1.5},TR4:{fna:1.5,fu:1.0},TR5:{fna:1.0,fu:0.5}};
 const IND=['Rotina','Acompanhamento de nódulo','Nódulo palpável','Alteração de função tireoidiana','Pós-operatório','Vigilância ativa'];
 const SINT=['pigarro','rouquidão','disfagia','falta de ar'];
 const LOBO={D:'lobo direito',E:'lobo esquerdo',I:'istmo'};
+// Regra do app: estrutura que nem sempre aparece ("visibilizada") pergunta se está normal ou alterada,
+// e abre o texto pronto daquela opção para editar.
+const PARA_TXT={normal:'Paratireoide de aspecto habitual, visibilizada adjacente ao terço inferior do lobo direito.',alterada:'Formação nodular sólida, hipoecoica, ovalada, posterior ao terço ___ do lobo ___, com vascularização polar ao Doppler, medindo ___ × ___ × ___ cm, podendo corresponder a paratireoide aumentada.'};
 const NIVEIS=['I','II','III','IV','V','VI','VII'];
 
 const TRANS=[['l16','linear 3–16 MHz'],['l22','minilinear 2–22 MHz'],['c8','convexo 2–8 MHz'],['e9','endocavitário 2–9 MHz']];
@@ -220,7 +231,7 @@ const st={
   anam:{fam:'nao',conhece:true,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},
   gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},
   med:{istmo:['19','5','11,5'],ld:['47','18','20'],le:['46','16','19']},
-  nods:[],linfs:[],para:'nao',
+  nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',
   paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},
 };
 const n1=novoNod(); n1.med=['16','11','13']; st.nods.push(n1);
@@ -273,13 +284,14 @@ function conclusao(){
   const c=[];
   if(!st.nods.length) c.push('Glândula tireoide sem evidência de nódulos.');
   st.nods.forEach(n=>{const k=conduta(n).k; c.push(`${rotN(n)}: ACR ${tr(pts(n)).replace('TR','TI-RADS ')} em ${LOBO[n.lobo]}${k==='paaf'?', com indicação de PAAF':k==='seg'?', com indicação de seguimento por imagem':''}.`);});
+  if(st.para==='sim'&&st.paraAsp==='alterada') c.push('Formação nodular em topografia de paratireoide. Correlacionar com cálcio e PTH.');
   st.linfs.filter(suspL).forEach(l=>c.push(`${rotL(l)}: linfonodo cervical nível ${l.nivel} à ${l.lado==='D'?'direita':'esquerda'} com critérios ultrassonográficos de suspeição.`));
   return c;
 }
 function sugestao(){
   const s=[];
   const p=st.nods.filter(n=>conduta(n).k==='paaf').map(rotN).concat(st.linfs.filter(suspL).map(rotL));
-  if(p.length) s.push(`PAAF guiada por ultrassonografia de ${p.join(' e ')}${st.linfs.some(suspL)?', com dosagem de tireoglobulina no lavado do linfonodo':''}.`);
+  if(p.length) s.push(`PAAF de ${p.join(' e ')}${st.linfs.some(suspL)?', com tireoglobulina no lavado do linfonodo':''}.`);
   else if(st.nods.some(n=>conduta(n).k==='seg')) s.push('Novo exame em 12 meses.');
   else s.push('Acompanhamento com médico assistente.');
   return s.join(' ');
@@ -303,7 +315,7 @@ function docUS(){
     `Lobo direito: ${m.ld.map(cm).join(' × ')} cm.`,
     `Lobo esquerdo: ${m.le.map(cm).join(' × ')} cm.`,
     `Volume total: ~${fmt(vd+ve,0)} mL.`,'',
-    st.para==='sim'?'Paratireoide visibilizada adjacente à glândula, de aspecto habitual.':'Paratireoides não visibilizadas ao método.',
+    st.para==='sim'?fraseP(st.paraTxt||PARA_TXT[st.paraAsp]):'Paratireoides não visibilizadas ao método.',
     'Regiões peritireoidianas sem alterações detectáveis.', ...linfTxt,'',
     'Conclusão:',...conclusao(),'',
     `Sugestão: ${sugestao()}`,
@@ -345,12 +357,12 @@ function viewLaudo(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard(['l16','l22','c8'])}
-      <div class="card"><div class="lbl">Exames anteriores</div><div class="form">
+      <div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
         <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
         ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
         <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou TI-RADS 5 em lobo esquerdo medindo 3,0 × 2,1 × 2,4 cm; TI-RADS 3 no istmo medindo 0,8 × 0,6 × 0,9 cm">${esc(st.prev.txt||'')}</textarea>`:''}
       </div></div>
-      <div class="card"><div class="lbl">Anamnese</div><div class="form">
+      <div class="card"><div class="lbl">Anamnese</div><div class="form dir">
         <div class="k">Hist. familiar</div>${segm([['nao','não'],['sim','sim'],['sim1','sim, 1º grau']],a.fam,'fam')}
         <div class="k">Conhece nódulos</div>${segm([['n','não'],['s','sim']],a.conhece?'s':'n','conhece')}
         <div class="k">Tireoidectomia</div>${segm([['n','não'],['s','sim']],a.tx?'s':'n','tx')}
@@ -359,7 +371,7 @@ function viewLaudo(){
         ${a.levo?`<div class="k">Dose</div><div class="in"><input class="cell" inputmode="numeric" data-f="dose" value="${esc(a.dose)}" placeholder="—"><span class="x">mcg</span></div>`:''}
         <div class="k">Sintomas</div>${chips(SINT,a.sint,'sint',true)}
       </div></div>
-      <div class="card"><div class="lbl">Glândula</div><div class="form">
+      <div class="card"><div class="lbl">Glândula</div><div class="form dir">
         <div class="k">Simetria</div>${segm([['simétrica','simétrica'],['assimétrica','assimétrica']],st.gl.sim,'gsim')}
         <div class="k">Dimensões</div>${segm([['habituais','habituais'],['aumentadas','aumentadas'],['reduzidas','reduzidas']],st.gl.dim,'gdim')}
         <div class="k">Superfície</div>${segm([['regular','regular'],['lobulada','lobulada']],st.gl.sup,'gsup')}
@@ -380,7 +392,8 @@ function viewLaudo(){
         ${st.linfs.length?st.linfs.map(l=>`<button type="button" class="nod" data-open="l${l.id}"><div class="n"><b>${rotL(l)} · nível ${l.nivel} ${l.lado} · ${l.med.map(cm).join(' × ')} cm</b><span>${l.forma} · hilo ${l.hilo} · ${l.dop}</span></div><span class="tag ${suspL(l)?'alert':'ok'}">${suspL(l)?'suspeito':'reacional'}</span>${I.chev}</button>`).join(''):'<div class="empty">Cadeias linfonodais cervicais sem linfonodos com critérios de suspeição.</div>'}
         <button type="button" class="addbtn" data-add="l">${I.plus}Adicionar linfonodo</button>
       </div>
-      <div class="card"><div class="lbl">Paratireoides</div>${segm([['nao','não visibilizadas'],['sim','visibilizada']],st.para,'para')}</div>
+      <div class="card"><div class="lbl">Paratireoides</div>${segm([['nao','não visibilizadas'],['sim','visibilizada']],st.para,'para')}
+        ${st.para==='sim'?`<div class="para-txt"><div class="lbl" style="margin-bottom:6px">Está normal ou alterada?</div>${segm([['normal','normal'],['alterada','alterada']],st.paraAsp,'paraasp')}<textarea class="obs" id="paraTxt" style="margin-top:8px">${esc(st.paraTxt||PARA_TXT[st.paraAsp])}</textarea></div>`:''}</div>
       <div class="card"><div class="toggle"><div><div class="lbl" style="margin:0">Procedimento</div><div class="p">PAAF realizada neste atendimento</div></div><button type="button" class="sw" id="paafSw" aria-pressed="${st.paaf.on}" aria-label="PAAF"></button></div>
         ${st.paaf.on?`<div class="form" style="margin-top:12px">
           <div class="k">Puncionados</div>${alvoChips.length?chips(alvoChips,st.paaf.alvos,'alvo',true):'<div class="empty">Adicione um nódulo ou linfonodo primeiro.</div>'}
@@ -412,7 +425,7 @@ function viewNodulo(n){
         <div class="txt"><small>Texto no laudo</small>${esc(descrN(n))}</div>
       </div>
     </div>
-    <div class="bottom"><button type="button" class="btn ghost" data-remove="n${n.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir nódulo</button></div>
+    <div class="bottom"><button type="button" class="btn primary" data-back="1">${I.check}Concluir nódulo</button><button type="button" class="btn ghost" data-remove="n${n.id}">Remover</button></div>
   </div>`;
 }
 function viewLinf(l){
@@ -432,7 +445,7 @@ function viewLinf(l){
       <div class="card"><div class="lbl">Doppler</div>${chips(['hilar','periférica','mista'],l.dop,'ldop')}</div>
       <div class="result" data-tone="${suspL(l)?'alert':'ok'}"><div class="big"><b>${suspL(l)?'suspeito':'reacional'}</b></div><div class="txt"><small>Texto no laudo</small>${esc(descrL(l))}</div></div>
     </div>
-    <div class="bottom"><button type="button" class="btn ghost" data-remove="l${l.id}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir linfonodo</button></div>
+    <div class="bottom"><button type="button" class="btn primary" data-back="1">${I.check}Concluir linfonodo</button><button type="button" class="btn ghost" data-remove="l${l.id}">Remover</button></div>
   </div>`;
 }
 function render(){
@@ -470,6 +483,8 @@ function wire(){
   on('[data-open]',el=>{const k=el.dataset.open;st.edit=+k.slice(1);st.view=k[0]==='n'?'nodulo':'linf';render();});
   on('[data-add]',el=>{ if(el.dataset.add==='n'){const n=novoNod();st.nods.push(n);st.edit=n.id;st.view='nodulo';} else {const l=novoLinf();st.linfs.push(l);st.edit=l.id;st.view='linf';} render();});
   on('[data-para]',el=>{st.para=el.dataset.para;render();});
+  on('[data-paraasp]',el=>{st.paraAsp=el.dataset.paraasp;st.paraTxt='';render();});
+  const pt=document.getElementById('paraTxt'); if(pt) pt.addEventListener('input',()=>{st.paraTxt=pt.value;renderDocs();});
   const ps=$('#paafSw'); if(ps) ps.addEventListener('click',()=>{st.paaf.on=!st.paaf.on; if(st.paaf.on&&!st.paaf.alvos.size){const f=st.nods.find(n=>conduta(n).k==='paaf')||st.nods[0]; if(f) st.paaf.alvos.add('n'+f.id); st.doc='paaf';} render();});
   on('[data-alvo]',el=>{const k=el.dataset.alvo;st.paaf.alvos.has(k)?st.paaf.alvos.delete(k):st.paaf.alvos.add(k);render();});
   on('[data-agulha]',el=>{st.paaf.agulha=el.dataset.agulha;render();});on('[data-lab]',el=>{st.paaf.lab=el.dataset.lab;render();});
@@ -496,7 +511,7 @@ function wire(){
 }
 function refreshVol(){const t=$('#volTot');if(t)t.textContent='~ '+fmt(vol(st.med.ld)+vol(st.med.le),0)+' mL';}
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800);}
-function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},pac:''}); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},pac:''}); }
 // ---------- padrões do app: pular para o próximo campo e máscara de data ----------
 function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
 document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;

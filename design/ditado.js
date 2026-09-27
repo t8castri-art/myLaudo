@@ -152,7 +152,19 @@ const DITADO_CSS=`
 .ditpan .ditok{margin-top:10px;font-size:13px;padding:8px 16px;border-radius:999px;border:1px solid var(--ac);color:var(--acT)}
 body.dit-flut .bottom{padding-left:84px}
 body.dit-flut .body{padding-bottom:96px}
-body.dit-flut .docs{padding-bottom:84px}`;
+body.dit-flut .docs{padding-bottom:84px}
+/* mão esquerda: controles à esquerda, rótulo à direita */
+.form.dir{direction:rtl;grid-template-columns:92px 1fr}
+.form.dir>*{direction:ltr}
+.form.dir>.k{text-align:right}
+.form.dir .obs{grid-column:1/-1}
+.side.dir .row{flex-direction:row-reverse}
+.side.dir .row .k{text-align:right}
+/* transcrição dentro das caixas de texto: toca, fala, substitui o texto */
+.tmic-wrap{position:relative;display:block;grid-column:1/-1;width:100%}
+.tmic-wrap>textarea{padding-bottom:44px!important;width:100%}
+.tmic{position:absolute;left:8px;bottom:8px;height:32px;padding:0 12px 0 9px;border-radius:999px;border:1px solid var(--ac);background:var(--s1);color:var(--acT);display:flex;align-items:center;gap:6px;font:12px var(--f)}
+.tmic.on{background:var(--ac);color:var(--bg)}`;
 if(typeof document!=='undefined') (function(){ const s=document.createElement('style'); s.textContent=DITADO_CSS; document.head.appendChild(s); })();
 const DITADO_MIC='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
 const DITADO_STOP='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
@@ -395,4 +407,27 @@ function ditadoLigar(item,tipo,attrs,rerender,avisar,alvo){
     DITADO_REC=rec; box.value=''; btn.classList.add('on'); btn.innerHTML=DITADO_STOP; btn.setAttribute('aria-label','Parar ditado');
   });
 }
+// ---------- transcrição em qualquer caixa de texto do exame ----------
+// O ditado substitui o que estava escrito; a caixa continua editável.
+const TMIC_ICO='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+function tmicEquipar(){
+  document.querySelectorAll('#phone textarea.obs:not([data-tmic])').forEach(ta=>{
+    ta.dataset.tmic='1';
+    const w=document.createElement('span'); w.className='tmic-wrap'; ta.parentNode.insertBefore(w,ta); w.appendChild(ta);
+    const b=document.createElement('button'); b.type='button'; b.className='tmic'; b.innerHTML=TMIC_ICO+'<span>transcrever</span>'; w.appendChild(b);
+    b.addEventListener('click',()=>{
+      if(DITADO_REC){ DITADO_REC.stop(); return; }
+      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      if(!SR){ ta.focus(); return; }
+      const rec=new SR(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
+      const antes=ta.value; let ouviu=false;
+      rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; s=s.replace(/\s+/g,' ').trim(); if(!s) return; ouviu=true; ta.value=s.charAt(0).toUpperCase()+s.slice(1); ta.dispatchEvent(new Event('input',{bubbles:true})); };
+      rec.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed') ta.focus(); };
+      rec.onend=()=>{ DITADO_REC=null; b.classList.remove('on'); b.lastChild.textContent='transcrever'; if(!ouviu){ ta.value=antes; } ta.dispatchEvent(new Event('change',{bubbles:true})); };
+      try{ rec.start(); }catch(err){ ta.focus(); return; }
+      DITADO_REC=rec; b.classList.add('on'); b.lastChild.textContent='parar';
+    });
+  });
+}
+if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',()=>{ const ph=document.getElementById('phone'); if(!ph) return; tmicEquipar(); new MutationObserver(tmicEquipar).observe(ph,{childList:true,subtree:true}); });
 if(typeof module!=='undefined') module.exports={ditadoNodulo,ditadoLinf,ditadoLeito,ditadoTexto};

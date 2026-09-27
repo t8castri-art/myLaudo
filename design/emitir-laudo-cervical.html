@@ -143,6 +143,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
@@ -319,12 +320,12 @@ function viewLaudo(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard(['l16','l22','c8'])}
-      <div class="card"><div class="lbl">Exames anteriores</div><div class="form">
+      <div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
         <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
         ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
         <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou linfonodo nível III à direita de 1,2 cm, sem critérios de suspeição">${esc(st.prev.txt||'')}</textarea>`:''}
       </div></div>
-      <div class="card"><div class="lbl">Anamnese</div><div class="form">
+      <div class="card"><div class="lbl">Anamnese</div><div class="form dir">
         <div class="k">CA cabeça/pescoço</div>${segm([['nao','não'],['tireoide','tireoide'],['outro','outro']],a.ca,'ca')}
         <div class="k">Tireoidectomia</div>${segm([['n','não'],['s','sim']],a.tx?'s':'n','tx')}
         ${a.tx?`<div class="k">Por câncer</div>${segm([['n','não'],['s','sim']],a.txCa?'s':'n','txca')}`:''}
@@ -338,7 +339,7 @@ function viewLaudo(){
       <div class="card"><div class="lbl">Linfonodos <span class="act">${st.linfs.length||''}</span></div>
         ${lista(st.linfs,'LN','l',l=>[`${rotL(l)} · nível ${l.nivel} ${l.lado} · ${l.med.map(cm).join(' × ')} cm`,`${l.forma} · hilo ${l.hilo} · ${l.dop}`],l=>[suspL(l)?'suspeito':'reacional',suspL(l)?'alert':'ok'])||'<div class="empty">Níveis I a VII sem linfonodos com critérios de suspeição.</div>'}
         <button type="button" class="addbtn" data-add="l">${I.plus}Adicionar linfonodo</button></div>
-      <div class="card"><div class="lbl">Glândulas salivares <span class="act">${st.sal.length||''}</span></div><div class="form">
+      <div class="card"><div class="lbl">Glândulas salivares <span class="act">${st.sal.length||''}</span></div><div class="form dir">
         ${Object.entries(GL).map(([k,v])=>`<div class="k">${v.replace('direita','D').replace('esquerda','E')}</div>${segm([['habitual','habitual'],['sialoadenite','sialoadenite']],st.glst[k],'gl'+k)}`).join('')}
         <div class="k">Sublinguais</div><div class="p">habituais</div>
       </div>
@@ -348,7 +349,7 @@ function viewLaudo(){
         ${lista(st.cerv,'LC','c',c=>[`${rotC(c)} · ${REG[c.reg].replace('região cervical ','')}`,`${c.tipo} · ${c.dx} · ${c.med.map(cm).join(' × ')} cm`])||'<div class="empty">Sem massas ou coleções nas regiões cervicais.</div>'}
         <button type="button" class="addbtn" data-add="c">${I.plus}Adicionar lesão cervical</button></div>
       <div class="card"><div class="toggle"><div><div class="lbl" style="margin:0">Procedimento</div><div class="p">PAAF realizada neste atendimento</div></div><button type="button" class="sw" id="paafSw" aria-pressed="${st.paaf.on}" aria-label="PAAF"></button></div>
-        ${st.paaf.on?`<div class="form" style="margin-top:12px">
+        ${st.paaf.on?`<div class="form dir" style="margin-top:12px">
           <div class="k">Puncionados</div>${alvoChips.length?chips(alvoChips,st.paaf.alvos,'alvo',true):'<div class="empty">Adicione um linfonodo, nódulo salivar ou lesão do leito.</div>'}
           <div class="k">Punções</div><div class="in"><input class="cell" inputmode="numeric" data-f="punc" value="${esc(st.paaf.punc)}" placeholder="—"><span class="x">por alvo</span></div>
           <div class="k">Agulha</div>${segm([['25G','25G'],['23G','23G'],['27G','27G']],st.paaf.agulha,'agulha')}
@@ -362,7 +363,7 @@ function viewLaudo(){
 const sheet=(title,sub,pill,bodyHtml,txtHtml,tone,removeKey,label)=>`<div class="view">
   <div class="top"><button type="button" class="iconbtn" data-back="1" aria-label="Voltar">${I.back}</button><div class="ttl"><div class="h">${title}</div><div class="s">${sub}</div></div>${pill}</div>
   <div class="body">${bodyHtml}<div class="result" data-tone="${tone}"><div class="txt" style="border:0;padding:0"><small>Texto no laudo</small>${esc(txtHtml)}</div></div></div>
-  <div class="bottom"><button type="button" class="btn ghost" data-remove="${removeKey}">Remover</button><button type="button" class="btn primary" data-back="1">${I.check}Concluir ${label}</button></div></div>`;
+  <div class="bottom"><button type="button" class="btn primary" data-back="1">${I.check}Concluir ${label}</button><button type="button" class="btn ghost" data-remove="${removeKey}">Remover</button></div></div>`;
 function viewLinf(l){ return sheet(`Linfonodo ${rotL(l)}`,`nível ${l.nivel} · ${lado(l.lado)}`,`<span class="pill ${suspL(l)?'':'ok'}">${suspL(l)?suspL(l)+' critério'+(suspL(l)>1?'s':''):'sem suspeição'}</span>`,
   ditadoCard(l,'linf')+`<div class="card"><div class="lbl">Localização e medidas</div><div class="form"><div class="k">Nível</div>${chips(NIVEIS,l.nivel,'nivel')}<div class="k">Lado</div>${segm([['D','direita'],['E','esquerda']],l.lado,'llado')}<div class="k">Medidas</div><div class="in">${cells(l.med,'lm')}<span class="x">mm</span></div></div></div>
    <div class="card"><div class="lbl">Forma</div>${chips(['ovalado','arredondado'],l.forma,'lforma')}</div><div class="card"><div class="lbl">Hilo</div>${chips(['preservado','apagado'],l.hilo,'lhilo')}</div><div class="card"><div class="lbl">Cortical</div>${chips(['fina','espessada','heterogênea'],l.cort,'lcort')}</div><div class="card"><div class="lbl">Microcalcificações / cístico</div>${chips([['nenhum','nenhum'],['microcalcificações','microcalcificações'],['cístico','áreas císticas']],l.extra,'lextra')}</div><div class="card"><div class="lbl">Doppler</div>${chips(['hilar','periférica','mista'],l.dop,'ldop')}</div>`,

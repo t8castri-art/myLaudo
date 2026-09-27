@@ -57,6 +57,13 @@ exigencias-laudo-us.md  normas (CFM 2.381/2024, CBR/PADI 2025, SBEM etc.)
 - 3 medidas cabem numa linha.
 - Toda alteração marcada "sim" ou "alterada" abre **caixa de texto livre**, que entra no laudo.
 - A **prévia do laudo é editável** (fundo claro). Editar à mão congela o texto; o botão "Refazer pelos cartões" volta ao automático. O **Copiar laudo fica abaixo da prévia**.
+- **Uso com a mão esquerda** (o probe fica na direita), aprovado em 27/09:
+  - O microfone fica fixo no canto inferior esquerdo, em todas as telas. Na tela do exame ele dita o exame; dentro de um item (nódulo etc.), dita o item. O texto aparece num painel acima dele, com um botão "Fechar"; depois de fechar, "ver ditado" reabre.
+  - Nos cartões com vários campos (anamnese, glândula, órgão...), os botões ficam colados à esquerda e o nome do campo fica à direita. Cartões de dois botões ficam como estão.
+  - Nas telas de item, "Concluir" fica à esquerda e "Remover" na ponta direita.
+  - **Toda caixa de texto tem o botão "transcrever"** no canto inferior esquerdo: toca, fala, e o que transcreveu **substitui** o texto antigo. Nada precisa ser digitado.
+  - O Copiar laudo continua embaixo da prévia.
+- **Estrutura que nem sempre aparece** (ex.: paratireoide "visibilizada") pergunta "Está normal ou alterada?" e abre o texto pronto da opção escolhida, que dá para editar. Paratireoide normal: "Paratireoide de aspecto habitual, visibilizada adjacente ao terço inferior do lobo direito." Quando alterada, a conclusão ganha "Formação nodular em topografia de paratireoide. Correlacionar com cálcio e PTH."
 - Cada exame aberto pelo início abre **limpo**. A seta do topo volta ao início.
 
 ## Serviços
@@ -80,7 +87,7 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 - Cada nódulo, mioma, ovário e lesão em **parágrafo próprio**.
 
 ## Regras por exame
-- **Tireoide**: descreve TODOS os nódulos, de qualquer tamanho. ACR TI-RADS 2017 (não existe "2025"); pontos escondidos. No texto entram a composição e só o que pontua, mais o Doppler do nódulo (ausente / central / periférica, combináveis). **Focos ecogênicos são multi-seleção e os pontos somam.** Conduta pela MAIOR medida (TR3 PAAF ≥ 2,5, seguimento ≥ 1,5; TR4 ≥ 1,5 / ≥ 1,0; TR5 ≥ 1,0 / ≥ 0,5 cm). Só volume total. Anamnese: história familiar (não / sim / sim 1º grau), conhece nódulos, tireoidectomia (por câncer?), levotiroxina + dose, sintomas (pigarro, rouquidão, disfagia, falta de ar). TSH e anticorpos não entram.
+- **Tireoide**: descreve TODOS os nódulos, de qualquer tamanho. ACR TI-RADS 2017 (não existe "2025"); pontos escondidos. No texto entram a composição e só o que pontua, mais o Doppler do nódulo (ausente / central / periférica, combináveis). **Focos ecogênicos são multi-seleção e os pontos somam.** Sugestão curta: "PAAF de N1." (com linfonodo: "PAAF de N1 e LN1, com tireoglobulina no lavado do linfonodo."). Conduta pela MAIOR medida (TR3 PAAF ≥ 2,5, seguimento ≥ 1,5; TR4 ≥ 1,5 / ≥ 1,0; TR5 ≥ 1,0 / ≥ 0,5 cm). Só volume total. Anamnese: história familiar (não / sim / sim 1º grau), conhece nódulos, tireoidectomia (por câncer?), levotiroxina + dose, sintomas (pigarro, rouquidão, disfagia, falta de ar). TSH e anticorpos não entram.
 - **Mamas e axilas** (sempre juntas): nódulo com horário, distância do mamilo, distância da pele e medidas. Descritores antes da classificação. BI-RADS por mama, só na conclusão. Mamografia (não fez / trouxe com BI-RADS e data / não trouxe). Anamnese sem nada marcado → "Nega histórico familiar de câncer de mama e biópsia prévia."; se a indicação é Rotina, não escreve negativas. CORE aprovado.
 - **Transvaginal**: DUM ou menopausa; G P A com cesárea ou vaginal. Miomas com FIGO sugerido; lesões anexiais com IOTA e O-RADS sugerido. Só endocavitário.
 - **Cervical e salivares**: leito tireoidiano, linfonodos por nível I–VII, salivares (todas normais = "Glândulas salivares sem alterações detectáveis."), PAAF com tireoglobulina no lavado quando há linfonodo.

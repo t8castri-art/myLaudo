@@ -156,6 +156,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 </div>
 <div class="toast" id="toast"></div>
 
+<script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
@@ -290,18 +291,18 @@ function render(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard()}
-      <div class="card"><div class="lbl">Exames anteriores</div><div class="form">
+      <div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
         <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
         ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
         <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou próstata com 48 g e resíduo de 60 mL">${esc(st.prev.txt||'')}</textarea>`:''}
       </div></div>
-      <div class="card"><div class="lbl">Anamnese</div><div class="form">
+      <div class="card"><div class="lbl">Anamnese</div><div class="form dir">
         <div class="k">PSA</div><div class="in"><input class="cell" inputmode="decimal" data-f="psa" value="${esc(a.psa)}" placeholder="—"><span class="x">ng/mL em</span><input class="cell" style="width:72px" data-f="psadata" value="${esc(a.psaData)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
         <div class="k">Sintomas</div>${chips(SINT,a.sint,'sint',true)}
         <div class="k">Medicação HPB</div>${segm([['n','não'],['s','sim']],a.med?'s':'n','med')}
         ${a.med?obs('medTxt',a.medTxt,'qual? ex.: tansulosina 0,4 mg'):''}
       </div></div>
-      <div class="card"><div class="lbl">Bexiga · volume inicial <span class="act" id="vbx">~${fmt(vol(b.med))} mL</span></div><div class="form">
+      <div class="card"><div class="lbl">Bexiga · volume inicial <span class="act" id="vbx">~${fmt(vol(b.med))} mL</span></div><div class="form dir">
         <div class="k">Repleção</div>${segm([['boa','boa'],['parcial','parcial']],b.rep,'rep')}
         <div class="k">Medidas</div><div class="in">${cells(b.med,'bm')}<span class="x">mm</span></div>
         <div class="k">Parede</div><div class="in"><input class="cell" inputmode="decimal" data-f="parede" value="${esc(b.parede)}" placeholder="—"><span class="x">mm</span></div>
@@ -309,26 +310,26 @@ function render(){
         <div class="k">Conteúdo</div>${segm([['anecoico','anecoico'],['ecos','ecos'],['calculo','cálculo']],b.cont,'bcont')}
         ${b.cont!=='anecoico'?obs('contTxt',b.contTxt,b.cont==='calculo'?'ex.: medindo 1,2 cm, móvel':'ex.: finos, móveis'):''}
       </div></div>
-      <div class="card"><div class="lbl">Junções ureterovesicais</div><div class="form">
+      <div class="card"><div class="lbl">Junções ureterovesicais</div><div class="form dir">
         <div class="k">Direita</div>${segm(JUVOPT,st.juv.D,'juvd')}
         <div class="k">Esquerda</div>${segm(JUVOPT,st.juv.E,'juve')}
       </div></div>
-      <div class="card"><div class="lbl">Próstata <span class="act" id="vpr">~${fmt(pesoDe(p.med))} g</span></div><div class="form">
+      <div class="card"><div class="lbl">Próstata <span class="act" id="vpr">~${fmt(pesoDe(p.med))} g</span></div><div class="form dir">
         <div class="k">Medidas</div><div class="in">${cells(p.med,'pm')}<span class="x">mm</span></div>
         <div class="k">Contornos</div>${segm([['regulares','regulares'],['lobulados','lobulados']],p.cont,'pcont')}
         <div class="k">Textura</div>${segm([['homogênea','homogênea'],['heterogênea','heterogênea']],p.text,'ptext')}
         <div class="k">Calcificações</div>${segm([['n','não'],['s','sim']],p.calc?'s':'n','pcalc')}
         ${p.calc?obs('calcTxt',p.calcTxt,'descreva: ex.: calcificações periuretrais, a maior com 0,4 cm'):''}
       </div></div>
-      <div class="card"><div class="lbl">Vesículas seminais</div><div class="form">
+      <div class="card"><div class="lbl">Vesículas seminais</div><div class="form dir">
         <div class="k">Aspecto</div>${segm([['habitual','habituais'],['alterada','alteradas']],st.vs,'vs')}
         ${st.vs!=='habitual'?obs('vsTxt',st.vsTxt,'descreva a alteração'):''}
       </div></div>
-      <div class="card"><div class="lbl">Protrusão intravesical <span class="act" id="ippG">${ipp?'grau '+ipp:'ausente'}</span></div><div class="form">
+      <div class="card"><div class="lbl">Protrusão intravesical <span class="act" id="ippG">${ipp?'grau '+ipp:'ausente'}</span></div><div class="form dir">
         <div class="k">Protrusão</div><div class="in"><input class="cell" inputmode="decimal" data-f="ipp" value="${esc(p.ipp)}" placeholder="0"><span class="x">mm</span></div>
       </div></div>
       <div class="card"><div class="lbl">Pós-miccional <span class="act">${st.pos.length?st.pos.length+'×':''}</span></div>
-        ${st.pos.map((m,i)=>`<div class="pm"><div class="t">Pós-mic ${i+1}</div><div class="form">
+        ${st.pos.map((m,i)=>`<div class="pm"><div class="t">Pós-mic ${i+1}</div><div class="form dir">
           <div class="k">Bexiga</div><div class="in">${cells(m.bx,'b'+i)}<span class="auto" id="rb${i}">~${fmt(vol(m.bx))} mL</span></div>
           <div class="k">Próstata</div><div class="in">${cells(m.pr,'p'+i)}<span class="auto" id="rp${i}">~${fmt(pesoDe(m.pr))} g</span></div>
         </div></div>`).join('')||'<div class="empty">Pelo menos uma medida pós-miccional é obrigatória.</div>'}
