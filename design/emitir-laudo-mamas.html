@@ -392,6 +392,7 @@ function viewNodulo(){
   return `<div class="view" data-view="nodulo">
     <div class="top"><button type="button" class="iconbtn" data-back="1" aria-label="Voltar">${I.back}</button><div class="ttl"><div class="h">${isC?'Cisto':'Nódulo'} ${rotulo(n)}</div><div class="s">Mama ${lado(n.mama)} · US Mamas e axilas</div></div>${isC?'':`<span class="pill ${suspicious(n)?'alert':''}">${suspicious(n)?suspicious(n)+' suspeito'+(suspicious(n)>1?'s':''):'sem suspeição'}</span>`}</div>
     <div class="body">
+      ${ditadoCard(n,'mama')}
       <div class="card"><div class="lbl">Localização</div><div class="form">
         <div class="k">Mama</div>${segm([['D','direita'],['E','esquerda']], n.mama, 'mama')}
         <div class="k">Horário</div><div>${chips(HORAS.map(h=>[h,h==='retroareolar'?'retroareolar':h+'h']), n.hora, 'hora')}</div>
@@ -458,6 +459,7 @@ function wire(){
   on('[data-remove]', el=>{ st.lesoes=st.lesoes.filter(l=>l.id!==Number(el.dataset.remove)); if(st.core.alvo===Number(el.dataset.remove)) st.core.alvo=null; st.view='laudo'; render(); });
   const n=st.lesoes.find(l=>l.id===st.edit);
   if(n){
+    ditadoLigar(n,'mama',{mama:'mama',hora:'hora',mamilo:'[data-f="mamilo"]',pele:'[data-f="pele"]',med:'m',forma:'forma',orient:'orient',marg:'marg',eco:'eco',post:'post',calc:'calc',dop:'dop',cisto:'cisto'},()=>{ st.birads={D:null,E:null}; render(); },toast);
     on('[data-mama]', el=>{ n.mama=el.dataset.mama; st.birads={D:null,E:null}; render(); });
     on('[data-hora]', el=>{ n.hora=el.dataset.hora; render(); });
     ['forma','orient','marg','eco','post','calc','cisto'].forEach(k=> on(`[data-${k}]`, el=>{ n[k]=el.dataset[k]; st.birads[n.mama]=null; render(); }));

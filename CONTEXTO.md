@@ -99,11 +99,11 @@ Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para um
 ## Próximos passos combinados
 1. **Ditado** (no ar desde 24–25/09, código em `design/ditado.js`, compartilhado pelas telas; reconhecimento por regras, no aparelho, sem IA; "sem X" / "nega X" anulam X).
    - **Ditado do exame**: cartão no topo das 5 telas. Preenche indicação, anamnese, exames anteriores, órgão e medidas. Ignora nódulos e lesões.
-   - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical). Frase corrida: localização + características + **medidas em cm por último**.
+   - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical), nódulo e cisto de mama (mama, horário, distância do mamilo e da pele, descritores BI-RADS; o ditado pode trocar a mama e o tipo nódulo/cisto). Frase corrida: localização + características + **medidas em cm por último**.
    - Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm.
    - **Tracejado = veio do ditado e já está no laudo.** Não precisa tocar para confirmar; só toca para trocar. O que não foi dito fica no padrão, que conta como ausente. O aviso só aparece quando falta o essencial do item (nódulo: lobo, terço, composição, ecogenicidade, medidas).
    - Se o microfone do site falhar, usa-se o do teclado na mesma caixa.
-   - Falta ditado de item em: mama (nódulo e cisto), mioma, lesão anexial, lesão salivar e lesão cervical.
+   - Falta ditado de item em: mioma, lesão anexial, lesão salivar e lesão cervical.
 2. **Ícone**: laboratório em `design/laboratorio-do-icone.html` (gerado por `ferramentas/icone/lab_icone.py`). Decidido: calipers em **X**, traço fino, rosa + sálvia, degradê esfumaçado que termina em preto. Reprovados: feixe, colchetes, logo dele no ícone, Saturno, traçado livre, cruz "+". Na mesa: nódulo medido, só os calipers, elipse medida, Doppler de 1 e de 2 ondas (subida sistólica rápida), campo trapezoidal e **campo minimalista** (fundo preto, degradê só dentro do feixe, nódulo medido dentro). Falta ele escolher; depois gerar `apple-touch-icon.png` 180×180 e ligar no `index.html`.
 3. Exames que faltam para cobrir o HMC: rins e vias, carótidas, depois abdome superior e total.
 4. Depois (não agora): agenda (Google Calendar do Instituto e do particular) e integração DICOM com o aparelho.
