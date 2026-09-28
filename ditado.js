@@ -123,10 +123,11 @@ function ditadoLeito(fala){
 }
 
 // ---------- tela: cartão de ditado ----------
-const DITADO_NOMES={lobo:'lobo',terco:'terço',comp:'composição',eco:'ecogenicidade',forma:'forma',marg:'margens',focos:'focos ecogênicos',dop:'Doppler',med:'medidas',nivel:'nível',lado:'lado',hilo:'hilo',cort:'cortical',extra:'microcalcificações / cístico'};
+const DITADO_NOMES={mama:'mama',hora:'horário',mamilo:'distância do mamilo',pele:'distância da pele',lobo:'lobo',terco:'terço',comp:'composição',eco:'ecogenicidade',forma:'forma',marg:'margens',focos:'focos ecogênicos',dop:'Doppler',med:'medidas',nivel:'nível',lado:'lado',hilo:'hilo',cort:'cortical',extra:'microcalcificações / cístico'};
 const DITADO_TIPOS={
   nod:{parse:ditadoNodulo,campos:['lobo','terco','comp','eco','med'],ex:'terço superior do lobo direito, nódulo sólido hipoecoico, margens irregulares, com microcalcificações, vascularização central, 2,0 por 1,4 por 1,2'},
   linf:{parse:ditadoLinf,campos:['nivel','lado','med'],ex:'nível três à direita, linfonodo arredondado, sem hilo, cortical espessada, fluxo periférico, 1,2 por 0,8 por 0,9'},
+  mama:{parse:ditadoMama,campos:['mama','hora','mamilo','pele','med'],ex:'mama direita, às 10 horas, a 4 cm do mamilo e 1,5 cm da pele, nódulo oval, paralelo, circunscrito, hipoecoico, sem calcificações, sem fluxo, 1,3 por 0,9 por 0,6'},
   leito:{parse:ditadoLeito,campos:['lado','comp','med'],ex:'leito direito, lesão sólida hipoecoica, margens irregulares, fluxo central, 0,8 por 0,6 por 0,5'},
 };
 const DITADO_CSS=`
@@ -351,6 +352,41 @@ function ditadoLaudoProstata(fala){
   return r;
 }
 
+// ---------- nódulo / cisto de mama ----------
+// distância em mm a partir de um rótulo ("4 cm do mamilo", "1,5 da pele", "profundidade de 15 mm")
+function ditDist(t,re,depoisPrimeiro){
+  const m=t.match(re); if(!m) return null;
+  const N=/(\d+(?:[.,]\d+)?)\s*(cm|centimetros?|mm|milimetros?)?/g;
+  const antes=[...t.slice(Math.max(0,m.index-30),m.index).matchAll(N)].pop(), depois=t.slice(m.index+m[0].length,m.index+m[0].length+25).match(/^\D{0,12}?(\d+(?:[.,]\d+)?)\s*(cm|centimetros?|mm|milimetros?)?/);
+  const x=depoisPrimeiro?(depois||antes):(antes||depois); if(!x) return null;
+  let v=parseFloat(x[1].replace(',','.')); const u=x[2]||'';
+  if(/^c/.test(u)||(!u&&v<16)) v*=10;
+  v=Math.round(v*10)/10; return Number.isInteger(v)?String(v):String(v).replace('.',',');
+}
+function ditadoMama(fala){
+  const t=ditadoTexto(fala), r={};
+  const l=t.match(/mama\s+(direita|esquerda)/)||t.match(/\b(direita|esquerda)\b/); if(l) r.mama=l[1]==='direita'?'D':'E';
+  if(/retroareolar|retro\s*-?\s*areolar|atras\s+do\s+mamilo/.test(t)) r.hora='retroareolar';
+  else { const h=t.match(/\b(\d{1,2})\s*(?:h\b|horas?\b)/)||t.match(/\bas\s+(\d{1,2})\b/); if(h&&+h[1]>=1&&+h[1]<=12) r.hora=String(+h[1]); }
+  const mam=ditDist(t,/(do|ao|da)\s+(complexo\s+areolo\w*\s+|papila|mamilo)(mamilo)?|mamilo/); if(mam) r.mamilo=mam;
+  const pel=/profundidade/.test(t)?ditDist(t,/profundidade/,true):ditDist(t,/(da|a)\s+pele/); if(pel) r.pele=pel;
+  if(ditadoTem(/\bcisto\b|\bcistic[oa]\b/,t)&&!/cistico[\s-]*solid|solido[\s-]*cistic|complexo/.test(t)){
+    r.tipo='cisto'; r.cisto=/complicad|ecos\s+internos|debris|conteudo\s+espesso/.test(t)?'complicado':'simples';
+  } else if(/\bnodul/.test(t)) r.tipo='nodulo';
+  if(/\boval|ovalad|elipt/.test(t)) r.forma='oval'; else if(/redond|arredondad/.test(t)) r.forma='redondo';
+  else if(/forma\s+irregular|nodulo\s+(\w+\s+)?irregular/.test(t)) r.forma='irregular';
+  if(/nao\s+paralel|vertical|mais\s+alto/.test(t)) r.orient='não paralelo'; else if(/paralel|horizontal|mais\s+largo/.test(t)) r.orient='paralelo';
+  if(/espiculad/.test(t)) r.marg='espiculadas'; else if(/microlobulad/.test(t)) r.marg='microlobuladas'; else if(/angulad/.test(t)) r.marg='anguladas';
+  else if(/indistint|mal\s+(definid|delimitad)|imprecis|margens?\s+irregular/.test(t)) r.marg='indistintas'; else if(/circunscrit|bem\s+(definid|delimitad)|margens?\s+regular/.test(t)) r.marg='circunscritas';
+  if(/complexo|cistico[\s-]*solid|solido[\s-]*cistic/.test(t)) r.eco='complexo cístico-sólido'; else if(/heterogene/.test(t)) r.eco='heterogêneo';
+  else if(/hiper\s*-?\s*ec/.test(t)) r.eco='hiperecoico'; else if(/\biso\s*-?\s*ec/.test(t)) r.eco='isoecoico'; else if(/hipo\s*-?\s*ec/.test(t)) r.eco='hipoecoico';
+  if(/combinad|padrao\s+misto/.test(t)) r.post='combinado'; else if(ditadoTem(/sombra/,t)) r.post='sombra'; else if(ditadoTem(/reforco/,t)) r.post='reforço';
+  else if(/sem\s+(alteracao|efeito|fenomeno|artefato)s?\s+acustic|sem\s+sombra|sem\s+reforco/.test(t)) r.post='nenhuma';
+  if(ditadoTem(/calcific|microcalcific/,t)) r.calc='com'; else if(/sem\s+(\w+\s+)?(calcific|microcalcific)/.test(t)) r.calc='sem';
+  const d=ditadoDopNod(t); if(d) r.dop=d;
+  const m=ditadoMedidas(t); if(m) r.med=m;
+  return r;
+}
 // ---------- tipos do ditado ----------
 Object.assign(DITADO_TIPOS,{
   tireoide:{laudo:true,parse:ditadoLaudoTireoide,ex:'rotina, nega história familiar, tireoide assimétrica, dimensões habituais, homogênea; lobo direito 4,7 por 1,8 por 2,0; lobo esquerdo 4,6 por 1,6 por 1,9; istmo 0,3'},
