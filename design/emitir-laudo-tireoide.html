@@ -312,7 +312,7 @@ function docUS(){
     `Glândula tireoide tópica, ${g.sim}, com dimensões ${g.dim}, superfície ${g.sup} e ecotextura ${g.eco}, móvel à deglutição. Ao estudo Doppler: ${g.dop==='sem alterações'?'sem alterações detectáveis':'aumento difuso da vascularização parenquimatosa'}.`,'',
     ...(st.nods.length?st.nods.flatMap(n=>[descrN(n),'']):['Sem evidência de formações nodulares.','']),
     'Medidas:',
-    `Istmo: ${m.istmo.map(cm).join(' × ')} cm.`,
+    (m.istmo.filter(v=>String(v).trim()).length===1?`Istmo: ${cm(m.istmo.find(v=>String(v).trim()))} cm de espessura.`:`Istmo: ${m.istmo.map(cm).join(' × ')} cm.`),
     `Lobo direito: ${m.ld.map(cm).join(' × ')} cm.`,
     `Lobo esquerdo: ${m.le.map(cm).join(' × ')} cm.`,
     `Volume total: ~${fmt(vd+ve,0)} mL.`,'',
