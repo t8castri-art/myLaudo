@@ -138,4 +138,49 @@ async function antOrganizar(prev,exame,rerender,avisar){
   }catch(e){ prev.erroIA=e.message==='senha incorreta'?'Senha da ponte incorreta.':'Não consegui organizar ('+e.message+'). O texto lido continua guardado.'; }
   prev.organizando=false; rerender();
 }
-if(typeof module!=='undefined') module.exports={antLimpar};
+// ---------- evolução: lê a lista dos exames anteriores e compara com os nódulos de hoje ----------
+// Lista no formato da IA (ou digitada igual): "US 06/24:" / "Lobo direito" / "Terço médio: N1 TI-RADS 4: 9 × 6 × 7 mm"
+function antLer(txt){
+  const exames=[]; let ex=null, lobo=null;
+  String(txt||'').split(/\r?\n/).forEach(l0=>{ const l=l0.trim(); if(!l) return;
+    let m=l.match(/^(US|PAAF)\s+(?:de\s+)?(\d{1,2})\s*\/\s*(\d{2,4})\s*:?$/i)||l.match(/^(US|PAAF)\s+sem\s+data\s*:?$/i);
+    if(m){ ex={tipo:m[1].toUpperCase(),data:m[2]?String(m[2]).padStart(2,'0')+'/'+String(m[3]).slice(-2):null,nods:[]}; exames.push(ex); lobo=null; return; }
+    if(!ex) return;
+    if(/^lobo\s+direito\s*:?$/i.test(l)){ lobo='D'; return; } if(/^lobo\s+esquerdo\s*:?$/i.test(l)){ lobo='E'; return; }
+    m=l.match(/^(?:(lobo\s+(?:direito|esquerdo))[,\s]*)?(?:(istmo)|terço\s+(superior|médio|medio|inferior|não\s+informado))?\s*:?\s*(N\d+)\s+TI-?RADS\s*(\d|não informado)?\s*:\s*([\d.,]+(?:\s*[×x*]\s*[\d.,]+){0,2})\s*(mm|cm)?/i);
+    if(m){ const lb=m[1]?(/direito/i.test(m[1])?'D':'E'):m[2]?'I':lobo; const un=(m[7]||'mm').toLowerCase();
+      const med=m[6].split(/\s*[×x*]\s*/).map(v=>parseFloat(v.replace(',','.'))*(un==='cm'?10:1));
+      ex.nods.push({rot:m[4].toUpperCase(),lobo:lb,terco:m[3]?m[3].toLowerCase().replace('medio','médio'):null,tr:/^\d$/.test(m[5]||'')?+m[5]:null,med}); return; }
+    m=l.match(/^citologia\s*:\s*(?:bethesda\s*)?([IVX]+|\d)/i); if(m&&ex.nods.length) ex.nods[ex.nods.length-1].bethesda=m[1].toUpperCase();
+  });
+  return exames;
+}
+const antMeses=(d,hoje)=>{ if(!d) return null; const [mm,aa]=d.split('/').map(Number); return (hoje.getFullYear()-(2000+aa))*12+(hoje.getMonth()+1-mm); };
+const antCm=mm=>(mm/10).toFixed(1).replace('.',',');
+// atuais: [{rot:'N1',lobo:'D',tr:4,med:[mm,mm,mm]}]
+function antEvolucao(txt,atuais,hoje){
+  hoje=hoje||new Date(); const exames=antLer(txt); if(!exames.length||!atuais.length) return '';
+  const frases=[], estaveis=[], sem=[];
+  const ordem=atuais.slice().sort((a,b)=>(b.tr||0)-(a.tr||0));
+  ordem.forEach((n,i)=>{
+    const hist=[]; exames.forEach(e=>e.nods.forEach(p=>{ if(p.rot===n.rot&&(!p.lobo||!n.lobo||p.lobo===n.lobo)) hist.push({...p,data:e.data,tipo:e.tipo}); }));
+    const paaf=hist.filter(h=>h.tipo==='PAAF'&&h.bethesda).pop();
+    const ant=hist.filter(h=>h.med&&h.med.filter(isFinite).length).pop();
+    const agora=n.med.filter(isFinite);
+    if(!ant||!agora.length){ if(!hist.length) sem.push(n.rot); return; }
+    const maxA=Math.max(...ant.med), maxN=Math.max(...agora), d=Math.round((maxN-maxA)*10)/10, meses=antMeses(ant.data,hoje);
+    let volP=null; if(ant.med.length===3&&agora.length===3) volP=Math.round((agora.reduce((x,y)=>x*y,1)/ant.med.reduce((x,y)=>x*y,1)-1)*100);
+    let dims=0; if(ant.med.length===agora.length) agora.forEach((v,k)=>{ if(v-ant.med[k]>=2&&v>=ant.med[k]*1.2) dims++; });
+    const signif=dims>=2||(volP!=null&&volP>=50), rapido=d>=4&&meses!=null&&meses<=6;
+    const quem=`${n.rot}${n.tr?` (TI-RADS ${n.tr}${i===0&&ordem.length>1?', o mais suspeito':''})`:''}`;
+    const prazo=meses!=null?` em ${meses} ${meses===1?'mês':'meses'}`:'';
+    const pf=paaf?`; PAAF em ${paaf.data}: Bethesda ${paaf.bethesda}`:'';
+    if(Math.abs(d)<=2&&!signif){ if(i===0||pf) frases.push(`${quem}: estável (${antCm(maxA)} → ${antCm(maxN)} cm${prazo})${pf}.`); else estaveis.push(n.rot); return; }
+    const verbo=d<-2?'redução':'aumento';
+    frases.push(`${quem}: ${verbo} de ${antCm(maxA)} para ${antCm(maxN)} cm (${d>0?'+':''}${String(d).replace('.',',')} mm${volP!=null?`, volume ${volP>0?'+':''}${volP}%`:''})${prazo}${rapido?', crescimento rápido':signif&&d>0?', crescimento significativo pelo ACR':''}${pf}.`);
+  });
+  if(estaveis.length) frases.push(`${estaveis.join(', ')}: ${estaveis.length>1?'estáveis':'estável'}.`);
+  if(sem.length) frases.push(`${sem.join(', ')}: sem correspondente nos exames anteriores.`);
+  return frases.length?'Evolução: '+frases.join(' '):'';
+}
+if(typeof module!=='undefined') module.exports={antLimpar,antLer,antEvolucao};
