@@ -51,6 +51,10 @@ const ANT_I={
   x:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
 };
 const ANT_CSS=`
+.antcam{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border:1px solid var(--ac);border-radius:10px;color:var(--acT);font-size:13.5px;font-weight:500}
+.antst{grid-column:1/-1;font-size:12px;color:var(--acT)}
+.antst.erro{color:var(--alert)}
+.lbl .act[data-prev]{display:flex;padding:2px;color:var(--tx3)}
 .antsplit{display:flex;border:1px solid var(--ac);border-radius:10px;overflow:hidden;grid-column:1/-1}
 .antsplit button{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:44px;color:var(--acT);font-size:13px;font-weight:500}
 .antsplit button+button{border-left:1px solid var(--ac)}
@@ -72,57 +76,66 @@ const ANT_CSS=`
 
 // cartão inteiro de "Exames anteriores"; prev = st.prev; exemploTxt = placeholder da caixa
 function anterioresCard(prev,exemploTxt){
-  prev.arqs=prev.arqs||[];
-  const cfg=antCfg.get(), lidos=prev.arqs.filter(a=>a.status==='pronto').length, lendo=prev.arqs.some(a=>a.status!=='pronto'&&a.status!=='erro');
+  prev.arqs=prev.arqs||[]; prev.manuais=prev.manuais||[];
+  const cfg=antCfg.get(), ligada=!!(cfg.url&&cfg.senha);
   const esc2=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  return `<div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
-    <div class="k">Trouxe</div><div class="segm"><button type="button" data-prev="nao" aria-pressed="${prev.tem==='nao'}">não</button><button type="button" data-prev="sim" aria-pressed="${prev.tem==='sim'}">sim</button></div>
-    ${prev.tem==='sim'?`
-    <div class="antsplit"><button type="button" id="antDig">${ANT_I.lapis}digitar</button><button type="button" id="antCam">${ANT_I.cam}escanear ou PDF</button></div>
+  if(prev.tem!=='sim') return `<div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
+    <div class="k">Trouxe</div><div class="segm"><button type="button" data-prev="nao" aria-pressed="true">não</button><button type="button" data-prev="sim" aria-pressed="false">sim</button></div></div></div>`;
+  const precisaCfg=(prev.arqs.length||prev.manuais.length)&&!ligada||prev.cfgAberta;
+  return `<div class="card"><div class="lbl">Exames anteriores <button type="button" class="act" data-prev="nao" aria-label="Não trouxe">${ANT_I.x}</button></div><div class="form dir">
+    <button type="button" class="antcam" id="antCam">${ANT_I.cam}escanear ou PDF</button>
     <input type="file" id="antArq" accept="image/*,application/pdf" multiple hidden>
-    ${prev.arqs.length?`<div class="antarqs">${prev.arqs.map(a=>`<div class="antarq"><span class="n">${esc2(a.nome)}</span><span class="s ${a.status==='pronto'?'ok':a.status==='erro'?'erro':''}">${esc2(a.status==='pronto'?'lido':a.msg||a.status)}</span><button type="button" data-antdel="${a.id}" aria-label="Tirar">${ANT_I.x}</button></div>`).join('')}</div>
-      ${cfg.url&&cfg.senha?`<button type="button" class="antorg" id="antOrg" ${lidos&&!lendo&&!prev.organizando?'':'disabled'}>${prev.organizando?'Organizando…':lendo?'Lendo…':'Organizar por lobo e terço'}</button>`:''}`:''}
-    ${prev.arqs.length&&!(cfg.url&&cfg.senha)||prev.cfgAberta?`<div class="antcfg"><div class="h">Ligar a IA neste aparelho (uma vez só)</div>
+    ${prev.arqs.length?`<div class="antarqs">${prev.arqs.map(a=>`<div class="antarq"><span class="n">${esc2(a.nome)}</span><span class="s ${a.status==='pronto'?'ok':a.status==='erro'?'erro':''}">${esc2(a.status==='pronto'?'lido':a.msg||a.status)}</span><button type="button" data-antdel="${a.id}" aria-label="Tirar">${ANT_I.x}</button></div>`).join('')}</div>`:''}
+    ${prev.organizando?'<div class="antst">Organizando por lobo e terço…</div>':prev.erroIA?`<div class="antst erro">${esc2(prev.erroIA)}</div>`:''}
+    ${precisaCfg?`<div class="antcfg"><div class="h">Ligar a IA neste aparelho (uma vez só)</div>
       <input id="antUrl" placeholder="endereço da ponte (https://…workers.dev)" value="${esc2(cfg.url||'')}" autocomplete="off" autocapitalize="off">
       <input id="antSenha" placeholder="senha da ponte" value="${esc2(cfg.senha||'')}" autocomplete="off" autocapitalize="off">
       <button type="button" id="antSalvar">Salvar</button></div>`:''}
-    ${prev.txtDaIA?'':`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc2(prev.data||'')}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>`}
     <textarea class="obs" id="prevTxt" rows="${prev.txtDaIA?Math.min(18,String(prev.txt||'').split('\n').length+3):3}" placeholder="${esc2(exemploTxt)}">${esc2(prev.txt||'')}</textarea>
-    ${cfg.url&&cfg.senha&&!prev.cfgAberta?'<button type="button" class="antlink" id="antCfg">ajustar ponte da IA</button>':''}`:''}
+    ${ligada&&!prev.cfgAberta?'<button type="button" class="antlink" id="antCfg">ajustar ponte da IA</button>':''}
   </div></div>`;
 }
 // liga o cartão; exame = 'tireoide'...; nome = nome do paciente (para apagar se aparecer)
 function anterioresLigar(prev,exame,nome,rerender,avisar){
+  prev.nomePac=nome;
   const $i=id=>document.getElementById(id);
-  const arq=$i('antArq'), dig=$i('antDig'), cam=$i('antCam');
-  if(dig) dig.onclick=()=>{ const t=$i('prevTxt'); if(t){ t.focus(); t.scrollIntoView({block:'center'}); } };
+  const arq=$i('antArq'), cam=$i('antCam'), box=$i('prevTxt');
   if(cam&&arq) cam.onclick=()=>arq.click();
-  if(arq) arq.onchange=()=>{ [...arq.files].forEach(f=>antAdicionar(prev,f,nome,rerender)); arq.value=''; };
+  const auto=()=>antAuto(prev,exame,rerender,avisar);
+  if(arq) arq.onchange=()=>{ [...arq.files].forEach(f=>antAdicionar(prev,f,nome,rerender,auto)); arq.value=''; };
+  // caixa: texto ditado/transcrito (ou digitado antes de haver resumo) vai para a IA; correção do resumo, não
+  if(box) box.addEventListener('change',()=>{ const v=box.value.trim(), ditado=box.dataset.ditado==='1'; delete box.dataset.ditado; prev.txt=v;
+    if(v&&(ditado||!prev.txtDaIA)){ prev.manuais.push(v); prev.txtDaIA=false; auto(); } });
   document.querySelectorAll('#phone [data-antdel]').forEach(b=>b.onclick=()=>{ prev.arqs=prev.arqs.filter(a=>a.id!==+b.dataset.antdel); rerender(); });
-  const sv=$i('antSalvar'); if(sv) sv.onclick=()=>{ const url=$i('antUrl').value.trim().replace(/\/$/,''), senha=$i('antSenha').value.trim(); if(!/^https:\/\//.test(url)||!senha){ avisar('Preencha o endereço (https://…) e a senha'); return; } antCfg.set({url,senha}); prev.cfgAberta=false; avisar('IA ligada neste aparelho'); rerender(); };
+  const sv=$i('antSalvar'); if(sv) sv.onclick=()=>{ const url=$i('antUrl').value.trim().replace(/\/$/,''), senha=$i('antSenha').value.trim(); if(!/^https:\/\//.test(url)||!senha){ avisar('Preencha o endereço (https://…) e a senha'); return; } antCfg.set({url,senha}); prev.cfgAberta=false; avisar('IA ligada neste aparelho'); rerender(); auto(); };
   const cf=$i('antCfg'); if(cf) cf.onclick=()=>{ prev.cfgAberta=true; rerender(); };
-  const org=$i('antOrg'); if(org) org.onclick=()=>antOrganizar(prev,exame,rerender,avisar);
 }
-async function antAdicionar(prev,file,nome,rerender){
+async function antAdicionar(prev,file,nome,rerender,depois){
   const a={id:antSeq++,nome:file.name||(file.type.includes('pdf')?'PDF':'foto'),status:'lendo',msg:'lendo…',texto:''}; prev.arqs.push(a); rerender();
   const status=m=>{ a.msg=m; const el=[...document.querySelectorAll('#phone [data-antdel]')].find(b=>+b.dataset.antdel===a.id); if(el) el.previousElementSibling.textContent=m; };
   try{
     const bruto=/pdf/i.test(file.type)||/\.pdf$/i.test(file.name)?await antLerPdf(file,status):await antLerImagem(file,status);
     a.texto=antLimpar(bruto,nome); a.status=a.texto.replace(/\s/g,'').length>20?'pronto':'erro'; if(a.status==='erro') a.msg='não achei texto';
   }catch(e){ a.status='erro'; a.msg='não consegui ler'; }
-  rerender();
+  rerender(); if(depois) depois();
+}
+// organiza quando tudo terminou de ler e a ponte está ligada
+function antAuto(prev,exame,rerender,avisar){
+  const cfg=antCfg.get(); if(!(cfg.url&&cfg.senha)) { rerender(); return; }
+  if(prev.organizando||prev.arqs.some(a=>a.status!=='pronto'&&a.status!=='erro')) return;
+  if(!prev.arqs.some(a=>a.status==='pronto')&&!prev.manuais.length) return;
+  antOrganizar(prev,exame,rerender,avisar);
 }
 async function antOrganizar(prev,exame,rerender,avisar){
   const cfg=antCfg.get(); const textos=prev.arqs.filter(a=>a.status==='pronto').map(a=>({texto:a.texto}));
-  if(prev.txt&&prev.txt.trim()&&!prev.txtDaIA) textos.push({texto:prev.txt.trim()}); // o que você digitou/ditou também entra
-  prev.organizando=true; rerender();
+  (prev.manuais||[]).forEach(m=>textos.push({texto:antLimpar(m,prev.nomePac)})); // o que você ditou também entra
+  prev.organizando=true; prev.erroIA=''; rerender();
   try{
     const r=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha:cfg.senha,exame,textos})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.erro||('erro '+r.status));
     prev.txt=j.texto; prev.txtDaIA=true;
-    avisar('Exames anteriores organizados');
-  }catch(e){ avisar(e.message==='senha incorreta'?'Senha da ponte incorreta':'Não consegui organizar: '+e.message); }
+  }catch(e){ prev.erroIA=e.message==='senha incorreta'?'Senha da ponte incorreta.':'Não consegui organizar ('+e.message+'). O texto lido continua guardado.'; }
   prev.organizando=false; rerender();
 }
 if(typeof module!=='undefined') module.exports={antLimpar};

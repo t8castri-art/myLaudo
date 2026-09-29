@@ -94,7 +94,8 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 - **Próstata via abdominal**: ordem bexiga (volume inicial) → parede → JUV → próstata → vesículas seminais → protrusão → **pós-miccional** (sempre ≥ 1; cada um mede bexiga e próstata de novo; repete se sobrar volume; não existe "bexiga vazia"). HPB > 30 g (discreto ≤ 50, moderado ≤ 80, acentuado > 80). IPP I < 5, II 5–10, III > 10 mm. Resíduo significativo > 50 mL (último).
 
 ## Exames anteriores (tireoide, desde 29/09)
-- Cartão: `Trouxe não | sim`. Com "sim", botão dividido `✎ digitar | 📷 escanear ou PDF` (várias fotos e PDFs de uma vez), a lista dos arquivos lidos, e **Organizar por lobo e terço**.
+- Cartão: `Trouxe não | sim`. Com "sim", somem o "Trouxe" e o não/sim (um ✕ discreto no título desfaz). Fica só o botão **escanear ou PDF** (várias fotos e PDFs), a lista dos arquivos e a caixa de texto (clicável, com "transcrever"). Sem botão "digitar", sem campo de data (cada exame traz a sua).
+- **Não há botão "organizar"**: agrupar por lobo e terço é a instrução da IA. Terminou de ler os arquivos, ou terminou de transcrever/ditar na caixa, vai sozinho para a IA e volta agrupado. Correção à mão no resumo não é reenviada.
 - O texto é lido **no iPhone** (PDF com texto direto; foto ou PDF escaneado pela leitura de imagem), e o app **apaga as linhas de identificação** (nome, nascimento, idade, CPF, telefone, e-mail, convênio, atendimento, médicos) antes de qualquer envio. O nome da ficha também é apagado se aparecer solto.
 - Só o texto limpo vai para a **ponte** (`ferramentas/ponte-ia/`, Cloudflare Worker com a chave da Anthropic e uma senha). A IA **só agrupa** por lobo e terço (e istmo), exame por exame, com o rótulo original de cada colega. **Quem diz qual nódulo é qual é o médico.**
 - No laudo sai como "US anteriores:" seguido do resumo. Endereço e senha da ponte ficam guardados só no aparelho.

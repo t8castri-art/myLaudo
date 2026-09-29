@@ -479,7 +479,7 @@ function tmicEquipar(){
       const antes=ta.value; let ouviu=false;
       rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; s=s.replace(/\s+/g,' ').trim(); if(!s) return; ouviu=true; ta.value=s.charAt(0).toUpperCase()+s.slice(1); ta.dispatchEvent(new Event('input',{bubbles:true})); };
       rec.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed') ta.focus(); };
-      rec.onend=()=>{ DITADO_REC=null; b.classList.remove('on'); b.lastChild.textContent='transcrever'; if(!ouviu){ ta.value=antes; } ta.dispatchEvent(new Event('change',{bubbles:true})); };
+      rec.onend=()=>{ DITADO_REC=null; b.classList.remove('on'); b.lastChild.textContent='transcrever'; if(!ouviu){ ta.value=antes; } else ta.dataset.ditado='1'; ta.dispatchEvent(new Event('change',{bubbles:true})); };
       try{ rec.start(); }catch(err){ ta.focus(); return; }
       DITADO_REC=rec; b.classList.add('on'); b.lastChild.textContent='parar';
     });
