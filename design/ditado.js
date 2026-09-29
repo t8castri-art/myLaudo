@@ -4,9 +4,14 @@
 
 // ---------- texto falado → texto com números ----------
 const DITADO_NUM={zero:0,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,catorze:14,quinze:15,dezesseis:16,dezasseis:16,dezessete:17,dezoito:18,dezenove:19,vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90};
+// o iPhone cola as frases ditadas sem ponto ("PeçanhaExame") e gruda número em palavra ("mediu06")
+function ditPrep(s){ return String(s||'').replace(/([a-zà-ÿ])([A-ZÀ-Ý])/g,'$1. $2').replace(/([A-Za-zÀ-ÿ])(\d)/g,'$1 $2'); }
+let ditMMGlobal=false;
 function ditadoTexto(s){
-  let t=String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-  t=t.replace(/(\d)\s*[x×*]\s*(?=\d)/g,'$1 por ').replace(/[;:!?]/g,' , ');
+  let t=ditPrep(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  t=t.replace(/(\d)\s*[x×*]\s*(?=\d)/g,'$1 por ').replace(/(\d)h(\d)/g,'$1 $2').replace(/[;:!?]/g,' , ')
+    .replace(/\b(?:logo|lobu|loba|lóbulo|lobulo)\s+(direito|esquerdo)/g,'lobo $1').replace(/\b(?:estimulo|estimo|istimo|ismo|itsmo)\b/g,'istmo')
+    .replace(/\bpara\s+tireoides?\b/g,'paratireoide').replace(/\b(?:leva|levo)\s+tiroxina/g,'levotiroxina').replace(/\bti\s*-?\s*rads?\b|\btirades\b|\btiradis\b/g,'tirads');
   const tk=t.split(/\s+/).filter(Boolean), out=[];
   for(let i=0;i<tk.length;i++){
     const m=tk[i].match(/^(.*?)([.,]*)$/), w=m[1];
@@ -31,7 +36,8 @@ function ditadoMedidas(t,primeira){
   if(!ms) return null;
   const v=[ms[1],ms[3],ms[5]].filter(Boolean).map(x=>parseFloat(x.replace(',','.')));
   const un=[ms[2],ms[4],ms[6]].filter(Boolean).join(' ');
-  const emMm=/\bm/.test(un)?true:/c/.test(un)?false:v.some(x=>x>=10);
+  const emMm=/\bm/.test(un)?true:/c/.test(un)?false:ditMMGlobal||v.some(x=>x>=10);
+  if(emMm&&ditMMGlobal&&!/c/.test(un)) v.forEach((x,i)=>{ if(x<10&&!Number.isInteger(x)) v[i]=x*10; });  // "1.2" ditado em mm = 12
   return [0,1,2].map(i=>{ if(v[i]==null) return ''; const mm=Math.round((emMm?v[i]:v[i]*10)*10)/10; return Number.isInteger(mm)?String(mm):String(mm).replace('.',','); });
 }
 const ditadoLado=t=>/\bdireit[oa]\b/.test(t)?'D':/\besquerd[oa]\b/.test(t)?'E':null;
@@ -185,7 +191,7 @@ const p2=n=>String(n).padStart(2,'0');
 function ditSegs(t,labels){
   const hits=[]; Object.entries(labels).forEach(([k,re])=>{ for(const m of t.matchAll(new RegExp(re.source,'g'))) hits.push({k,i:m.index,e:m.index+m[0].length}); });
   hits.sort((a,b)=>a.i-b.i); const out={};
-  hits.forEach((h,j)=>{ const fim=j+1<hits.length?hits[j+1].i:t.length; out[h.k]=(out[h.k]||'')+' '+t.slice(h.e,fim)+' '; });
+  out._todos={}; hits.forEach((h,j)=>{ const fim=j+1<hits.length?hits[j+1].i:t.length, seg=' '+t.slice(h.e,fim)+' '; out[h.k]=(out[h.k]||'')+seg; (out._todos[h.k]=out._todos[h.k]||[]).push(seg); });
   return out;
 }
 // texto sem os trechos que falam de nódulo/lesão (para não confundir com o órgão)
@@ -216,13 +222,13 @@ const ditSimNao=(t,re)=>{ const m=t.match(re); if(!m) return null; return !ditad
 // exames anteriores
 // nome do paciente: "paciente Maria Aparecida de Souza, ..." (fica no aparelho)
 function ditNome(fala,r){
-  const m=String(fala||'').match(/\b(?:paciente|nome)\s*(?:é|:)?\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){0,6}?)(?=\s*(?:[,.;]|$)|\s+(?:idade|anos|nascid|data|indica|rotina|sem\b|com\b|exame|tireoide|refere|nega|us\b|ultrass|mamografia|dum\b|psa\b))/i);
+  const m=ditPrep(fala).match(/\b(?:paciente|nome)\s*(?:é|:)?\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){0,6}?)(?=\s*(?:[,.;]|$)|\s+(?:idade|anos|nascid|data|indica|rotina|sem\b|com\b|exame|tireoide|refere|nega|us\b|ultrass|mamografia|dum\b|psa\b))/i);
   if(!m) return; const nome=m[1].trim().split(/\s+/).map(p=>/^(da|de|do|das|dos|e)$/i.test(p)?p.toLowerCase():p.charAt(0).toUpperCase()+p.slice(1).toLowerCase()).join(' ');
   if(nome.split(' ').length>=2) r.pac=nome;
 }
 // texto do exame anterior: "exame anterior de 06/25 mostrava nódulo de 1,2 cm no lobo direito."
 function ditPrevTxt(fala,r){
-  const m=String(fala||'').match(/\b(?:exames?|us|ultrass\S*)\s+(?:anterior(?:es)?|pr[eé]vios?)\b\s*(?:de\s+)?(?:\d{1,2}\s*\/\s*\d{2,4}|(?:janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+(?:de\s+)?\d{2,4})?\s*[,:]?\s*([^.]{8,})/i);
+  const m=ditPrep(fala).match(/\b(?:exames?|us|ultrass\S*)\s+(?:anterior(?:es)?|pr[eé]vios?)\b\s*(?:de\s+)?(?:\d{1,2}\s*\/\s*\d{2,4}|(?:janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+(?:de\s+)?\d{2,4})?\s*[,:]?\s*([^.]{8,})/i);
   if(m&&!/^\s*(para\s+compara|dispon)/i.test(m[1])) r['prev.txt']=m[1].trim();
 }
 // três números seguidos sem "por" ("47 18 20", "4,7 1,8 2,0")
@@ -232,7 +238,7 @@ function ditMedSoltas(s){
   return ditadoMedidas(`${m[1]} ${m[2]||''} por ${m[3]} ${m[4]||''} por ${m[5]} ${m[6]||''}`,true);
 }
 function ditPrev(t,r){
-  if(/\b(sem|nao\s+(trouxe|tem|possui))\s+(\w+\s+){0,2}(exames?|us|ultrass\w*)\s+(anterior|previo)/.test(t)) r['prev.tem']='nao';
+  if(/\b(sem|nao\s+(trouxe|tem|possui))\s+(\w+\s+){0,2}(exames?|us|ultrass\w*)\b/.test(t)&&!/(sem|nao\s+tem)\s+(\w+\s+){0,2}exames?\s+(de\s+)?(sangue|laborator|tsh|hormon)/.test(t)) r['prev.tem']='nao';
   else { const m=t.match(/(exames?|us|ultrass\w*)\s+(anterior|previo)\w*/); if(m){ r['prev.tem']='sim'; const d=ditMesAno(t.slice(m.index,m.index+60)); if(d) r['prev.data']=d; } }
 }
 // sintomas: lista [nome no chip, regex]
@@ -240,11 +246,11 @@ function ditSint(t,lista){ const s=new Set(); lista.forEach(([v,re])=>{ if(ditad
 
 // ---------- tireoide ----------
 function ditadoLaudoTireoide(fala){
-  const t=ditadoTexto(fala), r={};
+  const t=ditadoTexto(fala), r={}; ditMMGlobal=/(tudo|medidas|todas?)\s+(\w+\s+)?(em\s+)?milimetros/.test(t);
   ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/vigilancia\s+ativa/,'Vigilância ativa'],[/pos[\s-]*operatori/,'Pós-operatório'],[/(acompanhamento|controle|seguimento)\s+d[eo]\s+nodul/,'Acompanhamento de nódulo'],[/nodulo\s+palpavel/,'Nódulo palpável'],[/hipotireoid|hipertireoid|funcao\s+tireoid|tsh|tireoidite|hashimoto|graves/,'Alteração de função tireoidiana'],[/\brotina\b|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
   ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);
-  const fm=t.match(/historia\s+familiar|antecedente\s+familiar|(mae|pai|irma|irmao|filh[oa])\s+(com|teve|tem)\s+(cancer|ca)\b/);
+  const fm=t.match(/histori\w*\s+familiar|antecedentes?\s+familiar|(mae|pai|irma|irmao|filh[oa])\s+(com|teve|tem)\s+(cancer|ca)\b/);
   if(fm) r['anam.fam']=ditadoNeg(t,fm.index)?'nao':/(1|primeiro)\s*o?\s*grau|\b(mae|pai|irma|irmao|filh[oa])\b/.test(t)?'sim1':'sim';
   const co=t.match(/(conhec\w*|sabia|sabe)\s+(\w+\s+){0,3}nodul|nodul\w*\s+(ja\s+)?conhecid/); if(co) r['anam.conhece']=!ditadoNeg(t,co.index);
   const tx=ditSimNao(t,/tireoidectomi|operou\s+a\s+tireoide/); if(tx!=null){ r['anam.tx']=tx; if(tx) r['anam.txCa']=/tireoidectomi\w*[^.]{0,40}(cancer|carcinoma|neoplas|maligno)/.test(t); }
@@ -259,9 +265,10 @@ function ditadoLaudoTireoide(fala){
   // "nódulo no lobo esquerdo de 2 por 1": o lobo aqui é do nódulo, não é medida do lobo
   const tm=t.replace(/(nodul\w*[^,.;]{0,30}?\b(?:no|do|em|de)\s+)(lobo\s+(?:direito|esquerdo|d|e)\b|\bld\b|\ble\b|istmo)/g,'$1LOBONOD');
   const sg=ditSegs(tm,{ld:/lobo\s+direito|lobo\s+d\b|\bld\b/,le:/lobo\s+esquerdo|lobo\s+e\b|\ble\b/,istmo:/\bistmo\b/,nod:/\bnodul\w*/,para:/paratireoide/});
-  [['ld','med.ld'],['le','med.le'],['istmo','med.istmo']].forEach(([k,path])=>{ if(!sg[k]) return; const s=sg[k].slice(0,160);
-    const m=ditadoMedidas(s,true)||ditMedSoltas(s); if(m){ r[path]=m; return; }
-    if(k==='istmo'){ const e=ditNum(s.slice(0,50),/(espessura|mede|medindo|com|de)?/); if(e) r[path]=['',e,'']; } });
+  [['ld','med.ld'],['le','med.le'],['istmo','med.istmo']].forEach(([k,path])=>{ if(!sg[k]) return;
+    for(const s0 of sg._todos[k].slice().reverse()){ const s=s0.slice(0,160);   // a última menção vale
+      const m=ditadoMedidas(s,true)||ditMedSoltas(s); if(m){ r[path]=m; return; }
+      if(k==='istmo'){ const e=ditNum(s.slice(0,50),/(espessura|mede|medindo|com|de)?/,ditMMGlobal); if(e){ r[path]=['',e,'']; return; } } } });
   if(/paratireoide\s+(\w+\s+){0,2}(visibiliz|visualiz|identific)/.test(t)&&!/paratireoides?\s+nao\s+(visibiliz|visualiz|identific)/.test(t)) r.para='sim';
   else if(/paratireoides?\s+nao\s+(visibiliz|visualiz|identific)/.test(t)) r.para='nao';
   return r;
@@ -269,7 +276,7 @@ function ditadoLaudoTireoide(fala){
 
 // ---------- cervical e salivares ----------
 function ditadoLaudoCervical(fala){
-  const t=ditadoTexto(fala), r={};
+  const t=ditadoTexto(fala), r={}; ditMMGlobal=/(tudo|medidas|todas?)\s+(\w+\s+)?(em\s+)?milimetros/.test(t);
   ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/vigilancia|seguimento\s+oncologic|controle\s+oncologic|pesquisa\s+de\s+recidiva/,'Vigilância oncológica'],[/aumento\s+(de\s+)?(volume\s+)?(da\s+)?(glandula|parotida|submandibular|salivar)/,'Aumento de glândula salivar'],[/sinais\s+inflamat|\bdor\s+(cervical|local)/,'Dor / sinais inflamatórios'],[/(nodulo|massa|abaulamento)\s+cervical/,'Nódulo cervical'],[/\brotina\b/,'Rotina']]); if(ind) r.ind=ind;
   ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);
@@ -289,7 +296,7 @@ function ditadoLaudoCervical(fala){
 
 // ---------- mamas e axilas ----------
 function ditadoLaudoMamas(fala){
-  const t=ditadoTexto(fala), r={};
+  const t=ditadoTexto(fala), r={}; ditMMGlobal=/(tudo|medidas|todas?)\s+(\w+\s+)?(em\s+)?milimetros/.test(t);
   ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/complementa\w*\s+(d[ae]\s+)?mamografia/,'Complementação de mamografia'],[/(seguimento|controle|acompanhamento)\s+d[eo]\s+nodul/,'Seguimento de nódulo'],[/nodulo\s+palpavel/,'Nódulo palpável'],[/(dor|mastalgia)/,'Dor mamária'],[/\brotina\b|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
   if(/nao\s+trouxe\s+(a\s+)?mamografia|mamografia\s+(\w+\s+)?nao\s+trouxe/.test(t)) r['mmg.feita']='naotrouxe';
@@ -313,7 +320,7 @@ function ditadoLaudoMamas(fala){
 
 // ---------- transvaginal ----------
 function ditadoLaudoTransvaginal(fala){
-  const t=ditadoTexto(fala), r={};
+  const t=ditadoTexto(fala), r={}; ditMMGlobal=/(tudo|medidas|todas?)\s+(\w+\s+)?(em\s+)?milimetros/.test(t);
   ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/controle\s+(de\s+|do\s+)?diu/,'Controle de DIU'],[/sangramento/,'Sangramento uterino anormal'],[/infertilidade|dificuldade\s+para\s+engravidar/,'Infertilidade'],[/endometriose/,'Suspeita de endometriose'],[/massa\s+anexial|(avaliacao|pesquisa)\s+de\s+(massa|cisto)/,'Avaliação de massa anexial'],[/dor\s+pelvica|dismenorreia/,'Dor pélvica'],[/\brotina\b|preventivo|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
   ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);
@@ -345,7 +352,7 @@ function ditadoLaudoTransvaginal(fala){
 
 // ---------- próstata via abdominal ----------
 function ditadoLaudoProstata(fala){
-  const t=ditadoTexto(fala), r={};
+  const t=ditadoTexto(fala), r={}; ditMMGlobal=/(tudo|medidas|todas?)\s+(\w+\s+)?(em\s+)?milimetros/.test(t);
   ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/retencao\s+urinaria/,'Retenção urinária'],[/psa\s+(alto|elevado|aumentado|alterado)/,'PSA elevado'],[/avalia\w*\s+(do\s+)?volume\s+prostatico/,'Avaliação de volume prostático'],[/sintomas?\s+urinari|\bluts\b|prostatismo/,'Sintomas urinários'],[/\brotina\b|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
   ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);

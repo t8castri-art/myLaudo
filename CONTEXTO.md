@@ -115,6 +115,9 @@ Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para um
    - **Ditado do exame**: cartão no topo das 5 telas. Preenche indicação, anamnese, exames anteriores, órgão e medidas. Ignora nódulos e lesões.
    - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical), nódulo e cisto de mama (mama, horário, distância do mamilo e da pele, descritores BI-RADS; o ditado pode trocar a mama e o tipo nódulo/cisto). Frase corrida: localização + características + **medidas em cm por último**.
    - Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm.
+   - "Tudo em milímetros" (ou "medidas em milímetros") vale para a frase inteira. A última menção de um lobo vale (correção falada).
+   - O iPhone erra previsivelmente, e o app corrige: frases coladas sem ponto ("PeçanhaExame"), "Estímulo/istimo" = istmo, "logo direito" = lobo direito, "para tireoide" = paratireoide, "leva tiroxina" = levotiroxina, "17h21" entre números = 17 21, "mediu06" = mediu 06. Medidas também com "vezes", só números em sequência ("47 18 20"), "LD/LE". Istmo com um número só = espessura.
+   - Para depurar: pedir ao médico o **texto exato da caixa** (o que o iPhone escreveu) e testar o parser em cima dele.
    - **Tracejado = veio do ditado e já está no laudo.** Não precisa tocar para confirmar; só toca para trocar. O que não foi dito fica no padrão, que conta como ausente. O aviso só aparece quando falta o essencial do item (nódulo: lobo, terço, composição, ecogenicidade, medidas).
    - Se o microfone do site falhar, usa-se o do teclado na mesma caixa.
    - Falta ditado de item em: mioma, lesão anexial, lesão salivar e lesão cervical.
