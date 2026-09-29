@@ -156,6 +156,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 
 <script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
+<script src="anteriores.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -357,11 +358,7 @@ function viewLaudo(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard(['l16','l22','c8'])}
-      <div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
-        <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
-        ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
-        <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou TI-RADS 5 em lobo esquerdo medindo 3,0 × 2,1 × 2,4 cm; TI-RADS 3 no istmo medindo 0,8 × 0,6 × 0,9 cm">${esc(st.prev.txt||'')}</textarea>`:''}
-      </div></div>
+      ${anterioresCard(st.prev,'ex.: US da clínica X evidenciou TI-RADS 5 em lobo esquerdo medindo 3,0 × 2,1 × 2,4 cm')}
       <div class="card"><div class="lbl">Anamnese</div><div class="form dir">
         <div class="k">Hist. familiar</div>${segm([['nao','não'],['sim','sim'],['sim1','sim, 1º grau']],a.fam,'fam')}
         <div class="k">Conhece nódulos</div>${segm([['n','não'],['s','sim']],a.conhece?'s':'n','conhece')}
@@ -462,13 +459,14 @@ function renderDocs(){
   $('#docOut').innerHTML=esc(t).replace(/^(ULTRASSONOGRAFIA[^\n]*|PUNÇÃO[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Medidas|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/gm,'<b>$1:</b>');
 }
 function wire(){
-  if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'tireoide',{"ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.fam": "fam", "anam.conhece": "conhece", "anam.tx": "tx", "anam.txCa": "txca", "anam.levo": "levo", "anam.dose": "[data-f=\"dose\"]", "anam.sint": "sint", "gl.sim": "gsim", "gl.dim": "gdim", "gl.sup": "gsup", "gl.eco": "geco", "gl.dop": "gdop", "med.istmo": "istmo", "med.ld": "ld", "med.le": "le", "para": "para"},render,toast,st);
+  if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'tireoide',{"pac": "#pac", "prev.txt": "#prevTxt", "ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.fam": "fam", "anam.conhece": "conhece", "anam.tx": "tx", "anam.txCa": "txca", "anam.levo": "levo", "anam.dose": "[data-f=\"dose\"]", "anam.sint": "sint", "gl.sim": "gsim", "gl.dim": "gdim", "gl.sup": "gsup", "gl.eco": "geco", "gl.dop": "gdop", "med.istmo": "istmo", "med.ld": "ld", "med.le": "le", "para": "para"},render,toast,st);
   wireServ();
   const ph=$('#phone'); const on=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('click',()=>fn(el)));
   const inp=(sel,fn)=>ph.querySelectorAll(sel).forEach(el=>el.addEventListener('input',()=>fn(el)));
   on('[data-ind]',el=>{st.ind=el.dataset.ind;render();});
   on('[data-eq]',el=>{const v=el.dataset.eq; if(st.equip.has(v)&&st.equip.size>1) st.equip.delete(v); else st.equip.add(v); render();});
   on('[data-prev]',el=>{st.prev.tem=el.dataset.prev;render();});
+  if(!st.view||st.view==='laudo') anterioresLigar(st.prev,'tireoide',st.pac,render,toast);
   on('[data-fam]',el=>{st.anam.fam=el.dataset.fam;render();});
   on('[data-conhece]',el=>{st.anam.conhece=el.dataset.conhece==='s';render();});
   on('[data-tx]',el=>{st.anam.tx=el.dataset.tx==='s';render();});
@@ -525,7 +523,7 @@ document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='
 // medidas digitadas em mm saem em cm no laudo (20 → 2,0)
 const cm=v=>{const s=String(v||'').trim(); if(!s) return '___'; const n=parseFloat(s.replace(',','.')); if(!isFinite(n)) return '___'; return (n/10).toFixed(/[.,]/.test(s)?2:1).replace('.',',');};
 const fraseP=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?:]$/.test(t)?'':'.');};
-const prevLinha=()=>st.prev.tem==='sim'?[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`]:[];
+const prevLinha=()=>st.prev.tem!=='sim'?[]:st.prev.txtDaIA?[`US anteriores:\n${String(st.prev.txt||'').trim()}`]:[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`];
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='prevTxt'){ st.prev.txt=e.target.value; renderDocs(); } });
 // prévia editável: o que você escreve nela é o que vai no Copiar
 const EDITS={}; let RAW=false, INR=false, LAST='docUS';

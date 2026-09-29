@@ -93,6 +93,13 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 - **Cervical e salivares**: leito tireoidiano, linfonodos por nível I–VII, salivares (todas normais = "Glândulas salivares sem alterações detectáveis."), PAAF com tireoglobulina no lavado quando há linfonodo.
 - **Próstata via abdominal**: ordem bexiga (volume inicial) → parede → JUV → próstata → vesículas seminais → protrusão → **pós-miccional** (sempre ≥ 1; cada um mede bexiga e próstata de novo; repete se sobrar volume; não existe "bexiga vazia"). HPB > 30 g (discreto ≤ 50, moderado ≤ 80, acentuado > 80). IPP I < 5, II 5–10, III > 10 mm. Resíduo significativo > 50 mL (último).
 
+## Exames anteriores (tireoide, desde 29/09)
+- Cartão: `Trouxe não | sim`. Com "sim", botão dividido `✎ digitar | 📷 escanear ou PDF` (várias fotos e PDFs de uma vez), a lista dos arquivos lidos, e **Organizar por lobo e terço**.
+- O texto é lido **no iPhone** (PDF com texto direto; foto ou PDF escaneado pela leitura de imagem), e o app **apaga as linhas de identificação** (nome, nascimento, idade, CPF, telefone, e-mail, convênio, atendimento, médicos) antes de qualquer envio. O nome da ficha também é apagado se aparecer solto.
+- Só o texto limpo vai para a **ponte** (`ferramentas/ponte-ia/`, Cloudflare Worker com a chave da Anthropic e uma senha). A IA **só agrupa** por lobo e terço (e istmo), exame por exame, com o rótulo original de cada colega. **Quem diz qual nódulo é qual é o médico.**
+- No laudo sai como "US anteriores:" seguido do resumo. Endereço e senha da ponte ficam guardados só no aparelho.
+- Ditado: tocar de novo no microfone **continua** de onde parou; "Apagar e recomeçar" limpa. O ditado do exame pega também o **nome** ("paciente Fulano de Tal") e o **texto do exame anterior** ("exame anterior de 06/25 mostrava ...").
+
 ## Privacidade (regra fixa)
 Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para uma IA (ditado ou scanner), o app remove nome, nascimento, CPF, telefone e e-mail; a IA recebe só achados. Os dados ficam no aparelho.
 

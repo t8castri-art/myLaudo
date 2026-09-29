@@ -150,7 +150,9 @@ const DITADO_CSS=`
 .ditver{font-size:12px;padding:7px 12px;border-radius:999px;border:1px solid var(--bd2);background:var(--s2);color:var(--tx2)}
 .ditpan{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:21;background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.6);max-width:520px}
 .ditpan .fala{width:100%;background:var(--s1)}
-.ditpan .ditok{margin-top:10px;font-size:13px;padding:8px 16px;border-radius:999px;border:1px solid var(--ac);color:var(--acT)}
+.ditbts{display:flex;gap:8px;margin-top:10px}
+.ditpan .ditapaga{border-color:var(--bd2);color:var(--tx2)}
+.ditpan .ditok{font-size:13px;padding:8px 16px;border-radius:999px;border:1px solid var(--ac);color:var(--acT)}
 body.dit-flut .bottom{padding-left:84px}
 body.dit-flut .body{padding-bottom:96px}
 body.dit-flut .docs{padding-bottom:84px}
@@ -211,6 +213,17 @@ const ditPrimeiro=(t,pares)=>{ for(const [re,v] of pares) if(re.test(t)) return 
 // sim / não para um achado citado ("nega X", "sem X" → não)
 const ditSimNao=(t,re)=>{ const m=t.match(re); if(!m) return null; return !ditadoNeg(t,m.index); };
 // exames anteriores
+// nome do paciente: "paciente Maria Aparecida de Souza, ..." (fica no aparelho)
+function ditNome(fala,r){
+  const m=String(fala||'').match(/\b(?:paciente|nome)\s*(?:é|:)?\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){0,6}?)(?=\s*(?:[,.;]|$)|\s+(?:idade|anos|nascid|data|indica|rotina|sem\b|com\b|exame|tireoide|refere|nega|us\b|ultrass|mamografia|dum\b|psa\b))/i);
+  if(!m) return; const nome=m[1].trim().split(/\s+/).map(p=>/^(da|de|do|das|dos|e)$/i.test(p)?p.toLowerCase():p.charAt(0).toUpperCase()+p.slice(1).toLowerCase()).join(' ');
+  if(nome.split(' ').length>=2) r.pac=nome;
+}
+// texto do exame anterior: "exame anterior de 06/25 mostrava nódulo de 1,2 cm no lobo direito."
+function ditPrevTxt(fala,r){
+  const m=String(fala||'').match(/\b(?:exames?|us|ultrass\S*)\s+(?:anterior(?:es)?|pr[eé]vios?)\b\s*(?:de\s+)?(?:\d{1,2}\s*\/\s*\d{2,4}|(?:janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+(?:de\s+)?\d{2,4})?\s*[,:]?\s*([^.]{8,})/i);
+  if(m&&!/^\s*(para\s+compara|dispon)/i.test(m[1])) r['prev.txt']=m[1].trim();
+}
 function ditPrev(t,r){
   if(/\b(sem|nao\s+(trouxe|tem|possui))\s+(\w+\s+){0,2}(exames?|us|ultrass\w*)\s+(anterior|previo)/.test(t)) r['prev.tem']='nao';
   else { const m=t.match(/(exames?|us|ultrass\w*)\s+(anterior|previo)\w*/); if(m){ r['prev.tem']='sim'; const d=ditMesAno(t.slice(m.index,m.index+60)); if(d) r['prev.data']=d; } }
@@ -221,8 +234,9 @@ function ditSint(t,lista){ const s=new Set(); lista.forEach(([v,re])=>{ if(ditad
 // ---------- tireoide ----------
 function ditadoLaudoTireoide(fala){
   const t=ditadoTexto(fala), r={};
+  ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/vigilancia\s+ativa/,'Vigilância ativa'],[/pos[\s-]*operatori/,'Pós-operatório'],[/(acompanhamento|controle|seguimento)\s+d[eo]\s+nodul/,'Acompanhamento de nódulo'],[/nodulo\s+palpavel/,'Nódulo palpável'],[/hipotireoid|hipertireoid|funcao\s+tireoid|tsh|tireoidite|hashimoto|graves/,'Alteração de função tireoidiana'],[/\brotina\b|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
-  ditPrev(t,r);
+  ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);
   const fm=t.match(/historia\s+familiar|antecedente\s+familiar|(mae|pai|irma|irmao|filh[oa])\s+(com|teve|tem)\s+(cancer|ca)\b/);
   if(fm) r['anam.fam']=ditadoNeg(t,fm.index)?'nao':/(1|primeiro)\s*o?\s*grau|\b(mae|pai|irma|irmao|filh[oa])\b/.test(t)?'sim1':'sim';
   const co=t.match(/(conhec\w*|sabia|sabe)\s+(\w+\s+){0,3}nodul|nodul\w*\s+(ja\s+)?conhecid/); if(co) r['anam.conhece']=!ditadoNeg(t,co.index);
@@ -245,8 +259,9 @@ function ditadoLaudoTireoide(fala){
 // ---------- cervical e salivares ----------
 function ditadoLaudoCervical(fala){
   const t=ditadoTexto(fala), r={};
+  ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/vigilancia|seguimento\s+oncologic|controle\s+oncologic|pesquisa\s+de\s+recidiva/,'Vigilância oncológica'],[/aumento\s+(de\s+)?(volume\s+)?(da\s+)?(glandula|parotida|submandibular|salivar)/,'Aumento de glândula salivar'],[/sinais\s+inflamat|\bdor\s+(cervical|local)/,'Dor / sinais inflamatórios'],[/(nodulo|massa|abaulamento)\s+cervical/,'Nódulo cervical'],[/\brotina\b/,'Rotina']]); if(ind) r.ind=ind;
-  ditPrev(t,r);
+  ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);
   const ca=t.match(/(cancer|carcinoma|neoplasia|\bca\b)\s+(\w+\s+){0,2}(tireoide|papilifer|folicular|medular)|(carcinoma|cancer)\s+papilifer/);
   const caO=t.match(/(cancer|carcinoma|neoplasia|\bca\b)\s+(\w+\s+){0,2}(laringe|boca|lingua|faringe|cabeca|epidermoide|orofaringe|nasofaringe)|carcinoma\s+epidermoide/);
   if(ca) r['anam.ca']=ditadoNeg(t,ca.index)?'nao':'tireoide'; else if(caO) r['anam.ca']=ditadoNeg(t,caO.index)?'nao':'outro'; else if(/\b(sem|nega)\s+(historia\s+de\s+)?(cancer|neoplasia)/.test(t)) r['anam.ca']='nao';
@@ -264,6 +279,7 @@ function ditadoLaudoCervical(fala){
 // ---------- mamas e axilas ----------
 function ditadoLaudoMamas(fala){
   const t=ditadoTexto(fala), r={};
+  ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/complementa\w*\s+(d[ae]\s+)?mamografia/,'Complementação de mamografia'],[/(seguimento|controle|acompanhamento)\s+d[eo]\s+nodul/,'Seguimento de nódulo'],[/nodulo\s+palpavel/,'Nódulo palpável'],[/(dor|mastalgia)/,'Dor mamária'],[/\brotina\b|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
   if(/nao\s+trouxe\s+(a\s+)?mamografia|mamografia\s+(\w+\s+)?nao\s+trouxe/.test(t)) r['mmg.feita']='naotrouxe';
   else if(/(nunca\s+fez|nao\s+fez|sem|nao\s+realizou)\s+(\w+\s+)?mamografia/.test(t)) r['mmg.feita']='nao';
@@ -287,8 +303,9 @@ function ditadoLaudoMamas(fala){
 // ---------- transvaginal ----------
 function ditadoLaudoTransvaginal(fala){
   const t=ditadoTexto(fala), r={};
+  ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/controle\s+(de\s+|do\s+)?diu/,'Controle de DIU'],[/sangramento/,'Sangramento uterino anormal'],[/infertilidade|dificuldade\s+para\s+engravidar/,'Infertilidade'],[/endometriose/,'Suspeita de endometriose'],[/massa\s+anexial|(avaliacao|pesquisa)\s+de\s+(massa|cisto)/,'Avaliação de massa anexial'],[/dor\s+pelvica|dismenorreia/,'Dor pélvica'],[/\brotina\b|preventivo|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
-  ditPrev(t,r);
+  ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);
   const meno=ditSimNao(t,/menopausa/); if(meno!=null&&!/pre[\s-]*menopausa/.test(t)) r['anam.meno']=meno;
   const dm=t.match(/\bdum\b|ultima\s+menstruacao|data\s+da\s+ultima/); if(dm){ const d=ditData(t.slice(dm.index,dm.index+50)); if(d){ r['anam.dum']=d; r['anam.meno']=false; } }
   const gpa=t.match(/\bg\s*(\d+)\s*p\s*(\d+)\s*a\s*(\d+)/);
@@ -318,9 +335,10 @@ function ditadoLaudoTransvaginal(fala){
 // ---------- próstata via abdominal ----------
 function ditadoLaudoProstata(fala){
   const t=ditadoTexto(fala), r={};
+  ditNome(fala,r);
   const ind=ditPrimeiro(t,[[/retencao\s+urinaria/,'Retenção urinária'],[/psa\s+(alto|elevado|aumentado|alterado)/,'PSA elevado'],[/avalia\w*\s+(do\s+)?volume\s+prostatico/,'Avaliação de volume prostático'],[/sintomas?\s+urinari|\bluts\b|prostatismo/,'Sintomas urinários'],[/\brotina\b|check[\s-]*up/,'Rotina']]); if(ind) r.ind=ind;
-  ditPrev(t,r);
-  const ps=t.match(/\bpsa\s+(total\s+)?(de\s+)?(\d+(?:[.,]\d+)?)/); if(ps){ r['anam.psa']=ps[3].replace('.',','); const d=ditMesAno(t.slice(ps.index+ps[0].length,ps.index+ps[0].length+30)); if(d) r['anam.psaData']=d; }
+  ditPrev(t,r); if(r['prev.tem']==='sim') ditPrevTxt(fala,r);
+  const ps=t.match(/\bpsa\s+(total\s+)?(de\s+)?(\d+(?:[.,]\d+)?)/); if(ps){ r['anam.psa']=ps[3].replace('.',','); const dp=t.slice(ps.index+ps[0].length).match(/^\s*(?:ng\s*\/?\s*ml\s*)?,?\s*(?:em|de|do\s+dia)\s+([^,.;]{3,20})/); const d=dp&&ditMesAno(dp[1]); if(d) r['anam.psaData']=d; }
   const si=ditSint(t,[['jato fraco',/jato\s+(fraco|fino|reduzido)/],['noctúria',/nocturia|levanta\s+(\w+\s+){0,3}noite|urina\s+(\w+\s+){0,2}noite/],['urgência',/urgencia/],['polaciúria',/polaciuria|urina\s+muit\w*\s+vez/],['esvaziamento incompleto',/esvaziamento\s+incompleto|sensacao\s+de\s+(esvaziamento|residuo)/],['retenção',/retencao/]]); if(si) r['anam.sint']=si;
   const dr=t.match(/tansulosina|tamsulosina|finasterida|dutasterida|doxazosina|silodosina|alfuzosina|combodart|secotex/);
   if(dr){ if(ditadoNeg(t,dr.index)) r['anam.med']=false; else { r['anam.med']=true; const w=t.slice(dr.index).match(/^[a-z]+(\s+\d+(?:[.,]\d+)?\s*mg)?/); r['anam.medTxt']=w[0].replace(/(\d)\.(\d)/,'$1,$2'); } }
@@ -405,7 +423,7 @@ function ditadoCard(item,tipo){
   if(flut){ document.body.classList.add('dit-flut');
     return `<div class="ditpan" id="ditPan"${item.painel?'':' hidden'}><div class="lbl">${T.laudo?'Ditado do exame':'Ditado do item'} <span class="act">fale tudo de uma vez</span></div>
       <textarea class="fala" id="falaTxt" rows="3" placeholder="ex.: ${ditEsc(T.ex)}">${ditEsc(item.fala||'')}</textarea>
-      ${aviso?`<div class="dit-falta">${aviso}</div>`:''}<button type="button" class="ditok" id="ditFechar">Fechar</button></div>
+      ${aviso?`<div class="dit-falta">${aviso}</div>`:''}<div class="ditbts"><button type="button" class="ditok" id="ditFechar">Fechar</button><button type="button" class="ditok ditapaga" id="ditApagar">Apagar e recomeçar</button></div></div>
       <div class="ditfab"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>${item.fala&&!item.painel?'<button type="button" class="ditver" id="ditAbrir">ver ditado</button>':''}</div>`; }
   return `<div class="card"><div class="lbl">${T.laudo?'Ditado do exame':'Ditado'} <span class="act">fale tudo de uma vez</span></div>
     <div class="dit"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>
@@ -429,6 +447,7 @@ function ditadoLigar(item,tipo,attrs,rerender,avisar,alvo){
   const pan=document.getElementById('ditPan'), fe=document.getElementById('ditFechar'), ab=document.getElementById('ditAbrir');
   if(fe) fe.addEventListener('click',()=>{ if(DITADO_REC) DITADO_REC.abort(); item.painel=false; rerender(); });
   if(ab) ab.addEventListener('click',()=>{ item.painel=true; rerender(); });
+  const ap=document.getElementById('ditApagar'); if(ap) ap.addEventListener('click',()=>{ if(DITADO_REC) DITADO_REC.abort(); box.value=''; item.fala=''; item.dict=null; item.painel=true; rerender(); });
   box.addEventListener('change',()=>{ item.fala=box.value.trim(); aplicar(); });
   btn.addEventListener('click',()=>{
     if(DITADO_REC){ DITADO_REC.stop(); return; }
@@ -436,11 +455,12 @@ function ditadoLigar(item,tipo,attrs,rerender,avisar,alvo){
     if(pan) pan.hidden=false;
     if(!SR){ box.focus(); avisar('Toque no microfone do teclado para ditar'); return; }
     const rec=new SR(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
-    rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; box.value=s.replace(/\s+/g,' ').trim(); };
+    const base=box.value.trim();
+    rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; s=s.replace(/\s+/g,' ').trim(); box.value=base&&s?base+' '+s:(base||s); };
     rec.onerror=e=>{ avisar(e.error==='not-allowed'||e.error==='service-not-allowed'?'Microfone bloqueado aqui. Use o microfone do teclado.':e.error==='no-speech'?'Não ouvi nada. Toque de novo e fale.':'Ditado falhou ('+e.error+'). Use o microfone do teclado.'); if(e.error!=='no-speech') box.focus(); };
     rec.onend=()=>{ DITADO_REC=null; btn.classList.remove('on'); btn.innerHTML=DITADO_MIC; const v=box.value.trim(); if(v){ item.fala=v; aplicar(); } };
     try{ rec.start(); }catch(err){ avisar('Não deu para abrir o microfone. Use o do teclado.'); box.focus(); return; }
-    DITADO_REC=rec; box.value=''; btn.classList.add('on'); btn.innerHTML=DITADO_STOP; btn.setAttribute('aria-label','Parar ditado');
+    DITADO_REC=rec; btn.classList.add('on'); btn.innerHTML=DITADO_STOP; btn.setAttribute('aria-label','Parar ditado');
   });
 }
 // ---------- transcrição em qualquer caixa de texto do exame ----------
