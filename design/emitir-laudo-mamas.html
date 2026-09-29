@@ -155,6 +155,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 
 <script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
+<script src="anteriores.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -225,7 +226,7 @@ const st = {
   view:'laudo', edit:null, doc:'us',
   serv:'part', pac:'Fabiana Martins Santos', carater:'eletivo',
   ind:'Rotina', equip:new Set(['l16']), textura:'heterogênea', predominio:'fibroglandular', ectasia:false,
-  mmg:{ feita:'trouxe', birads:'2', data:'06/2026' },
+  mmg:{ feita:'trouxe', birads:'2', data:'06/2026' }, prev:{tem:'nao',txt:''},
   anam:{ fam:true, famGrau:'1º grau', pessoal:false, bx:true, bxRes:'benigna', cir:false, meno:'pós', trh:false, palp:false, desc:false, gest:false, lact:false },
   lesoes:[], axila:{D:'normal',E:'normal'}, birads:{D:null,E:null},
   core:{on:false, alvo:null, agulha:'14G', frag:'5', lab:'próprio'},
@@ -257,6 +258,10 @@ function descr(n){
 }
 const lado = m => m==='D'?'direita':'esquerda';
 const dataCurta=d=>{const m=String(d||'').trim().match(/^(\d{1,2})\/(\d{2,4})$/); return m?m[1].padStart(2,'0')+'/'+m[2].slice(-2):String(d||'').trim();};
+// exames anteriores: lista (formato fixo) + evolução calculada no app
+const nodsAtuaisM=()=>st.lesoes.map(n=>({rot:rotulo(n),lado:n.mama,nome:rotulo(n)+' M'+n.mama,rank:suspicious(n)+(n.tipo==='cisto'?0:1),tag:'',med:n.med.map(v=>parseFloat(String(v).replace(',','.')))}));
+function prevLinhasM(){ if(st.prev.tem!=='sim') return []; const t=String(st.prev.txt||'').trim(); if(!t) return [];
+  if(!antLer(t).length) return ['Exames anteriores: '+t]; const e=antEvolucao(t,nodsAtuaisM(),null,'mamas'); return ['Exames anteriores:',t,...(e?[e]:[])]; }
 function infoClinica(){
   const a=st.anam, f=[];
   if(a.fam) f.push(`História familiar de câncer de mama em parente de ${a.famGrau}.`);
@@ -300,7 +305,7 @@ function docUS(){
     `Indicação: ${st.ind}.`,
     ...linhaEquip(),
     tecnica(', com varredura radial e antirradial de ambas as mamas, regiões retroareolares e axilas, e estudo Doppler colorido e PowerDoppler'),
-    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]),'',
+    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]), ...prevLinhasM(),'',
     'Descrição:',
     'Pele, tecido subcutâneo e complexo areolopapilar de aspecto habitual, sem alterações detectáveis.',
     `Mamas simétricas, de ecotextura ${st.textura}, com predomínio de tecido ${st.predominio}.`,
@@ -321,7 +326,7 @@ function docCORE(){
     `Indicação: Nódulo mamário BI-RADS US ${c} em mama ${lado(n.mama)}.`,
     'Consentimento e preparo: Paciente esclarecida sobre o procedimento, riscos e benefícios, com termo de consentimento assinado. Antissepsia com clorexidina alcoólica e campos estéreis. Anestesia local com lidocaína 2% sem vasoconstritor.',
     `Técnica: Sob orientação ultrassonográfica em tempo real com transdutor linear de alta frequência, após pequena incisão cutânea, realizadas passagens com agulha de corte automática ${st.core.agulha}, com obtenção de ${st.core.frag||'___'} fragmentos, acondicionados em formol tamponado a 10%, identificados e encaminhados para estudo histopatológico${st.core.lab==='entregue'?' ao laboratório escolhido pela paciente, com termo de entrega de amostra':''}. Hemostasia por compressão local e curativo compressivo.`,
-    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]),'',
+    ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]), ...prevLinhasM(),'',
     `Alvo: ${descr(n)}`,'',
     'Intercorrências: Procedimento realizado sem intercorrências.',
     'Orientações: Paciente liberada em bom estado geral, orientada sobre compressão local, gelo, sinais de alerta e retorno com o resultado histopatológico ao médico assistente.','',
@@ -351,6 +356,7 @@ function viewLaudo(){
         ${st.mmg.feita==='trouxe' ? `<div class="k">Resultado</div>${segm([['1','BI-RADS 1'],['2','2'],['3','3'],['4','4'],['5','5'],['0','0']], st.mmg.birads, 'mmgb')}
         <div class="k">Data</div><div class="in"><input class="cell" style="width:72px" inputmode="numeric" data-f="mmgdata" value="${esc(st.mmg.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>` : ''}
       </div></div>
+      ${anterioresCard(st.prev,'ex.: US de 06/24: nódulo às 10h da mama direita, 1,2 cm, BI-RADS 3')}
       <div class="card"><div class="lbl">Anamnese <span class="act">o que não marcar entra como negado</span></div>
         ${chips([['fam','história familiar de CA de mama'],['pessoal','CA de mama prévio'],['bx','biópsia prévia'],['cir','cirurgia mamária'],['palp','nódulo palpável'],['desc','descarga papilar'],['gest','gestação recente'],['lact','amamentando']], new Set(Object.keys(st.anam).filter(k=>st.anam[k]===true)), 'an', true)}
         <div class="form dir" style="margin-top:10px">
@@ -423,7 +429,7 @@ function renderDocs(){
   $('#docTabs').innerHTML = tabs.map(t=>`<button type="button" data-doc="${t[0]}" aria-pressed="${st.doc===t[0]}">${t[1]}</button>`).join('');
   $('#docTabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ st.doc=b.dataset.doc; renderDocs(); }));
   const txt = uni ? docUnico(docCORE,'COM BIÓPSIA POR AGULHA GROSSA (CORE)') : st.doc==='core' ? docCORE() : docUS();
-  $('#docOut').innerHTML = esc(txt).replace(/^(ULTRASSONOGRAFIA[^\n]*|BIÓPSIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações|Mama direita|Mama esquerda):/gm,'<b>$1:</b>');
+  $('#docOut').innerHTML = esc(txt).replace(/^(ULTRASSONOGRAFIA[^\n]*|BIÓPSIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações|Mama direita|Mama esquerda):/gm,'<b>$1:</b>');
 }
 function wire(){
   if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'mamas',{"pac": "#pac", "prev.txt": "#prevTxt", "ind": "ind", "mmg.feita": "mmg", "mmg.birads": "mmgb", "mmg.data": "[data-f=\"mmgdata\"]", "anam.fam": "[data-an=\"fam\"]", "anam.pessoal": "[data-an=\"pessoal\"]", "anam.bx": "[data-an=\"bx\"]", "anam.cir": "[data-an=\"cir\"]", "anam.palp": "[data-an=\"palp\"]", "anam.desc": "[data-an=\"desc\"]", "anam.gest": "[data-an=\"gest\"]", "anam.lact": "[data-an=\"lact\"]", "anam.famGrau": "famgrau", "anam.bxRes": "bxres", "anam.meno": "meno", "anam.trh": "trh", "textura": "textura", "predominio": "predominio", "ectasia": "ectasia", "axila.D": "axd", "axila.E": "axe"},render,toast,st);
@@ -434,6 +440,8 @@ function wire(){
   on('[data-ind]', el=>{ st.ind=el.dataset.ind; render(); });
   on('[data-eq]',el=>{const v=el.dataset.eq; if(st.equip.has(v)&&st.equip.size>1) st.equip.delete(v); else st.equip.add(v); render();});
   on('[data-mmg]', el=>{ st.mmg.feita=el.dataset.mmg; render(); });
+  on('[data-prev]', el=>{ st.prev.tem=el.dataset.prev; render(); });
+  if(st.view!=='nodulo'){ anterioresLigar(st.prev,'mamas',st.pac,render,toast); const pt=document.getElementById('prevTxt'); if(pt) pt.addEventListener('input',()=>{ st.prev.txt=pt.value; renderDocs(); }); }
   on('[data-mmgb]', el=>{ st.mmg.birads=el.dataset.mmgb; render(); });
   on('[data-an]', el=>{ const k=el.dataset.an; st.anam[k]=!st.anam[k]; render(); });
   on('[data-famgrau]', el=>{ st.anam.famGrau=el.dataset.famgrau; render(); });
@@ -470,7 +478,7 @@ function wire(){
   ph.querySelectorAll('input[data-f="frag"]').forEach(inp=>inp.addEventListener('input',()=>{ st.core.frag=inp.value; renderDocs(); }));
 }
 let tt; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),1800); }
-function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),textura:'heterogênea',predominio:'fibroglandular',ectasia:false,mmg:{feita:'nao',birads:'2',data:''},anam:{fam:false,famGrau:'1º grau',pessoal:false,bx:false,bxRes:'benigna',cir:false,meno:'pré',trh:false,palp:false,desc:false,gest:false,lact:false},lesoes:[],axila:{D:'normal',E:'normal'},birads:{D:null,E:null},core:{on:false,alvo:null,agulha:'14G',frag:'5',lab:'próprio'},pac:''}); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),textura:'heterogênea',predominio:'fibroglandular',ectasia:false,mmg:{feita:'nao',birads:'2',data:''},prev:{tem:'nao',txt:''},anam:{fam:false,famGrau:'1º grau',pessoal:false,bx:false,bxRes:'benigna',cir:false,meno:'pré',trh:false,palp:false,desc:false,gest:false,lact:false},lesoes:[],axila:{D:'normal',E:'normal'},birads:{D:null,E:null},core:{on:false,alvo:null,agulha:'14G',frag:'5',lab:'próprio'},pac:''}); }
 // ---------- padrões do app: pular para o próximo campo e máscara de data ----------
 function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
 document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;

@@ -523,7 +523,7 @@ document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='
 // medidas digitadas em mm saem em cm no laudo (20 → 2,0)
 const cm=v=>{const s=String(v||'').trim(); if(!s) return '___'; const n=parseFloat(s.replace(',','.')); if(!isFinite(n)) return '___'; return (n/10).toFixed(/[.,]/.test(s)?2:1).replace('.',',');};
 const fraseP=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?:]$/.test(t)?'':'.');};
-const nodsAtuais=()=>st.nods.map(n=>({rot:rotN(n),lobo:n.lobo,tr:+tr(pts(n)).slice(2),med:n.med.map(num)}));
+const nodsAtuais=()=>st.nods.map(n=>{const t=+tr(pts(n)).slice(2); return {rot:rotN(n),lado:n.lobo,tag:'TI-RADS '+t,rank:t,med:n.med.map(num)};});
 const prevLinha=()=>st.prev.tem!=='sim'?[]:antLer(st.prev.txt).length?['Exames anteriores:',String(st.prev.txt||'').trim(),...(antEvolucao(st.prev.txt,nodsAtuais())?[antEvolucao(st.prev.txt,nodsAtuais())]:[])]:[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`];
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='prevTxt'){ st.prev.txt=e.target.value; renderDocs(); } });
 // prévia editável: o que você escreve nela é o que vai no Copiar

@@ -14,28 +14,49 @@ const INSTRUCOES = {
 Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada além dele:
 
 US 06/24:
-Lobo direito
-Terço médio: N1 TI-RADS 4: 9 × 6 × 7 mm
-Terço inferior: N2 TI-RADS 4: 14 × 16 × 17 mm
-Lobo esquerdo
-Terço inferior: N3 TI-RADS 2: 23 × 17 × 12 mm
+N1 TM LD TIRADS 4: 9 × 6 × 7 mm
+N2 TI LD TIRADS 4: 14 × 16 × 17 mm
+N3 TI LE TIRADS 2: 23 × 17 × 12 mm
 
 PAAF 06/25:
-Lobo direito
-Terço inferior: N2 TI-RADS 5: 19 × 21 × 24 mm
-Citologia: Bethesda III
+N2 TI LD TIRADS 5: 19 × 21 × 24 mm, Bethesda III
 
 Regras:
-- Cabeçalho de cada exame: "US mm/aa:" ou "PAAF mm/aa:". Sem data, "US sem data:". Uma linha em branco entre exames.
-- Dentro do exame, "Lobo direito" e depois "Lobo esquerdo", cada nódulo numa linha começando pelo terço ("Terço superior:", "Terço médio:", "Terço inferior:" ou "Terço não informado:"). Nódulo no istmo: linha "Istmo: N4 TI-RADS 2: 5 × 4 × 3 mm", depois dos lobos.
+- Cabeçalho: "US mm/aa:" ou "PAAF mm/aa:" ("US sem data:" se faltar). Uma linha em branco entre exames.
+- Uma linha por nódulo: rótulo, terço (TS superior, TM médio, TI inferior; omita se o laudo não disser), lado (LD, LE ou istmo), "TIRADS" e o número, dois-pontos, medidas.
+- Ordem das linhas: LD de cima para baixo (TS, TM, TI), depois LE, depois istmo.
 - Rótulo: o que o laudo usou (N1, N2...). Sem rótulo, numere na ordem em que aparece.
-- TI-RADS: só o número que está no laudo. Se não tiver, "TI-RADS não informado". Não calcule.
-- Medidas sempre em mm, separadas por " × ", com vírgula decimal quando houver (1,2 cm = 12 mm).
-- PAAF: o nódulo puncionado com TI-RADS e medidas se constarem, e a linha "Citologia: Bethesda ..." (em algarismos romanos).
+- TIRADS: só o número escrito no laudo. Se não tiver, "TIRADS NI". Não calcule.
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- PAAF: o nódulo puncionado e, na mesma linha, ", Bethesda" em algarismos romanos.
 - Não diga que nódulos de exames diferentes são o mesmo. Não compare, não conclua, não recomende.
-- Se houver achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia), uma linha "Outros: ..." no fim do exame.
+- Achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia): uma linha "Outros: ..." no fim do exame.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
-- Sem markdown, sem título geral, sem comentários.`,
+- Sem markdown, sem título, sem comentários.`,
+  mamas: `Você recebe o texto de exames anteriores de mama (ultrassom, mamografia, core biopsy ou PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
+
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada além dele:
+
+MMG 05/24: BIRADS 2
+
+US 06/24:
+N1 MD QSL 10h BIRADS 3: 12 × 8 × 9 mm
+C1 ME QSM 11h BIRADS 2: 6 × 5 × 5 mm
+
+CORE 07/24:
+N1 MD QSL 10h BIRADS 4A: 13 × 8 × 9 mm, histologia: fibroadenoma
+
+Regras:
+- Cabeçalho: "US mm/aa:", "MMG mm/aa:", "CORE mm/aa:", "PAAF mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames. Mamografia sem nódulo descrito fica numa linha só: "MMG mm/aa: BIRADS n" e, se houver, um achado curto.
+- Uma linha por lesão: rótulo (N para nódulo, C para cisto; o que o laudo usou, ou numere por mama na ordem), mama (MD ou ME), quadrante, horário se houver, "BIRADS" e a categoria, dois-pontos, medidas.
+- Quadrante só nas quatro siglas clássicas: QSL, QSM, QIL, QIM. Se o laudo der só o horário: na MD, 10-11h QSL, 1-2h QSM, 7-8h QIL, 4-5h QIM; na ME, 1-2h QSL, 10-11h QSM, 4-5h QIL, 7-8h QIM. Lesão em 12h, 3h, 6h ou 9h (na linha entre quadrantes) ou em união de quadrantes: sem sigla, só o horário. Atrás do mamilo: "retroareolar" por extenso. Se quadrante e horário faltarem, omita.
+- BIRADS: a categoria escrita no laudo (0 a 6, 4A/4B/4C). Se não tiver, "BIRADS NI". Não calcule.
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- CORE/PAAF: a lesão biopsiada e, na mesma linha, ", histologia: ..." ou ", citologia: ..." curtos.
+- Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
+- Achado relevante fora de nódulo (linfonodo axilar suspeito, ectasia, prótese, cirurgia): uma linha "Outros: ..." no fim do exame.
+- Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem título, sem comentários.`,
 };
 
 function cors(origem) {
