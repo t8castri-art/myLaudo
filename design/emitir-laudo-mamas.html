@@ -251,10 +251,14 @@ const num = v => v && v.trim() ? v.trim() : '___';
 const hora = n => n.hora==='retroareolar' ? 'região retroareolar' : n.hora+'h';
 const rotulo = n => (n.tipo==='cisto'?'C':'N')+(lesoesDe(n.mama).filter(l=>l.tipo===n.tipo).indexOf(n)+1);
 const L = k => Object.fromEntries(LEX[k]);
+// quadrante a partir do horário (quatro clássicos; na linha entre quadrantes, só o horário)
+function quadrante(n){ const h=+n.hora; if(!h) return '';
+  const lat=n.mama==='D'?[10,11]:[1,2], med=n.mama==='D'?[1,2]:[10,11], latI=n.mama==='D'?[7,8]:[4,5], medI=n.mama==='D'?[4,5]:[7,8];
+  return lat.includes(h)?'QSL':med.includes(h)?'QSM':latI.includes(h)?'QIL':medI.includes(h)?'QIM':''; }
 function descr(n){
-  const loc = `${rotulo(n)}, ${hora(n)}, distando ${cm(n.mamilo)} cm do mamilo e ${cm(n.pele)} cm da pele: `;
+  const loc = `${rotulo(n)}, ${quadrante(n)?quadrante(n)+', ':''}${hora(n)}, distando ${cm(n.pele)} cm da pele e ${cm(n.mamilo)} cm do mamilo: `;
   if(n.tipo==='cisto') return loc + L('cisto')[n.cisto] + `. Mediu ${n.med.map(cm).join(' × ')} cm.`;
-  return loc + `nódulo ${L('eco')[n.eco]}, ${L('forma')[n.forma]}, ${L('orient')[n.orient]}, com margens ${L('marg')[n.marg]}, ${L('post')[n.post]}, ${L('calc')[n.calc]}, ${dopTxt(n)}. Mediu ${n.med.map(cm).join(' × ')} cm.`;
+  return loc + `nódulo ${L('forma')[n.forma]}, ${L('orient')[n.orient]}, com margens ${L('marg')[n.marg]}, ${L('eco')[n.eco]}, ${L('post')[n.post]}, ${L('calc')[n.calc]}, ${dopTxt(n)}. Mediu ${n.med.map(cm).join(' × ')} cm.`;
 }
 const lado = m => m==='D'?'direita':'esquerda';
 const dataCurta=d=>{const m=String(d||'').trim().match(/^(\d{1,2})\/(\d{2,4})$/); return m?m[1].padStart(2,'0')+'/'+m[2].slice(-2):String(d||'').trim();};
@@ -341,7 +345,7 @@ function catsHtml(m){ const sug=sugerir(m), cur=catDe(m); return `<div class="ca
 
 function viewLaudo(){
   const mamaCard = m => { const ls=lesoesDe(m); return `<div class="card"><div class="lbl">Mama ${lado(m)} <span class="act">${ls.length?ls.length+(ls.length>1?' achados':' achado'):''}</span></div>`+
-    (ls.length? ls.map(n=>`<button type="button" class="nod" data-open="${n.id}"><div class="n"><b>${rotulo(n)} · ${hora(n)} · ${n.med.map(cm).join(' × ')} cm</b><span>${n.tipo==='cisto'? L('cisto')[n.cisto].split(',')[0] : `${n.eco} · ${n.forma} · margens ${n.marg}`}</span></div><span class="tag ${suspicious(n)?'alert':''}">${n.tipo==='cisto'?'cisto':(suspicious(n)?suspicious(n)+' susp.':'benigno')}</span>${I.chev}</button>`).join('') : '<div class="empty">Não há evidência de nódulos, cistos ou distorções arquiteturais.</div>')+
+    (ls.length? ls.map(n=>`<button type="button" class="nod" data-open="${n.id}"><div class="n"><b>${rotulo(n)} · ${quadrante(n)?quadrante(n)+' ':''}${hora(n)} · ${n.med.map(cm).join(' × ')} cm</b><span>${n.tipo==='cisto'? L('cisto')[n.cisto].split(',')[0] : `${n.eco} · ${n.forma} · margens ${n.marg}`}</span></div><span class="tag ${suspicious(n)?'alert':''}">${n.tipo==='cisto'?'cisto':(suspicious(n)?suspicious(n)+' susp.':'benigno')}</span>${I.chev}</button>`).join('') : '<div class="empty">Não há evidência de nódulos, cistos ou distorções arquiteturais.</div>')+
     `<div class="addrow"><button type="button" class="addbtn" data-add="nodulo" data-mama="${m}">${I.plus}Adicionar nódulo</button><button type="button" class="addbtn" data-add="cisto" data-mama="${m}">${I.plus}Adicionar cisto</button></div></div>`; };
   const nods=st.lesoes.filter(l=>l.tipo==='nodulo');
   return `<div class="view" data-view="laudo">
