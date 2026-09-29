@@ -26,7 +26,7 @@ function ditadoNeg(txt,i){ const pre=txt.slice(Math.max(0,i-40),i); const m=[...
 function ditadoTem(re,txt){ for(const m of txt.matchAll(new RegExp(re.source,'g'))) if(!ditadoNeg(txt,m.index)) return true; return false; }
 // medidas: a última sequência "a por b por c"; cm por padrão, mm se disser ou se passar de 10
 function ditadoMedidas(t,primeira){
-  const N='(\\d+(?:[.,]\\d+)?)', U='\\s*(cm|centimetros?|mm|milimetros?)?', S='\\s*(?:por|x|×)\\s*';
+  const N='(\\d+(?:[.,]\\d+)?)', U='\\s*(cm|centimetros?|mm|milimetros?)?', S='\\s*(?:por|x|×|vezes|\\*)\\s*';
   const all=[...t.matchAll(new RegExp(N+U+S+N+U+'(?:'+S+N+U+')?','g'))], ms=primeira?all[0]:all.pop();
   if(!ms) return null;
   const v=[ms[1],ms[3],ms[5]].filter(Boolean).map(x=>parseFloat(x.replace(',','.')));
@@ -225,6 +225,12 @@ function ditPrevTxt(fala,r){
   const m=String(fala||'').match(/\b(?:exames?|us|ultrass\S*)\s+(?:anterior(?:es)?|pr[eé]vios?)\b\s*(?:de\s+)?(?:\d{1,2}\s*\/\s*\d{2,4}|(?:janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+(?:de\s+)?\d{2,4})?\s*[,:]?\s*([^.]{8,})/i);
   if(m&&!/^\s*(para\s+compara|dispon)/i.test(m[1])) r['prev.txt']=m[1].trim();
 }
+// três números seguidos sem "por" ("47 18 20", "4,7 1,8 2,0")
+function ditMedSoltas(s){
+  const U='\\s*(cm|centimetros?|mm|milimetros?)?', N='(\\d+(?:[.,]\\d+)?)', G='[\\s,]+';
+  const m=s.match(new RegExp(N+U+G+N+U+G+N+U)); if(!m) return null;
+  return ditadoMedidas(`${m[1]} ${m[2]||''} por ${m[3]} ${m[4]||''} por ${m[5]} ${m[6]||''}`,true);
+}
 function ditPrev(t,r){
   if(/\b(sem|nao\s+(trouxe|tem|possui))\s+(\w+\s+){0,2}(exames?|us|ultrass\w*)\s+(anterior|previo)/.test(t)) r['prev.tem']='nao';
   else { const m=t.match(/(exames?|us|ultrass\w*)\s+(anterior|previo)\w*/); if(m){ r['prev.tem']='sim'; const d=ditMesAno(t.slice(m.index,m.index+60)); if(d) r['prev.data']=d; } }
@@ -250,8 +256,12 @@ function ditadoLaudoTireoide(fala){
   if(/(superficie|contorno)\w*\s+(\w+\s+)?(lobulad|irregular)|glandula\s+lobulada/.test(g)) r['gl.sup']='lobulada'; else if(/(superficie|contorno)\w*\s+(\w+\s+)?(regular|lis)/.test(g)) r['gl.sup']='regular';
   if(/heterogene/.test(g)) r['gl.eco']='heterogênea'; else if(/homogene/.test(g)) r['gl.eco']='homogênea';
   if(/VASCAUM|hipervascular|inferno/.test(g)) r['gl.dop']='aumentada'; else if(/doppler\s+(\w+\s+)?(normal|sem\s+altera)|vasculariz\w*\s+(\w+\s+)?(normal|preservad|habitual)/.test(g)) r['gl.dop']='sem alterações';
-  const sg=ditSegs(t,{ld:/lobo\s+direito/,le:/lobo\s+esquerdo/,istmo:/\bistmo\b/,nod:/\bnodul\w*/,para:/paratireoide/});
-  [['ld','med.ld'],['le','med.le'],['istmo','med.istmo']].forEach(([k,path])=>{ if(!sg[k]) return; const m=ditadoMedidas(sg[k].slice(0,60),true); if(m) r[path]=m; });
+  // "nódulo no lobo esquerdo de 2 por 1": o lobo aqui é do nódulo, não é medida do lobo
+  const tm=t.replace(/(nodul\w*[^,.;]{0,30}?\b(?:no|do|em|de)\s+)(lobo\s+(?:direito|esquerdo|d|e)\b|\bld\b|\ble\b|istmo)/g,'$1LOBONOD');
+  const sg=ditSegs(tm,{ld:/lobo\s+direito|lobo\s+d\b|\bld\b/,le:/lobo\s+esquerdo|lobo\s+e\b|\ble\b/,istmo:/\bistmo\b/,nod:/\bnodul\w*/,para:/paratireoide/});
+  [['ld','med.ld'],['le','med.le'],['istmo','med.istmo']].forEach(([k,path])=>{ if(!sg[k]) return; const s=sg[k].slice(0,160);
+    const m=ditadoMedidas(s,true)||ditMedSoltas(s); if(m){ r[path]=m; return; }
+    if(k==='istmo'){ const e=ditNum(s.slice(0,50),/(espessura|mede|medindo|com|de)?/); if(e) r[path]=['',e,'']; } });
   if(/paratireoide\s+(\w+\s+){0,2}(visibiliz|visualiz|identific)/.test(t)&&!/paratireoides?\s+nao\s+(visibiliz|visualiz|identific)/.test(t)) r.para='sim';
   else if(/paratireoides?\s+nao\s+(visibiliz|visualiz|identific)/.test(t)) r.para='nao';
   return r;
