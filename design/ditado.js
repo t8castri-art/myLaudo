@@ -269,8 +269,9 @@ function ditadoLaudoTireoide(fala){
     for(const s0 of sg._todos[k].slice().reverse()){ const s=s0.slice(0,160);   // a última menção vale
       const m=ditadoMedidas(s,true)||ditMedSoltas(s); if(m){ r[path]=m; return; }
       if(k==='istmo'){ const e=ditNum(s.slice(0,50),/(espessura|mede|medindo|com|de)?/,ditMMGlobal); if(e){ r[path]=['',e,'']; return; } } } });
-  if(/paratireoide\s+(\w+\s+){0,2}(visibiliz|visualiz|identific)/.test(t)&&!/paratireoides?\s+nao\s+(visibiliz|visualiz|identific)/.test(t)) r.para='sim';
-  else if(/paratireoides?\s+nao\s+(visibiliz|visualiz|identific)/.test(t)) r.para='nao';
+  // "não visibilizadas" vem no plural; visibilizada vem no singular. O iPhone às vezes engole o "não".
+  const pm=t.match(/paratireoides?\s+(nao\s+)?(\w+\s+){0,2}?(visibiliz|visualiz|identific|caracteriz|vist)\w*/);
+  if(pm) r.para=pm[1]||/(adas|idas|as)\b/.test(pm[0].split(/\s+/).pop())?'nao':'sim';
   return r;
 }
 
@@ -441,7 +442,7 @@ function ditadoCard(item,tipo){
   if(flut){ document.body.classList.add('dit-flut');
     return `<div class="ditpan" id="ditPan"${item.painel?'':' hidden'}><div class="lbl">${T.laudo?'Ditado do exame':'Ditado do item'} <span class="act">fale tudo de uma vez</span></div>
       <textarea class="fala" id="falaTxt" rows="3" placeholder="ex.: ${ditEsc(T.ex)}">${ditEsc(item.fala||'')}</textarea>
-      ${aviso?`<div class="dit-falta">${aviso}</div>`:''}<div class="ditbts"><button type="button" class="ditok" id="ditFechar">Fechar</button><button type="button" class="ditok ditapaga" id="ditApagar">Apagar e recomeçar</button></div></div>
+      ${aviso?`<div class="dit-falta">${aviso}</div>`:''}<div class="ditbts"><button type="button" class="ditok" id="ditFechar">Concluir</button><button type="button" class="ditok ditapaga" id="ditApagar">Deletar</button></div></div>
       <div class="ditfab"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>${item.fala&&!item.painel?'<button type="button" class="ditver" id="ditAbrir">ver ditado</button>':''}</div>`; }
   return `<div class="card"><div class="lbl">${T.laudo?'Ditado do exame':'Ditado'} <span class="act">fale tudo de uma vez</span></div>
     <div class="dit"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>
@@ -463,7 +464,10 @@ function ditadoLigar(item,tipo,attrs,rerender,avisar,alvo){
     document.querySelectorAll('#phone '+ditSel(a)).forEach(el=>{ if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.getAttribute('aria-pressed')==='true') el.classList.add('dit-on'); }); });
   const aplicar=()=>{ const r=T.parse(item.fala); Object.keys(r).forEach(k=>ditSet(alvo,k,r[k])); item.dict=new Set(Object.keys(r)); item.painel=true; rerender(); };
   const pan=document.getElementById('ditPan'), fe=document.getElementById('ditFechar'), ab=document.getElementById('ditAbrir');
-  if(fe) fe.addEventListener('click',()=>{ if(DITADO_REC) DITADO_REC.abort(); item.painel=false; rerender(); });
+  const concluir=()=>{ if(DITADO_REC) DITADO_REC.stop(); const v=box.value.trim(); if(v!==(item.fala||'')){ item.fala=v; const r=T.parse(v); Object.keys(r).forEach(k=>ditSet(alvo,k,r[k])); item.dict=new Set(Object.keys(r)); } item.painel=false; rerender(); };
+  if(fe) fe.addEventListener('click',concluir);
+  // tocar fora do painel (e fora do microfone) também conclui
+  if(pan&&!pan.hidden){ const fora=e=>{ if(!pan.isConnected){ document.removeEventListener('pointerdown',fora,true); return; } if(pan.contains(e.target)||e.target.closest('.ditfab')) return; document.removeEventListener('pointerdown',fora,true); concluir(); }; setTimeout(()=>document.addEventListener('pointerdown',fora,true),0); }
   if(ab) ab.addEventListener('click',()=>{ item.painel=true; rerender(); });
   const ap=document.getElementById('ditApagar'); if(ap) ap.addEventListener('click',()=>{ if(DITADO_REC) DITADO_REC.abort(); box.value=''; item.fala=''; item.dict=null; item.painel=true; rerender(); });
   box.addEventListener('change',()=>{ item.fala=box.value.trim(); aplicar(); });

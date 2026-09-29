@@ -58,7 +58,7 @@ exigencias-laudo-us.md  normas (CFM 2.381/2024, CBR/PADI 2025, SBEM etc.)
 - Toda alteração marcada "sim" ou "alterada" abre **caixa de texto livre**, que entra no laudo.
 - A **prévia do laudo é editável** (fundo claro). Editar à mão congela o texto; o botão "Refazer pelos cartões" volta ao automático. O **Copiar laudo fica abaixo da prévia**.
 - **Uso com a mão esquerda** (o probe fica na direita), aprovado em 27/09:
-  - O microfone fica fixo no canto inferior esquerdo, em todas as telas. Na tela do exame ele dita o exame; dentro de um item (nódulo etc.), dita o item. O texto aparece num painel acima dele, com um botão "Fechar"; depois de fechar, "ver ditado" reabre.
+  - O microfone fica fixo no canto inferior esquerdo, em todas as telas. Na tela do exame ele dita o exame; dentro de um item (nódulo etc.), dita o item. Toca para parar, toca de novo para continuar. O texto aparece num painel acima dele com **Concluir** (ou tocar fora do painel) e **Deletar** (zera para recomeçar); depois de concluir, "ver ditado" reabre.
   - Nos cartões com vários campos (anamnese, glândula, órgão...), os botões ficam colados à esquerda e o nome do campo fica à direita. Cartões de dois botões ficam como estão.
   - Nas telas de item, "Concluir" fica à esquerda e "Remover" na ponta direita.
   - **Toda caixa de texto tem um microfone redondo** no canto inferior esquerdo e um **✕** ao lado. O microfone **continua** de onde parou (emenda no texto, para imprevistos); o ✕ apaga tudo para recomeçar. Nada precisa ser digitado.
@@ -116,6 +116,7 @@ Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para um
    - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical), nódulo e cisto de mama (mama, horário, distância do mamilo e da pele, descritores BI-RADS; o ditado pode trocar a mama e o tipo nódulo/cisto). Frase corrida: localização + características + **medidas em cm por último**.
    - Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm.
    - "Tudo em milímetros" (ou "medidas em milímetros") vale para a frase inteira. A última menção de um lobo vale (correção falada).
+   - Paratireoide: plural ("visibilizadas") sem "não" conta como **não visibilizadas**, porque o iPhone às vezes engole o "não"; só o singular marca visibilizada.
    - O iPhone erra previsivelmente, e o app corrige: frases coladas sem ponto ("PeçanhaExame"), "Estímulo/istimo" = istmo, "logo direito" = lobo direito, "para tireoide" = paratireoide, "leva tiroxina" = levotiroxina, "17h21" entre números = 17 21, "mediu06" = mediu 06. Medidas também com "vezes", só números em sequência ("47 18 20"), "LD/LE". Istmo com um número só = espessura.
    - Para depurar: pedir ao médico o **texto exato da caixa** (o que o iPhone escreveu) e testar o parser em cima dele.
    - **Tracejado = veio do ditado e já está no laudo.** Não precisa tocar para confirmar; só toca para trocar. O que não foi dito fica no padrão, que conta como ausente. O aviso só aparece quando falta o essencial do item (nódulo: lobo, terço, composição, ecogenicidade, medidas).
