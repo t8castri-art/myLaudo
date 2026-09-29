@@ -104,8 +104,9 @@ function anterioresLigar(prev,exame,nome,rerender,avisar){
   const auto=()=>antAuto(prev,exame,rerender,avisar);
   if(arq) arq.onchange=()=>{ [...arq.files].forEach(f=>antAdicionar(prev,f,nome,rerender,auto)); arq.value=''; };
   // caixa: texto ditado/transcrito (ou digitado antes de haver resumo) vai para a IA; correção do resumo, não
-  if(box) box.addEventListener('change',()=>{ const v=box.value.trim(), ditado=box.dataset.ditado==='1'; delete box.dataset.ditado; prev.txt=v;
-    if(v&&(ditado||!prev.txtDaIA)){ prev.manuais.push(v); prev.txtDaIA=false; auto(); } });
+  if(box) box.addEventListener('change',()=>{ const v=box.value.trim(), ditado=box.dataset.ditado==='1', novo=box.dataset.novo; delete box.dataset.ditado; delete box.dataset.novo; prev.txt=v;
+    if(!v){ prev.manuais=[]; prev.txtDaIA=false; return; }
+    if(ditado){ prev.manuais.push(novo||v); auto(); } else if(!prev.txtDaIA){ prev.manuais=[v]; auto(); } });
   document.querySelectorAll('#phone [data-antdel]').forEach(b=>b.onclick=()=>{ prev.arqs=prev.arqs.filter(a=>a.id!==+b.dataset.antdel); rerender(); });
   const sv=$i('antSalvar'); if(sv) sv.onclick=()=>{ const url=$i('antUrl').value.trim().replace(/\/$/,''), senha=$i('antSenha').value.trim(); if(!/^https:\/\//.test(url)||!senha){ avisar('Preencha o endereço (https://…) e a senha'); return; } antCfg.set({url,senha}); prev.cfgAberta=false; avisar('IA ligada neste aparelho'); rerender(); auto(); };
   const cf=$i('antCfg'); if(cf) cf.onclick=()=>{ prev.cfgAberta=true; rerender(); };
@@ -122,7 +123,8 @@ async function antAdicionar(prev,file,nome,rerender,depois){
 // organiza quando tudo terminou de ler e a ponte está ligada
 function antAuto(prev,exame,rerender,avisar){
   const cfg=antCfg.get(); if(!(cfg.url&&cfg.senha)) { rerender(); return; }
-  if(prev.organizando||prev.arqs.some(a=>a.status!=='pronto'&&a.status!=='erro')) return;
+  if(prev.organizando){ prev.pendente=true; return; }
+  if(prev.arqs.some(a=>a.status!=='pronto'&&a.status!=='erro')) return;
   if(!prev.arqs.some(a=>a.status==='pronto')&&!prev.manuais.length) return;
   antOrganizar(prev,exame,rerender,avisar);
 }
@@ -137,6 +139,7 @@ async function antOrganizar(prev,exame,rerender,avisar){
     prev.txt=j.texto; prev.txtDaIA=true;
   }catch(e){ prev.erroIA=e.message==='senha incorreta'?'Senha da ponte incorreta.':'Não consegui organizar ('+e.message+'). O texto lido continua guardado.'; }
   prev.organizando=false; rerender();
+  if(prev.pendente){ prev.pendente=false; antOrganizar(prev,exame,rerender,avisar); }
 }
 // ---------- evolução: lê a lista dos exames anteriores e compara com as lesões de hoje ----------
 // Linhas: "US 06/24:" e "N1 TM LD TIRADS 4: 9 × 6 × 7 mm" (tireoide) ou "N1 MD QSL 10h BIRADS 3: 12 × 8 × 9 mm" (mama)

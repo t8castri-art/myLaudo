@@ -61,7 +61,8 @@ exigencias-laudo-us.md  normas (CFM 2.381/2024, CBR/PADI 2025, SBEM etc.)
   - O microfone fica fixo no canto inferior esquerdo, em todas as telas. Na tela do exame ele dita o exame; dentro de um item (nódulo etc.), dita o item. O texto aparece num painel acima dele, com um botão "Fechar"; depois de fechar, "ver ditado" reabre.
   - Nos cartões com vários campos (anamnese, glândula, órgão...), os botões ficam colados à esquerda e o nome do campo fica à direita. Cartões de dois botões ficam como estão.
   - Nas telas de item, "Concluir" fica à esquerda e "Remover" na ponta direita.
-  - **Toda caixa de texto tem o botão "transcrever"** no canto inferior esquerdo: toca, fala, e o que transcreveu **substitui** o texto antigo. Nada precisa ser digitado.
+  - **Toda caixa de texto tem um microfone redondo** no canto inferior esquerdo e um **✕** ao lado. O microfone **continua** de onde parou (emenda no texto, para imprevistos); o ✕ apaga tudo para recomeçar. Nada precisa ser digitado.
+  - Nos exames anteriores, cada trecho ditado vai para a IA; se chegar um trecho enquanto a IA ainda responde, ele entra na fila e vai junto no pedido seguinte.
   - O Copiar laudo continua embaixo da prévia.
 - **Estrutura que nem sempre aparece** (ex.: paratireoide "visibilizada") pergunta "Está normal ou alterada?" e abre o texto pronto da opção escolhida, que dá para editar. Paratireoide normal: "Paratireoide de aspecto habitual, visibilizada adjacente ao terço inferior do lobo direito." Quando alterada, a conclusão ganha "Formação nodular em topografia de paratireoide. Correlacionar com cálcio e PTH."
 - Cada exame aberto pelo início abre **limpo**. A seta do topo volta ao início.
@@ -103,7 +104,7 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
   - Medidas em mm; rótulo que o laudo usou.
 - No laudo sai **"Exames anteriores:"** com essa lista e, no fim, **"Evolução:"**, a mini conclusão, **calculada pelo app** (não pela IA) comparando os nódulos de hoje com o **mesmo rótulo e lobo** nos anteriores. O mais suspeito vem primeiro. Até 2 mm na maior medida = estável; +4 mm em até 6 meses = crescimento rápido; ACR (≥ 20% em 2 medidas e ≥ 2 mm, ou ≥ 50% no volume) = crescimento significativo. Nas mamas: aumento ≥ 20% na maior medida (e ≥ 2 mm) = crescimento, destacando quando em até 6 meses; comparação por rótulo e mama. Lembra a última PAAF (Bethesda). Nódulo de hoje sem rótulo correspondente: "sem correspondente nos exames anteriores". Quem liga os rótulos entre exames é o médico.
 - Endereço e senha da ponte ficam guardados só no aparelho.
-- O botão de transcrever nas caixas é só um microfone redondo.
+- A ponte responde a um GET com a versão (`versao`), para conferir qual código está no ar.
 - Ditado: tocar de novo no microfone **continua** de onde parou; "Apagar e recomeçar" limpa. O ditado do exame pega também o **nome** ("paciente Fulano de Tal") e o **texto do exame anterior** ("exame anterior de 06/25 mostrava ...").
 
 ## Privacidade (regra fixa)

@@ -7,6 +7,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
+const VERSAO = '2026-09-29b';
 
 const INSTRUCOES = {
   tireoide: `Você recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
@@ -75,7 +76,7 @@ export default {
   async fetch(request, env) {
     const origem = request.headers.get('Origin') || '';
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origem) });
-    if (request.method !== 'POST') return resp({ erro: 'use POST' }, 405, origem);
+    if (request.method !== 'POST') return resp({ erro: 'use POST', versao: VERSAO }, 405, origem);
     if (!ORIGENS.includes(origem)) return resp({ erro: 'origem não autorizada' }, 403, origem);
 
     let corpo;

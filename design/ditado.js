@@ -167,7 +167,8 @@ body.dit-flut .docs{padding-bottom:84px}
 .tmic-wrap{position:relative;display:block;grid-column:1/-1;width:100%}
 .tmic-wrap>textarea{padding-bottom:46px!important;width:100%}
 .tmic{position:absolute;left:8px;bottom:8px;width:34px;height:34px;padding:0;justify-content:center;border-radius:999px;border:1px solid var(--ac);background:var(--s1);color:var(--acT);display:flex;align-items:center;gap:6px;font:12px var(--f)}
-.tmic.on{background:var(--ac);color:var(--bg)}`;
+.tmic.on{background:var(--ac);color:var(--bg)}
+.tclr{position:absolute;left:48px;bottom:8px;width:34px;height:34px;border-radius:999px;border:1px solid var(--bd2);background:var(--s1);color:var(--tx3);display:flex;align-items:center;justify-content:center}`;
 if(typeof document!=='undefined') (function(){ const s=document.createElement('style'); s.textContent=DITADO_CSS; document.head.appendChild(s); })();
 const DITADO_MIC='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
 const DITADO_STOP='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
@@ -471,15 +472,17 @@ function tmicEquipar(){
     ta.dataset.tmic='1';
     const w=document.createElement('span'); w.className='tmic-wrap'; ta.parentNode.insertBefore(w,ta); w.appendChild(ta);
     const b=document.createElement('button'); b.type='button'; b.className='tmic'; b.innerHTML=TMIC_ICO; b.setAttribute('aria-label','Transcrever'); w.appendChild(b);
+    const c=document.createElement('button'); c.type='button'; c.className='tclr'; c.setAttribute('aria-label','Apagar'); c.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>'; w.appendChild(c);
+    c.addEventListener('click',()=>{ if(DITADO_REC) DITADO_REC.abort(); ta.value=''; ta.dispatchEvent(new Event('input',{bubbles:true})); ta.dispatchEvent(new Event('change',{bubbles:true})); });
     b.addEventListener('click',()=>{
       if(DITADO_REC){ DITADO_REC.stop(); return; }
       const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
       if(!SR){ ta.focus(); return; }
       const rec=new SR(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
-      const antes=ta.value; let ouviu=false;
-      rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; s=s.replace(/\s+/g,' ').trim(); if(!s) return; ouviu=true; ta.value=s.charAt(0).toUpperCase()+s.slice(1); ta.dispatchEvent(new Event('input',{bubbles:true})); };
+      const antes=ta.value, base=ta.value.trim(); let ouviu=false, novo='';
+      rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; s=s.replace(/\s+/g,' ').trim(); if(!s) return; ouviu=true; novo=s; const S=s.charAt(0).toUpperCase()+s.slice(1); ta.value=base?base+(/[.!?]$/.test(base)?' ':'. ')+S:S; ta.dispatchEvent(new Event('input',{bubbles:true})); };
       rec.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed') ta.focus(); };
-      rec.onend=()=>{ DITADO_REC=null; b.classList.remove('on'); if(!ouviu){ ta.value=antes; } else ta.dataset.ditado='1'; ta.dispatchEvent(new Event('change',{bubbles:true})); };
+      rec.onend=()=>{ DITADO_REC=null; b.classList.remove('on'); if(!ouviu){ ta.value=antes; } else { ta.dataset.ditado='1'; ta.dataset.novo=novo; } ta.dispatchEvent(new Event('change',{bubbles:true})); };
       try{ rec.start(); }catch(err){ ta.focus(); return; }
       DITADO_REC=rec; b.classList.add('on');
     });
