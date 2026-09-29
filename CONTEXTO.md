@@ -97,8 +97,11 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 - Cartão: `Trouxe não | sim`. Com "sim", somem o "Trouxe" e o não/sim (um ✕ discreto no título desfaz). Fica só o botão **escanear ou PDF** (várias fotos e PDFs), a lista dos arquivos e a caixa de texto (clicável, com "transcrever"). Sem botão "digitar", sem campo de data (cada exame traz a sua).
 - **Não há botão "organizar"**: agrupar por lobo e terço é a instrução da IA. Terminou de ler os arquivos, ou terminou de transcrever/ditar na caixa, vai sozinho para a IA e volta agrupado. Correção à mão no resumo não é reenviada.
 - O texto é lido **no iPhone** (PDF com texto direto; foto ou PDF escaneado pela leitura de imagem), e o app **apaga as linhas de identificação** (nome, nascimento, idade, CPF, telefone, e-mail, convênio, atendimento, médicos) antes de qualquer envio. O nome da ficha também é apagado se aparecer solto.
-- Só o texto limpo vai para a **ponte** (`ferramentas/ponte-ia/`, Cloudflare Worker com a chave da Anthropic e uma senha). A IA **só agrupa** por lobo e terço (e istmo), exame por exame, com o rótulo original de cada colega. **Quem diz qual nódulo é qual é o médico.**
-- No laudo sai como "US anteriores:" seguido do resumo. Endereço e senha da ponte ficam guardados só no aparelho.
+- Só o texto limpo vai para a **ponte** (`ferramentas/ponte-ia/`, Cloudflare Worker com a chave da Anthropic e uma senha). A IA só **reescreve no formato fixo**, exame por exame, do mais antigo ao mais recente, sem comparar:
+  `US 06/24:` / `Lobo direito` / `Terço médio: N1 TI-RADS 4: 9 × 6 × 7 mm` … `PAAF 06/25:` … `Citologia: Bethesda III`. Medidas em mm; rótulo que o laudo usou.
+- No laudo sai **"Exames anteriores:"** com essa lista e, no fim, **"Evolução:"**, a mini conclusão, **calculada pelo app** (não pela IA) comparando os nódulos de hoje com o **mesmo rótulo e lobo** nos anteriores. O mais suspeito vem primeiro. Até 2 mm na maior medida = estável; +4 mm em até 6 meses = crescimento rápido; ACR (≥ 20% em 2 medidas e ≥ 2 mm, ou ≥ 50% no volume) = crescimento significativo. Lembra a última PAAF (Bethesda). Nódulo de hoje sem rótulo correspondente: "sem correspondente nos exames anteriores". Quem liga os rótulos entre exames é o médico.
+- Endereço e senha da ponte ficam guardados só no aparelho.
+- O botão de transcrever nas caixas é só um microfone redondo.
 - Ditado: tocar de novo no microfone **continua** de onde parou; "Apagar e recomeçar" limpa. O ditado do exame pega também o **nome** ("paciente Fulano de Tal") e o **texto do exame anterior** ("exame anterior de 06/25 mostrava ...").
 
 ## Privacidade (regra fixa)

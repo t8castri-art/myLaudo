@@ -9,23 +9,33 @@ const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
 
 const INSTRUCOES = {
-  tireoide: `Você recebe o texto de um ou mais laudos anteriores de ultrassonografia de tireoide, de colegas diferentes. A identificação do paciente foi removida.
+  tireoide: `Você recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
 
-Monte um resumo curto, em português do Brasil, agrupando os nódulos por localização. Grupos, nesta ordem, só os que tiverem nódulo:
-Lobo direito, terço superior / Lobo direito, terço médio / Lobo direito, terço inferior / Istmo / Lobo esquerdo, terço superior / Lobo esquerdo, terço médio / Lobo esquerdo, terço inferior / Localização não informada.
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada além dele:
 
-Dentro de cada grupo, uma linha por nódulo por exame, do exame mais antigo para o mais recente:
-- mm/aa (rótulo que o colega usou, ex. "N6"): composição e ecogenicidade em poucas palavras, medidas em cm com vírgula (a × b × c), ACR TI-RADS.
+US 06/24:
+Lobo direito
+Terço médio: N1 TI-RADS 4: 9 × 6 × 7 mm
+Terço inferior: N2 TI-RADS 4: 14 × 16 × 17 mm
+Lobo esquerdo
+Terço inferior: N3 TI-RADS 2: 23 × 17 × 12 mm
+
+PAAF 06/25:
+Lobo direito
+Terço inferior: N2 TI-RADS 5: 19 × 21 × 24 mm
+Citologia: Bethesda III
 
 Regras:
-- Não diga que nódulos de exames diferentes são o mesmo nódulo. Não compare, não conclua, não recomende conduta. Só agrupe.
-- Se o laudo não traz o terço, use "terço não informado" dentro do lobo.
-- Se o laudo não traz o TI-RADS, escreva "TI-RADS não informado". Não calcule.
-- Mantenha as medidas exatamente como no laudo, convertendo mm para cm só se precisar.
-- Primeira linha: "Exames: " e as datas (mm/aa) de cada laudo recebido, separadas por vírgula. Se um laudo não tiver data, "sem data".
-- Se houver achado relevante fora de nódulo (linfonodo suspeito, tireoidite, volume alterado), uma linha final "Outros: ...".
-- Ignore qualquer nome, documento ou dado pessoal que tenha sobrado no texto.
-- Responda só com o resumo, sem título, sem markdown, sem comentários.`,
+- Cabeçalho de cada exame: "US mm/aa:" ou "PAAF mm/aa:". Sem data, "US sem data:". Uma linha em branco entre exames.
+- Dentro do exame, "Lobo direito" e depois "Lobo esquerdo", cada nódulo numa linha começando pelo terço ("Terço superior:", "Terço médio:", "Terço inferior:" ou "Terço não informado:"). Nódulo no istmo: linha "Istmo: N4 TI-RADS 2: 5 × 4 × 3 mm", depois dos lobos.
+- Rótulo: o que o laudo usou (N1, N2...). Sem rótulo, numere na ordem em que aparece.
+- TI-RADS: só o número que está no laudo. Se não tiver, "TI-RADS não informado". Não calcule.
+- Medidas sempre em mm, separadas por " × ", com vírgula decimal quando houver (1,2 cm = 12 mm).
+- PAAF: o nódulo puncionado com TI-RADS e medidas se constarem, e a linha "Citologia: Bethesda ..." (em algarismos romanos).
+- Não diga que nódulos de exames diferentes são o mesmo. Não compare, não conclua, não recomende.
+- Se houver achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia), uma linha "Outros: ..." no fim do exame.
+- Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem título geral, sem comentários.`,
 };
 
 function cors(origem) {
