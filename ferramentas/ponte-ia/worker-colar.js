@@ -8,7 +8,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
-const VERSAO = '2026-09-29b';
+const VERSAO = '2026-09-30a';
 
 const INSTRUCOES = {
   tireoide: `Voc\u00ea recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo pr\u00f3prio m\u00e9dico). A identifica\u00e7\u00e3o do paciente foi removida.
