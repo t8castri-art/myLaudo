@@ -48,6 +48,12 @@ function antLimpar(txt,nome){
 const ANT_MACROMAN="ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø"; // bytes 0x80-0xBF
 function antConserta(t){ return String(t||'').replace(/√([\s\S])/g,(m,c)=>{ const i=ANT_MACROMAN.indexOf(c); if(i<0) return m; try{ return new TextDecoder().decode(new Uint8Array([0xC3,0x80+i])); }catch(e){ return m; } }); }
 
+// laudo enxuto: sem valores de referência
+function antSemReferencia(t){ return String(t||'')
+  .replace(/\s*\((?:[^()]*\b(?:VR|v\.?\s?r\.?|refer[eê]ncia|ref\.|normal\s+(?:at[eé]|de|entre))\b[^()]*)\)/gi,'')
+  .replace(/[,;]?\s*(?:VR|valor(?:es)?\s+de\s+refer[eê]ncia|refer[eê]ncia)\s*:?\s*[^,;\n]*/gi,'')
+  .replace(/[ \t]+\n/g,'\n'); }
+
 // ---------- tela ----------
 const ANT_I={
   lapis:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
@@ -141,7 +147,7 @@ async function antOrganizar(prev,exame,rerender,avisar){
     const r=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha:cfg.senha,exame,textos})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.erro||('erro '+r.status));
-    prev.txt=antConserta(j.texto); prev.txtDaIA=true;
+    prev.txt=antSemReferencia(antConserta(j.texto)); prev.txtDaIA=true;
   }catch(e){ prev.erroIA=e.message==='senha incorreta'?'Senha da ponte incorreta.':'Não consegui organizar ('+e.message+'). O texto lido continua guardado.'; }
   prev.organizando=false; rerender();
   if(prev.pendente){ prev.pendente=false; antOrganizar(prev,exame,rerender,avisar); }
