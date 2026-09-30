@@ -6,7 +6,7 @@ O app manda para cá só o texto dos exames anteriores **já sem identificação
 
 1. **Chave da Anthropic**: console.anthropic.com → API Keys → Create Key. Copie a chave (começa com `sk-ant-`). Coloque crédito em Billing.
 2. **Cloudflare**: dash.cloudflare.com → Workers & Pages → Create → Create Worker → nome `mylaudo-ponte` → Deploy.
-3. Depois de criado, **Edit code**: apague tudo, cole o conteúdo de `worker.js` e clique em **Deploy**.
+3. Depois de criado, **Edit code**: apague tudo, cole o conteúdo de **`worker-colar.js`** (versão só com letras simples, que não estraga na colagem) e clique em **Deploy**. O `worker.js` é o mesmo código, legível; edite nele e gere o `worker-colar.js` de novo.
 4. No Worker → **Settings → Variables and Secrets → Add**:
    - `ANTHROPIC_API_KEY` (tipo Secret) = a chave do passo 1
    - `SENHA` (tipo Secret) = uma senha curta que você inventa

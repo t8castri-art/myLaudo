@@ -44,6 +44,10 @@ function antLimpar(txt,nome){
   return t;
 }
 
+// ---------- conserta texto que passou por Mac Roman ("√ó" em vez de "×", "√ß" em vez de "ç") ----------
+const ANT_MACROMAN="ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø"; // bytes 0x80-0xBF
+function antConserta(t){ return String(t||'').replace(/√([\s\S])/g,(m,c)=>{ const i=ANT_MACROMAN.indexOf(c); if(i<0) return m; try{ return new TextDecoder().decode(new Uint8Array([0xC3,0x80+i])); }catch(e){ return m; } }); }
+
 // ---------- tela ----------
 const ANT_I={
   lapis:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
@@ -77,6 +81,7 @@ const ANT_CSS=`
 // cartão inteiro de "Exames anteriores"; prev = st.prev; exemploTxt = placeholder da caixa
 function anterioresCard(prev,exemploTxt){
   prev.arqs=prev.arqs||[]; prev.manuais=prev.manuais||[];
+  if(/√/.test(prev.txt||'')) prev.txt=antConserta(prev.txt);
   const cfg=antCfg.get(), ligada=!!(cfg.url&&cfg.senha);
   const esc2=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   if(prev.tem!=='sim') return `<div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
@@ -136,7 +141,7 @@ async function antOrganizar(prev,exame,rerender,avisar){
     const r=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha:cfg.senha,exame,textos})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.erro||('erro '+r.status));
-    prev.txt=j.texto; prev.txtDaIA=true;
+    prev.txt=antConserta(j.texto); prev.txtDaIA=true;
   }catch(e){ prev.erroIA=e.message==='senha incorreta'?'Senha da ponte incorreta.':'Não consegui organizar ('+e.message+'). O texto lido continua guardado.'; }
   prev.organizando=false; rerender();
   if(prev.pendente){ prev.pendente=false; antOrganizar(prev,exame,rerender,avisar); }
@@ -146,7 +151,7 @@ async function antOrganizar(prev,exame,rerender,avisar){
 const ANT_RANK={'0':0,'1':1,'2':2,'3':3,'4':4,'4A':4,'4B':5,'4C':6,'5':7,'6':8};
 function antLer(txt){
   const exames=[]; let ex=null;
-  String(txt||'').split(/\r?\n/).forEach(l0=>{ const l=l0.trim(); if(!l) return;
+  antConserta(txt).split(/\r?\n/).forEach(l0=>{ const l=l0.trim(); if(!l) return;
     let m=l.match(/^(US|PAAF|CORE|MMG|RM)\s+(?:de\s+)?(?:(\d{1,2})\s*\/\s*(\d{2,4})|sem\s+data)\s*:?\s*(.*)$/i);
     if(m){ ex={tipo:m[1].toUpperCase(),data:m[2]?String(m[2]).padStart(2,'0')+'/'+String(m[3]).slice(-2):null,nota:m[4]||'',nods:[]}; exames.push(ex); return; }
     if(!ex) return;
