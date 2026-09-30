@@ -1,5 +1,7 @@
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<style>html,body{touch-action:pan-y;overflow-x:hidden;overscroll-behavior-x:none}</style>
+<script>['gesturestart','gesturechange','gestureend'].forEach(e=>document.addEventListener(e,ev=>ev.preventDefault(),{passive:false}));</script>
 <title>Laudo de Tireoide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -232,7 +234,7 @@ const st={
   anam:{fam:'nao',conhece:true,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},
   gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},
   med:{istmo:['19','5','11,5'],ld:['47','18','20'],le:['46','16','19']},
-  nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',
+  nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,
   paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},
 };
 const n1=novoNod(); n1.med=['16','11','13']; st.nods.push(n1);
@@ -289,13 +291,19 @@ function conclusao(){
   st.linfs.filter(suspL).forEach(l=>c.push(`${rotL(l)}: linfonodo cervical nível ${l.nivel} à ${l.lado==='D'?'direita':'esquerda'} com critérios ultrassonográficos de suspeição.`));
   return c;
 }
+// sugestão: só quatro opções; o app marca a que as regras indicam e o médico troca
+const SUGS=[['paaf','PAAF'],['sem','seguimento semestral'],['anu','seguimento anual'],['comp','TC/RM']];
+const alvosPaaf=()=>st.nods.filter(n=>conduta(n).k==='paaf').map(rotN).concat(st.linfs.filter(suspL).map(rotL));
+function sugAuto(){ const s=new Set(); if(alvosPaaf().length) s.add('paaf'); else if(st.nods.some(n=>conduta(n).k==='seg')) s.add('anu'); return s; }
+const sugAtual=()=>st.sug||sugAuto();
 function sugestao(){
-  const s=[];
-  const p=st.nods.filter(n=>conduta(n).k==='paaf').map(rotN).concat(st.linfs.filter(suspL).map(rotL));
-  if(p.length) s.push(`PAAF de ${p.join(' e ')}${st.linfs.some(suspL)?', com tireoglobulina no lavado do linfonodo':''}.`);
-  else if(st.nods.some(n=>conduta(n).k==='seg')) s.push('Novo exame em 12 meses.');
-  else s.push('Acompanhamento com médico assistente.');
-  return s.join(' ');
+  const q=sugAtual(), s=[];
+  if(q.has('paaf')){ let p=alvosPaaf(); if(!p.length&&st.nods.length){ const mx=Math.max(...st.nods.map(n=>pts(n))); p=st.nods.filter(n=>pts(n)===mx).map(rotN); }
+    s.push(p.length?`PAAF de ${p.join(' e ')}${st.linfs.some(suspL)?', com tireoglobulina no lavado do linfonodo':''}.`:'PAAF.'); }
+  if(q.has('sem')) s.push('Seguimento ecográfico semestral.');
+  if(q.has('anu')) s.push('Seguimento ecográfico anual.');
+  if(q.has('comp')) s.push('Sugere-se estudo com método de imagem complementar (tomografia/ressonância).');
+  return s.length?s.join(' '):'Acompanhamento com médico assistente.';
 }
 function docUS(){
   const g=st.gl,m=st.med,vd=vol(m.ld),ve=vol(m.le);
@@ -389,6 +397,7 @@ function viewLaudo(){
         ${st.linfs.length?st.linfs.map(l=>`<button type="button" class="nod" data-open="l${l.id}"><div class="n"><b>${rotL(l)} · nível ${l.nivel} ${l.lado} · ${l.med.map(cm).join(' × ')} cm</b><span>${l.forma} · hilo ${l.hilo} · ${l.dop}</span></div><span class="tag ${suspL(l)?'alert':'ok'}">${suspL(l)?'suspeito':'reacional'}</span>${I.chev}</button>`).join(''):'<div class="empty">Cadeias linfonodais cervicais sem linfonodos com critérios de suspeição.</div>'}
         <button type="button" class="addbtn" data-add="l">${I.plus}Adicionar linfonodo</button>
       </div>
+      <div class="card"><div class="lbl">Sugestão <span class="act">${st.sug?'ajustada':'sugerida pelo TI-RADS'}</span></div>${chips(SUGS,sugAtual(),'sug',true)}</div>
       <div class="card"><div class="lbl">Paratireoides</div>${segm([['nao','não visibilizadas'],['sim','visibilizada']],st.para,'para')}
         ${st.para==='sim'?`<div class="para-txt"><div class="lbl" style="margin-bottom:6px">Está normal ou alterada?</div>${segm([['normal','normal'],['alterada','alterada']],st.paraAsp,'paraasp')}<textarea class="obs" id="paraTxt" style="margin-top:8px">${esc(st.paraTxt||PARA_TXT[st.paraAsp])}</textarea></div>`:''}</div>
       <div class="card"><div class="toggle"><div><div class="lbl" style="margin:0">Procedimento</div><div class="p">PAAF realizada neste atendimento</div></div><button type="button" class="sw" id="paafSw" aria-pressed="${st.paaf.on}" aria-label="PAAF"></button></div>
@@ -481,6 +490,7 @@ function wire(){
   on('[data-open]',el=>{const k=el.dataset.open;st.edit=+k.slice(1);st.view=k[0]==='n'?'nodulo':'linf';render();});
   on('[data-add]',el=>{ if(el.dataset.add==='n'){const n=novoNod();st.nods.push(n);st.edit=n.id;st.view='nodulo';} else {const l=novoLinf();st.linfs.push(l);st.edit=l.id;st.view='linf';} render();});
   on('[data-para]',el=>{st.para=el.dataset.para;render();});
+  on('[data-sug]',el=>{ const v=el.dataset.sug, q=new Set(sugAtual()); if(q.has(v)) q.delete(v); else { q.add(v); if(v==='sem') q.delete('anu'); if(v==='anu') q.delete('sem'); } st.sug=q; render(); });
   on('[data-paraasp]',el=>{st.paraAsp=el.dataset.paraasp;st.paraTxt='';render();});
   const pt=document.getElementById('paraTxt'); if(pt) pt.addEventListener('input',()=>{st.paraTxt=pt.value;renderDocs();});
   const ps=$('#paafSw'); if(ps) ps.addEventListener('click',()=>{st.paaf.on=!st.paaf.on; if(st.paaf.on&&!st.paaf.alvos.size){const f=st.nods.find(n=>conduta(n).k==='paaf')||st.nods[0]; if(f) st.paaf.alvos.add('n'+f.id); st.doc='paaf';} render();});
@@ -509,7 +519,7 @@ function wire(){
 }
 function refreshVol(){const t=$('#volTot');if(t)t.textContent='~ '+fmt(vol(st.med.ld)+vol(st.med.le),0)+' mL';}
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800);}
-function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},pac:''}); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},pac:''}); }
 // ---------- padrões do app: pular para o próximo campo e máscara de data ----------
 function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
 document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;
