@@ -7,7 +7,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
-const VERSAO = '2026-09-30b';
+const VERSAO = '2026-09-30c';
 
 const INSTRUCOES = {
   tireoide: `Você recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
@@ -18,6 +18,7 @@ US 06/24:
 N1 TM LD TIRADS 4: 9 × 6 × 7 mm
 N2 TI LD TIRADS 4: 14 × 16 × 17 mm
 N3 TI LE TIRADS 2: 23 × 17 × 12 mm
+Volume: 17,6 cm³
 
 PAAF 06/25:
 N2 TI LD TIRADS 5: 19 × 21 × 24 mm, Bethesda III
@@ -31,7 +32,8 @@ Regras:
 - Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
 - PAAF: o nódulo puncionado e, na mesma linha, ", Bethesda" em algarismos romanos.
 - Não diga que nódulos de exames diferentes são o mesmo. Não compare, não conclua, não recomende.
-- Achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia, volume aumentado ou reduzido): uma linha "Outros: ..." no fim do exame. Volume normal não entra.
+- Última linha de cada US: "Volume: X cm³" com o volume total da tireoide que o laudo trouxer (mL = cm³, vírgula decimal). Se o laudo só trouxer volume por lobo, some os dois. Se não trouxer volume, omita a linha. Só o número: sem "aumentado", sem "normal".
+- Achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia): uma linha "Outros: ..." antes do volume.
 - Nunca escreva valores de referência ("VR", "referência", "normal até ..."). Laudo enxuto.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
 - Sem markdown, sem título, sem comentários.`,

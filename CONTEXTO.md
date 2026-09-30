@@ -55,6 +55,8 @@ exigencias-laudo-us.md  normas (CFM 2.381/2024, CBR/PADI 2025, SBEM etc.)
 - **Medidas em milímetros inteiros**: digita `20`, o laudo sai `2,0 cm`. Com vírgula, 2 casas.
 - **Preencheu, pula sozinho** para o próximo campo: 2 dígitos em medida; data completa.
 - Datas: exame anterior `mm/aa`; DUM e nascimento `dd/mm/aaaa`, com máscara.
+- Dose de levotiroxina: ao digitar o 3º dígito o teclado fecha sozinho (doses de 2 dígitos continuam possíveis).
+- O volume tireoidiano aparece sempre no laudo, normal ou não; o que não aparece são valores de referência.
 - 3 medidas cabem numa linha.
 - Toda alteração marcada "sim" ou "alterada" abre **caixa de texto livre**, que entra no laudo.
 - A **prévia do laudo é editável** (fundo claro). Editar à mão congela o texto; o botão "Refazer pelos cartões" volta ao automático. O **Copiar laudo fica abaixo da prévia**.
@@ -100,7 +102,7 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 - **Não há botão "organizar"**: agrupar por lobo e terço é a instrução da IA. Terminou de ler os arquivos, ou terminou de transcrever/ditar na caixa, vai sozinho para a IA e volta agrupado. Correção à mão no resumo não é reenviada.
 - O texto é lido **no iPhone** (PDF com texto direto; foto ou PDF escaneado pela leitura de imagem), e o app **apaga as linhas de identificação** (nome, nascimento, idade, CPF, telefone, e-mail, convênio, atendimento, médicos) antes de qualquer envio. O nome da ficha também é apagado se aparecer solto.
 - Só o texto limpo vai para a **ponte** (`ferramentas/ponte-ia/`, Cloudflare Worker com a chave da Anthropic e uma senha). A IA só **reescreve no formato fixo**, exame por exame, do mais antigo ao mais recente, sem comparar:
-  - Tireoide: `US 06/24:` e uma linha por nódulo `N1 TM LD TIRADS 4: 9 × 6 × 7 mm` (TS/TM/TI, LD/LE/istmo); `PAAF 06/25:` com `…, Bethesda III` na linha.
+  - Tireoide: `US 06/24:` e uma linha por nódulo `N1 TM LD TIRADS 4: 9 × 6 × 7 mm` (TS/TM/TI, LD/LE/istmo); `PAAF 06/25:` com `…, Bethesda III` na linha. Última linha de cada US: `Volume: 17,6 cm³` (só o número, sem referência).
   - Mamas (tela de US e laudo do Core): `MMG 05/24: BIRADS 2`, `US 06/24:` e `N1 MD QSL 10h BIRADS 3: 12 × 8 × 9 mm` (N nódulo, C cisto; só as 4 siglas clássicas QSL/QSM/QIL/QIM; em 12/3/6/9h só o horário; "retroareolar" por extenso); `CORE 07/24:` com `…, histologia: …`.
   - Medidas em mm; rótulo que o laudo usou.
 - No laudo sai **"Exames anteriores:"** com essa lista e, no fim, **"Evolução:"**, a mini conclusão, **calculada pelo app** (não pela IA) comparando os nódulos de hoje com o **mesmo rótulo e lobo** nos anteriores. O mais suspeito vem primeiro. Até 2 mm na maior medida = estável; +4 mm em até 6 meses = crescimento rápido; ACR (≥ 20% em 2 medidas e ≥ 2 mm, ou ≥ 50% no volume) = crescimento significativo. Nas mamas: aumento ≥ 20% na maior medida (e ≥ 2 mm) = crescimento, destacando quando em até 6 meses; comparação por rótulo e mama. Lembra a última PAAF (Bethesda). Nódulo de hoje sem rótulo correspondente: "sem correspondente nos exames anteriores". Quem liga os rótulos entre exames é o médico.

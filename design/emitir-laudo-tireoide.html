@@ -517,7 +517,8 @@ document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='
   if(m==='mmaa'||m==='ddmmaaaa'){ const max=m==='mmaa'?4:8; const d=el.value.replace(/\D/g,'').slice(0,max);
     el.value=m==='mmaa'?(d.length>2?d.slice(0,2)+'/'+d.slice(2):d):[d.slice(0,2),d.slice(2,4),d.slice(4)].filter(Boolean).join('/');
     if(d.length===max) proximo(el); return; }
-  if(el.dataset.mmc && /^\d{2}$/.test(el.value)) proximo(el);   // medida em mm: 2 dígitos e pula
+  if(el.dataset.mmc && /^\d{2}$/.test(el.value)) proximo(el);
+  if(el.dataset.f==='dose' && /^\d{3}$/.test(el.value)) el.blur();   // dose de levotiroxina: 3 dígitos, fecha o teclado   // medida em mm: 2 dígitos e pula
 },true);
 
 // medidas digitadas em mm saem em cm no laudo (20 → 2,0)
