@@ -7,7 +7,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
-const VERSAO = '2026-09-30a';
+const VERSAO = '2026-09-30b';
 
 const INSTRUCOES = {
   tireoide: `Você recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
@@ -31,7 +31,8 @@ Regras:
 - Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
 - PAAF: o nódulo puncionado e, na mesma linha, ", Bethesda" em algarismos romanos.
 - Não diga que nódulos de exames diferentes são o mesmo. Não compare, não conclua, não recomende.
-- Achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia): uma linha "Outros: ..." no fim do exame.
+- Achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia, volume aumentado ou reduzido): uma linha "Outros: ..." no fim do exame. Volume normal não entra.
+- Nunca escreva valores de referência ("VR", "referência", "normal até ..."). Laudo enxuto.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
 - Sem markdown, sem título, sem comentários.`,
   mamas: `Você recebe o texto de exames anteriores de mama (ultrassom, mamografia, core biopsy ou PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
@@ -56,6 +57,7 @@ Regras:
 - CORE/PAAF: a lesão biopsiada e, na mesma linha, ", histologia: ..." ou ", citologia: ..." curtos.
 - Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
 - Achado relevante fora de nódulo (linfonodo axilar suspeito, ectasia, prótese, cirurgia): uma linha "Outros: ..." no fim do exame.
+- Nunca escreva valores de referência. Laudo enxuto.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
 - Sem markdown, sem título, sem comentários.`,
 };

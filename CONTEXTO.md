@@ -27,6 +27,7 @@ Se esquecer o pull e der conflito, não force nada: pare e resolva arquivo por a
 ## Como trabalhar com ele
 - **Ritmo devagar.** Mostre, pergunte, e só então empilhe a próxima decisão.
 - **Mínimo de palavras** no texto do laudo. Nunca repita a mesma informação duas vezes.
+- **Sem valores de referência** no laudo (nem nos exames anteriores). Normal é só "normal"/"habitual"; alterado é "aumentado"/"reduzido". Laudo enxuto, nunca frente e verso.
 - Ele pede mudanças curtas e diretas. Aplique, confira o texto gerado e mostre um trecho de exemplo.
 - Sempre em português do Brasil.
 
