@@ -520,7 +520,8 @@ const EDITS={}; let RAW=false, INR=false, LAST='docUS';
 
 // ---------- myLaudo: modo app (aberto pelo início) ----------
 const APP=(()=>{try{return new URLSearchParams(location.search).has('app');}catch(e){return false;}})();
-if(APP){ limpar(); try{ const s=localStorage.getItem('mylaudo.serv'); if(s) st.serv=s; const p=JSON.parse(localStorage.getItem('mylaudo.pac')||'null'); if(p){ st.pac=p.nome||''; if(p.serv) st.serv=p.serv; } }catch(e){} }
+if(APP){ limpar(); try{ const s=localStorage.getItem('mylaudo.serv'); if(s) st.serv=s; const p=JSON.parse(localStorage.getItem('mylaudo.pac')||'null'); if(p){ st.pac=p.nome||''; if(p.serv) st.serv=p.serv; } }catch(e){}
+  if(anterioresDoPaciente(st.prev)) setTimeout(()=>antAuto(st.prev,'mamas',render,toast),50); }
 { const _r=render; render=function(){ _r(); const v=(st.view||'')+':'+(st.edit||''); if(v!==window._lv){ window._lv=v; if(innerWidth<600) scrollTo(0,0); } }; }
 render();
 </script>

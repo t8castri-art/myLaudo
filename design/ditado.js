@@ -20,6 +20,29 @@ const DITADO_NUM={zero:0,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6
 // o iPhone cola as frases ditadas sem ponto ("PeçanhaExame") e gruda número em palavra ("mediu06")
 function ditPrep(s){ return String(s||'').replace(/([a-zà-ÿ])([A-ZÀ-Ý])/g,'$1. $2').replace(/([A-Za-zÀ-ÿ])(\d)/g,'$1 $2'); }
 let ditMMGlobal=false;
+const DIT_CENT={cem:100,cento:100,duzentos:200,duzentas:200,trezentos:300,trezentas:300,quatrocentos:400,quatrocentas:400,quinhentos:500,quinhentas:500,seiscentos:600,seiscentas:600,setecentos:700,setecentas:700,oitocentos:800,oitocentas:800,novecentos:900,novecentas:900};
+// lê um número por extenso a partir do token i: "vinte e dois", "mil novecentos e setenta e dois", "dois mil e um". Devolve [valor, tokens] ou null.
+function ditNumRun(tk,i){
+  const w=k=>(tk[k]||'').replace(/[.,;:]+$/,''); let total=0,cur=0,j=i,ok=false,modo='num'; // num: espera número · pos: depois de número · mil: depois de "mil"
+  while(j<tk.length){ const x=w(j);
+    if(modo!=='pos'){
+      if(x in DIT_CENT){ cur+=DIT_CENT[x]; ok=true; modo='pos'; j++; }
+      else if(x in DITADO_NUM){ cur+=DITADO_NUM[x]; ok=true; modo='pos'; j++; }
+      else if(x==='mil'&&modo==='num'&&j===i){ total=1000; ok=true; modo='mil'; j++; }
+      else if(modo==='mil'&&x==='e'){ const nx=w(j+1); if((nx in DIT_CENT)||(nx in DITADO_NUM)){ j++; modo='num'; } else break; }
+      else break;
+    } else {
+      if(x==='mil'&&!total){ total=cur*1000; cur=0; modo='mil'; j++; }
+      else if(x==='e'){ const nx=w(j+1); let pode=false;
+        if(cur>0&&cur%100===0) pode=(nx in DITADO_NUM);
+        else if(cur%100>=20&&cur%10===0) pode=(nx in DITADO_NUM)&&DITADO_NUM[nx]<10;
+        if(!pode) break; j++; modo='num'; }
+      else break;
+    }
+    if(/[.,;:]$/.test(tk[j-1]||'')) break;
+  }
+  return ok?[total+cur,j-i]:null;
+}
 function ditadoTexto(s){
   let t=ditPrep(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   t=t.replace(/(\d)\s*[x×*]\s*(?=\d)/g,'$1 por ').replace(/(\d)h(\d)/g,'$1 $2').replace(/[;:!?]/g,' , ')
@@ -27,11 +50,9 @@ function ditadoTexto(s){
     .replace(/\bpara\s+tireoides?\b/g,'paratireoide').replace(/\b(?:leva|levo)\s+tiroxina/g,'levotiroxina').replace(/\bti\s*-?\s*rads?\b|\btirades\b|\btiradis\b/g,'tirads');
   const tk=t.split(/\s+/).filter(Boolean), out=[];
   for(let i=0;i<tk.length;i++){
-    const m=tk[i].match(/^(.*?)([.,]*)$/), w=m[1];
-    if(w in DITADO_NUM){ let v=DITADO_NUM[w];
-      if(v>=20&&tk[i+1]==='e'&&DITADO_NUM[tk[i+2]]<10){ v+=DITADO_NUM[tk[i+2]]; i+=2; }
-      out.push(String(v)+(m[2]&&!/^\d/.test(tk[i+1]||'')?m[2]:''));
-    } else out.push(tk[i]);
+    const r=ditNumRun(tk,i);
+    if(r){ const ult=tk[i+r[1]-1], p=(ult.match(/[.,]+$/)||[''])[0]; out.push(String(r[0])+(p&&!/^\d/.test(tk[i+r[1]]||'')?p:'')); i+=r[1]-1; }
+    else out.push(tk[i]);
   }
   return ' '+out.join(' ')
     .replace(/(\d+)\s+(?:virgula|ponto)\s+(\d+)/g,'$1,$2')
@@ -225,9 +246,10 @@ function ditMesAno(t){
 }
 // "28/08/2026", "28 de agosto de 2026", "28 de agosto" → dd/mm/aaaa
 function ditData(t){
-  let m=t.match(/\b(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{2,4})\b/); if(m) return p2(m[1])+'/'+p2(m[2])+'/'+(m[3].length===2?'20'+m[3]:m[3]);
-  m=t.match(/\b(\d{1,2})\s+(?:de\s+)?(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)(?:\s+(?:de\s+)?(\d{4}))?/);
-  if(m){ const hoje=new Date(), mes=DIT_MESES[m[2]]; let a=m[3]?+m[3]:hoje.getFullYear(); if(!m[3]&&mes>hoje.getMonth()+1) a--; return p2(m[1])+'/'+p2(mes)+'/'+a; }
+  const ano4=a=>{ a=String(a); if(a.length===4) return a; const yy=+a, h=new Date().getFullYear()%100; return String(yy>h?1900+yy:2000+yy); };
+  let m=t.match(/\b(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{2}|\d{4})\b/); if(m) return p2(m[1])+'/'+p2(m[2])+'/'+ano4(m[3]);
+  m=t.match(/\b(\d{1,2})\s+(?:de\s+)?(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)(?:\s+(?:de\s+)?(\d{2}|\d{4})\b)?/);
+  if(m){ const hoje=new Date(), mes=DIT_MESES[m[2]]; let a=m[3]?+ano4(m[3]):hoje.getFullYear(); if(!m[3]&&mes>hoje.getMonth()+1) a--; return p2(m[1])+'/'+p2(mes)+'/'+a; }
   return null;
 }
 const ditPrimeiro=(t,pares)=>{ for(const [re,v] of pares) if(re.test(t)) return v; return null; };
@@ -438,8 +460,29 @@ function ditadoMama(fala){
   const m=ditadoMedidas(t); if(m) r.med=m;
   return r;
 }
+// ---------- cadastro do paciente ----------
+// "Maria Aparecida de Souza Lima, nascida em doze de março de setenta e dois, feminino, Instituto, WhatsApp 65 99912 3456, trouxe US de tireoide de março de 2025 com nódulo no lobo direito de 1,2 cm"
+function ditadoPaciente(fala){
+  const bruto=ditPrep(fala), t=ditadoTexto(fala), r={};
+  const corte=/\s*(?:,|\.|;|\bnascid|\bnascimento|\bdata\s+de\s+nasc|\d|\bfeminin|\bmasculin|\bsexo\b|\binstituto\b|\bparticular\b|\bhmc\b|\bsus\b|\bwhats|\bzap\b|\btelefone|\bcelular|\be-?mail|\btrouxe|\bexames?\b|\bus\b|\bultrass|\bidade|\banos\b|$)/i;
+  const mn2=bruto.match(new RegExp("^\\s*(?:paciente\\s+|nome\\s+(?:é\\s+|:\\s*)?|o\\s+nome\\s+(?:é|dela|dele)\\s+)?([A-Za-zÀ-ÿ'][A-Za-zÀ-ÿ' ]*?)(?="+corte.source+")","i"));
+  if(mn2&&mn2[1].trim().split(/\s+/).length>=2){ r.nome=mn2[1].trim().split(/\s+/).map(p=>/^(da|de|do|das|dos|e)$/i.test(p)?p.toLowerCase():p.charAt(0).toUpperCase()+p.slice(1).toLowerCase()).join(' '); }
+  else { const r2={}; ditNome(fala,r2); if(r2.pac) r.nome=r2.pac; }
+  const dn=t.match(/nascid[oa]?\s+(?:em|no\s+dia|dia)?\s*|nascimento\s*(?:em|:)?\s*|data\s+de\s+nascimento\s*(?:é|:)?\s*/);
+  if(dn){ const win=t.slice(dn.index+dn[0].length,dn.index+dn[0].length+50); let dt=ditData(win); const y=win.match(/\b(19\d{2}|20\d{2})\b/); if(dt&&y&&!dt.endsWith(y[1])&&dt.endsWith(String(new Date().getFullYear()))) dt=dt.slice(0,6)+y[1]; if(dt) r.nasc=dt; }
+  if(!r.nasc){ const dt=ditData(t); if(dt&&!/\b(exame|us|ultrass|trouxe|mamografia)\b[^,.]{0,40}$/.test(t.slice(0,t.indexOf(dt.split('/')[0])))) r.nasc=dt; }
+  if(/\bfeminin|\bmulher\b|\bsexo\s+f\b/.test(t)) r.sexo='F'; else if(/\bmasculin|\bhomem\b|\bsexo\s+m\b/.test(t)) r.sexo='M';
+  if(/\binstituto\b/.test(t)) r.serv='inst'; else if(/\bparticular\b|\bconvenio\b|\bplano\s+de\s+saude/.test(t)) r.serv='part'; else if(/\bhmc\b|\bsus\b|hospital\s+municipal/.test(t)) r.serv='hmc';
+  const tel=t.replace(/\(|\)|-/g,' ').match(/(?:whats\w*|zap|telefone|celular|numero)?[^\d]{0,12}(\d{2})\s*(9?\s*\d{4})\s*(\d{4})\b/); if(tel){ const n=(tel[1]+tel[2]+tel[3]).replace(/\s/g,''); if(n.length>=10&&n.length<=11) r.zap='('+n.slice(0,2)+') '+n.slice(2,n.length-4)+'-'+n.slice(-4); }
+  const em=bruto.replace(/\s+arroba\s+/gi,'@').replace(/\s+ponto\s+/gi,'.').match(/[\w.+-]+@[\w-]+\.[\w.]+/); if(em) r.email=em[0].toLowerCase().replace(/[.,]$/,'');
+  const temZap=/whats|\bzap\b/.test(t)||!!r.zap, temMail=/e-?mail|arroba|@/.test(t); if(temZap&&temMail) r.envio='ambos'; else if(temZap) r.envio='zap'; else if(temMail) r.envio='email';
+  const pv=bruto.match(/\b(?:trouxe|exames?\s+anterior(?:es)?|us\s+anterior|ultrassom\s+anterior)\b[\s,:]*(.+)$/i); if(pv&&pv[1].trim().length>5) r.prevTxt=pv[1].trim().replace(/[.\s]+$/,'');
+  else if(/\b(sem|nao\s+(trouxe|tem))\s+(\w+\s+){0,2}exames?/.test(t)) r.prevNao=true;
+  return r;
+}
 // ---------- tipos do ditado ----------
 Object.assign(DITADO_TIPOS,{
+  paciente:{laudo:true,parse:ditadoPaciente,ex:'Maria Aparecida de Souza Lima, nascida em 12 de março de 1972, feminino, Instituto, WhatsApp 65 99912-3456; trouxe US de tireoide de 03/25 com nódulo no lobo direito de 1,2 cm'},
   tireoide:{laudo:true,parse:ditadoLaudoTireoide,ex:'rotina, nega história familiar, tireoide assimétrica, dimensões habituais, homogênea; lobo direito 4,7 por 1,8 por 2,0; lobo esquerdo 4,6 por 1,6 por 1,9; istmo 0,3'},
   cervical:{laudo:true,parse:ditadoLaudoCervical,ex:'vigilância oncológica, tireoidectomia por câncer, levotiroxina 112, glândulas salivares normais'},
   mamas:{laudo:true,parse:ditadoLaudoMamas,ex:'rotina, pós-menopausa, trouxe mamografia BI-RADS 2 de 06/26, mamas heterogêneas com predomínio fibroglandular, axilas normais'},
@@ -469,7 +512,7 @@ const ditSel=a=>'[#'.includes(a[0])?a:`[data-${a}]`;
 // mexeu à mão num campo ditado: some o tracejado dele
 if(typeof document!=='undefined') ['click','input'].forEach(ev=>document.addEventListener(ev,e=>{ const A=DITADO_ATUAL; if(!A||!A.item.dict) return;
   Object.entries(A.attrs).forEach(([k,a])=>{ if(e.target.closest&&e.target.closest(ditSel(a))) A.item.dict.delete(k); }); },true));
-function ditSet(o,path,v){ const ks=path.split('.'); let x=o; for(let i=0;i<ks.length-1;i++){ if(x[ks[i]]==null) return; x=x[ks[i]]; } x[ks[ks.length-1]]=Array.isArray(v)?v.slice():v instanceof Set?new Set(v):v; }
+var ditSet=function(o,path,v){ const ks=path.split('.'); let x=o; for(let i=0;i<ks.length-1;i++){ if(x[ks[i]]==null) return; x=x[ks[i]]; } x[ks[ks.length-1]]=Array.isArray(v)?v.slice():v instanceof Set?new Set(v):v; };
 // item: guarda fala e tracejados; alvo: onde os valores entram (o próprio item, ou o estado do exame)
 function ditadoLigar(item,tipo,attrs,rerender,avisar,alvo){
   const T=DITADO_TIPOS[tipo], btn=document.getElementById('micBtn'), box=document.getElementById('falaTxt'); if(!btn||!box) return;

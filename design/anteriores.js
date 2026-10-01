@@ -8,7 +8,8 @@ const ANT_PDFW='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker
 let antSeq=1, antTessP=null, antPdfP=null;
 
 // ---------- configuração da ponte (fica só neste aparelho) ----------
-const antCfg={ get(){ try{ return JSON.parse(localStorage.getItem('mylaudo.ponte')||'null')||{}; }catch(e){ return {}; } },
+const ANT_PONTE_PADRAO='https://wandering-firefly-afd6.drluiz-pericias.workers.dev';   // o endereço é público; só a senha protege
+const antCfg={ get(){ let c={}; try{ c=JSON.parse(localStorage.getItem('mylaudo.ponte')||'null')||{}; }catch(e){} if(!c.url) c.url=ANT_PONTE_PADRAO; return c; },
   set(v){ try{ localStorage.setItem('mylaudo.ponte',JSON.stringify(v)); }catch(e){} } };
 
 // ---------- leitura ----------
@@ -92,18 +93,18 @@ function anterioresCard(prev,exemploTxt){
   const esc2=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   if(prev.tem!=='sim') return `<div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
     <div class="k">Trouxe</div><div class="segm"><button type="button" data-prev="nao" aria-pressed="true">não</button><button type="button" data-prev="sim" aria-pressed="false">sim</button></div></div></div>`;
-  const precisaCfg=(prev.arqs.length||prev.manuais.length)&&!ligada||prev.cfgAberta;
+  const precisaCfg=!prev.semIA&&((prev.arqs.length||prev.manuais.length)&&!ligada||prev.cfgAberta);
   return `<div class="card"><div class="lbl">Exames anteriores <button type="button" class="act" data-prev="nao" aria-label="Não trouxe">${ANT_I.x}</button></div><div class="form dir">
     <button type="button" class="antcam" id="antCam">${ANT_I.cam}escanear ou PDF</button>
     <input type="file" id="antArq" accept="image/*,application/pdf" multiple hidden>
     ${prev.arqs.length?`<div class="antarqs">${prev.arqs.map(a=>`<div class="antarq"><span class="n">${esc2(a.nome)}</span><span class="s ${a.status==='pronto'?'ok':a.status==='erro'?'erro':''}">${esc2(a.status==='pronto'?'lido':a.msg||a.status)}</span><button type="button" data-antdel="${a.id}" aria-label="Tirar">${ANT_I.x}</button></div>`).join('')}</div>`:''}
     ${prev.organizando?'<div class="antst">Organizando por lobo e terço…</div>':prev.erroIA?`<div class="antst erro">${esc2(prev.erroIA)}</div>`:''}
     ${precisaCfg?`<div class="antcfg"><div class="h">Ligar a IA neste aparelho (uma vez só)</div>
-      <input id="antUrl" placeholder="endereço da ponte (https://…workers.dev)" value="${esc2(cfg.url||'')}" autocomplete="off" autocapitalize="off">
       <input id="antSenha" placeholder="senha da ponte" value="${esc2(cfg.senha||'')}" autocomplete="off" autocapitalize="off">
+      ${prev.cfgAberta?`<input id="antUrl" placeholder="endereço da ponte" value="${esc2(cfg.url||'')}" autocomplete="off" autocapitalize="off">`:''}
       <button type="button" id="antSalvar">Salvar</button></div>`:''}
     <textarea class="obs" id="prevTxt" rows="${prev.txtDaIA?Math.min(18,String(prev.txt||'').split('\n').length+3):3}" placeholder="${esc2(exemploTxt)}">${esc2(prev.txt||'')}</textarea>
-    ${ligada&&!prev.cfgAberta?'<button type="button" class="antlink" id="antCfg">ajustar ponte da IA</button>':''}
+    ${ligada&&!prev.cfgAberta&&!prev.semIA?'<button type="button" class="antlink" id="antCfg">ajustar ponte da IA</button>':''}
   </div></div>`;
 }
 // liga o cartão; exame = 'tireoide'...; nome = nome do paciente (para apagar se aparecer)
@@ -119,7 +120,7 @@ function anterioresLigar(prev,exame,nome,rerender,avisar){
     if(!v){ prev.manuais=[]; prev.txtDaIA=false; return; }
     if(ditado){ prev.manuais.push(novo||v); auto(); } else if(!prev.txtDaIA){ prev.manuais=[v]; auto(); } });
   document.querySelectorAll('#phone [data-antdel]').forEach(b=>b.onclick=()=>{ prev.arqs=prev.arqs.filter(a=>a.id!==+b.dataset.antdel); rerender(); });
-  const sv=$i('antSalvar'); if(sv) sv.onclick=()=>{ const url=$i('antUrl').value.trim().replace(/\/$/,''), senha=$i('antSenha').value.trim(); if(!/^https:\/\//.test(url)||!senha){ avisar('Preencha o endereço (https://…) e a senha'); return; } antCfg.set({url,senha}); prev.cfgAberta=false; avisar('IA ligada neste aparelho'); rerender(); auto(); };
+  const sv=$i('antSalvar'); if(sv) sv.onclick=()=>{ const url=($i('antUrl')?$i('antUrl').value.trim():antCfg.get().url).replace(/\/$/,''), senha=$i('antSenha').value.trim(); if(!/^https:\/\//.test(url)||!senha){ avisar('Preencha o endereço (https://…) e a senha'); return; } antCfg.set({url,senha}); prev.cfgAberta=false; avisar('IA ligada neste aparelho'); rerender(); auto(); };
   const cf=$i('antCfg'); if(cf) cf.onclick=()=>{ prev.cfgAberta=true; rerender(); };
 }
 async function antAdicionar(prev,file,nome,rerender,depois){
@@ -133,6 +134,7 @@ async function antAdicionar(prev,file,nome,rerender,depois){
 }
 // organiza quando tudo terminou de ler e a ponte está ligada
 function antAuto(prev,exame,rerender,avisar){
+  if(prev.semIA||!exame){ rerender(); return; }
   const cfg=antCfg.get(); if(!(cfg.url&&cfg.senha)) { rerender(); return; }
   if(prev.organizando){ prev.pendente=true; return; }
   if(prev.arqs.some(a=>a.status!=='pronto'&&a.status!=='erro')) return;
@@ -152,6 +154,10 @@ async function antOrganizar(prev,exame,rerender,avisar){
   prev.organizando=false; rerender();
   if(prev.pendente){ prev.pendente=false; antOrganizar(prev,exame,rerender,avisar); }
 }
+// cadastro → exame: o texto bruto dos exames anteriores (ditado ou lido do papel) vai junto com o paciente
+function anterioresTextos(prev){ return (prev.arqs||[]).filter(x=>x.status==='pronto').map(x=>x.texto).concat(prev.manuais||[]); }
+function anterioresDoPaciente(prev){ try{ const p=JSON.parse(localStorage.getItem('mylaudo.pac')||'null'); if(!p||!p.prev||!p.prev.length) return false;
+  prev.tem='sim'; prev.manuais=p.prev.slice(); prev.txt=p.prev.join('\n\n'); prev.txtDaIA=false; return true; }catch(e){ return false; } }
 // ---------- evolução: lê a lista dos exames anteriores e compara com as lesões de hoje ----------
 // Linhas de lesão: "N1 TM LD TIRADS 4: 9 × 6 × 7 mm", "N1 MD QSL 10h BIRADS 3: 12 × 8 × 9 mm", "LN1 III D: 12 × 8 × 9 mm, suspeito",
 // "M1 intramural posterior FIGO 4: 21 × 18 × 20 mm", "L1 ovário D O-RADS 2: 35 × 30 × 28 mm". Linhas de campo: "Volume: 17,6 cm³", "Próstata: 45 × 38 × 40 mm, 37 g", "Resíduo: 60 mL".

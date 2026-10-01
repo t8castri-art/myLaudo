@@ -37,7 +37,7 @@ Se esquecer o pull e der conflito, não force nada: pare e resolva arquivo por a
 design/               fontes das telas (é aqui que se edita)
   ditado.js           ditado por item: fala → chips e medidas (vai junto para o site)
   mylaudo.html        início: serviço, + novo paciente, lista de exames  → vira site/index.html
-  novo-paciente.html  cadastro com botão duplo ditado/scanner
+  novo-paciente.html  cadastro: microfone flutuante (ditado real) e exames anteriores com scanner
   emitir-laudo-*.html tireoide, mamas, transvaginal, cervical, prostata
   laboratorio-*.html  laboratórios de cor/layout e do ícone
   modelos.js          31 rascunhos de modelos (sintaxe {a|b|c} = chips, ___ = lacuna)
@@ -99,6 +99,11 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 - **Cervical e salivares**: cartão **Sugestão** com as mesmas quatro opções da tireoide (PAAF "de LN1, com tireoglobulina no lavado" · seguimento semestral · anual · TC/RM); sem chip marcado, se houver sialoadenite/sialolitíase sai "Avaliação com cirurgia de cabeça e pescoço." Leito tireoidiano, linfonodos por nível I–VII, salivares (todas normais = "Glândulas salivares sem alterações detectáveis."), PAAF com tireoglobulina no lavado quando há linfonodo.
 - **Próstata via abdominal**: ordem bexiga (volume inicial) → parede → JUV → próstata → vesículas seminais → protrusão → **pós-miccional** (sempre ≥ 1; cada um mede bexiga e próstata de novo; repete se sobrar volume; não existe "bexiga vazia"). HPB > 30 g (discreto ≤ 50, moderado ≤ 80, acentuado > 80). IPP I < 5, II 5–10, III > 10 mm. Resíduo significativo > 50 mL (último).
 
+## Cadastro (Novo paciente, refeito em 01/10)
+- Mesmo padrão dos exames: microfone flutuante dita tudo de uma vez (nome, nascimento, sexo, serviço, WhatsApp, e-mail, envio, e "trouxe …" para exames anteriores). Entende "nascida em doze de março de setenta e dois", "mil novecentos e oitenta e três", "arroba"/"ponto" no e-mail. O que veio do ditado fica tracejado.
+- Cartão de exames anteriores com scanner/PDF e caixa, **sem IA no cadastro**: o texto cru (já sem identificação) vai no `mylaudo.pac.prev` e, ao abrir o exame, a tela do exame organiza com a instrução daquele exame. Nada do cadastro sai do aparelho.
+- Saiu o botão duplo ditado/scanner do topo e todo o protótipo simulado.
+
 ## Exames anteriores (nas 5 telas, desde 01/10)
 - Cartão: `Trouxe não | sim`. Com "sim", somem o "Trouxe" e o não/sim (um ✕ discreto no título desfaz). Fica só o botão **escanear ou PDF** (várias fotos e PDFs), a lista dos arquivos e a caixa de texto (clicável, com "transcrever"). Sem botão "digitar", sem campo de data (cada exame traz a sua).
 - **Não há botão "organizar"**: agrupar por lobo e terço é a instrução da IA. Terminou de ler os arquivos, ou terminou de transcrever/ditar na caixa, vai sozinho para a IA e volta agrupado. Correção à mão no resumo não é reenviada.
@@ -111,7 +116,7 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
   - Próstata: `Próstata: 45 × 38 × 40 mm, 37 g`, `Resíduo: 60 mL`, `PSA 02/25: 4,2 ng/mL`. Evolução: "próstata 37 → 48 g (+30%) em 14 meses; resíduo 60 → 20 mL."
   - Medidas em mm; rótulo que o laudo usou.
 - No laudo sai **"Exames anteriores:"** com essa lista e, no fim, **"Evolução:"**, a mini conclusão, **calculada pelo app** (não pela IA) comparando os nódulos de hoje com o **mesmo rótulo e lobo** nos anteriores. O mais suspeito vem primeiro. Até 2 mm na maior medida = estável; +4 mm em até 6 meses = crescimento rápido; ACR (≥ 20% em 2 medidas e ≥ 2 mm, ou ≥ 50% no volume) = crescimento significativo. Nas mamas: aumento ≥ 20% na maior medida (e ≥ 2 mm) = crescimento, destacando quando em até 6 meses; comparação por rótulo e mama. Lembra a última PAAF (Bethesda). Nódulo de hoje sem rótulo correspondente: "sem correspondente nos exames anteriores". Quem liga os rótulos entre exames é o médico.
-- Endereço e senha da ponte ficam guardados só no aparelho.
+- O **endereço da ponte está embutido no app** (`ANT_PONTE_PADRAO` em `anteriores.js`; é público, e só a senha protege). Em cada aparelho novo (iPhone, Mac, PC) digita-se **só a senha**, uma vez, quando o primeiro exame anterior é lido.
 - A ponte responde a um GET com a versão (`versao`), para conferir qual código está no ar.
 - Ditado: tocar de novo no microfone **continua** de onde parou; "Apagar e recomeçar" limpa. O ditado do exame pega também o **nome** ("paciente Fulano de Tal") e o **texto do exame anterior** ("exame anterior de 06/25 mostrava ...").
 
