@@ -7,7 +7,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
-const VERSAO = '2026-09-30c';
+const VERSAO = '2026-10-01a';
 
 const INSTRUCOES = {
   tireoide: `Você recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
@@ -62,6 +62,68 @@ Regras:
 - Nunca escreva valores de referência. Laudo enxuto.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
 - Sem markdown, sem título, sem comentários.`,
+  cervical: `Você recebe o texto de exames anteriores da região cervical (ultrassom cervical, de linfonodos ou do leito tireoidiano, PAAF, TC ou RM, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
+
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada além dele:
+
+US 03/25:
+LN1 III D: 12 × 8 × 9 mm, suspeito
+LN2 II E: 8 × 4 × 5 mm, reacional
+LT1 leito D: 6 × 4 × 5 mm
+
+PAAF 04/25:
+LN1 III D: 12 × 8 × 9 mm, Bethesda VI, Tg no lavado 250
+
+Regras:
+- Cabeçalho: "US mm/aa:", "PAAF mm/aa:", "TC mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames.
+- Linfonodo: "LN" e número, nível (I a VII), lado (D ou E), dois-pontos, medidas em mm, e depois ", suspeito" ou ", reacional" conforme o laudo disser. Sem rótulo, numere na ordem.
+- Lesão do leito tireoidiano: "LT" e número, "leito D", "leito E" ou "leito istmo", dois-pontos, medidas.
+- Nódulo de glândula salivar: "LS" e número, a glândula (parótida D, parótida E, submandibular D, submandibular E), dois-pontos, medidas.
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- PAAF: o alvo e, na mesma linha, ", Bethesda" em romanos e, se houver, ", Tg no lavado" com o valor.
+- Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
+- Achado relevante fora de lesão (tireoidectomia, esvaziamento cervical, sialoadenite, sialolitíase): uma linha "Outros: ..." no fim do exame.
+- Nunca escreva valores de referência. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem título, sem comentários.`,
+  transvaginal: `Você recebe o texto de exames anteriores de ultrassom pélvico ou transvaginal (ou RM da pelve), de colegas diferentes, ou ditados pelo próprio médico. A identificação do paciente foi removida.
+
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada além dele:
+
+US 03/25:
+M1 intramural posterior FIGO 4: 21 × 18 × 20 mm
+L1 ovário D O-RADS 2: 35 × 30 × 28 mm, cisto simples
+Útero: 59 × 34 × 50 mm
+Endométrio: 8 mm
+
+Regras:
+- Cabeçalho: "US mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames.
+- Mioma: "M" e número, tipo (submucoso, intramural, subseroso, pediculado), parede (anterior, posterior, fundo, lateral D, lateral E), "FIGO" e o número se o laudo trouxer, dois-pontos, medidas.
+- Lesão anexial: "L" e número, "ovário D", "ovário E" ou "anexo D/E", "O-RADS" e o número se o laudo trouxer, dois-pontos, medidas, e depois uma descrição de até 4 palavras (cisto simples, hemorrágico, endometrioma, dermoide, sólido...).
+- Depois das lesões, "Útero:" com as três medidas e "Endométrio:" com a espessura em mm, se o laudo trouxer.
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
+- Achado relevante fora de lesão (DIU, adenomiose, líquido livre, histerectomia): uma linha "Outros: ..." no fim do exame.
+- Nunca escreva valores de referência. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem título, sem comentários.`,
+  prostata: `Você recebe o texto de exames anteriores de próstata (ultrassom abdominal ou transretal, PSA, RM, biópsia), de colegas diferentes, ou ditados pelo próprio médico. A identificação do paciente foi removida.
+
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada além dele:
+
+US 03/25:
+Próstata: 45 × 38 × 40 mm, 37 g
+Resíduo: 60 mL
+PSA 02/25: 4,2 ng/mL
+
+Regras:
+- Cabeçalho: "US mm/aa:", "RM mm/aa:" ou "BX mm/aa:" (biópsia) ("sem data" se faltar). Uma linha em branco entre exames. PSA isolado vira uma linha "PSA mm/aa: valor ng/mL" dentro do exame mais próximo ou sozinho.
+- "Próstata:" com as três medidas em mm e, depois da vírgula, o peso ou volume em g (se o laudo só trouxer mL ou cm³, use o mesmo número em g).
+- "Resíduo:" com o resíduo pós-miccional em mL, se o laudo trouxer.
+- Biópsia: "Gleason" ou "ISUP" com o resultado em uma linha.
+- Medidas sempre em mm, separadas por " × ", vírgula decimal.
+- Não compare, não conclua, não recomende.
+- Achado relevante (protrusão intravesical, cálculo vesical, hidronefrose, lesão focal): uma linha "Outros: ..." no fim do exame.
+- Nunca escreva valores de referência. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem título, sem comentários.`,
 };
 
 function cors(origem) {
@@ -87,7 +149,7 @@ export default {
     try { corpo = await request.json(); } catch { return resp({ erro: 'JSON inválido' }, 400, origem); }
     if (!env.SENHA || corpo.senha !== env.SENHA) return resp({ erro: 'senha incorreta' }, 401, origem);
 
-    const exame = corpo.exame in INSTRUCOES ? corpo.exame : 'tireoide';
+    const exame = Object.prototype.hasOwnProperty.call(INSTRUCOES, corpo.exame) ? corpo.exame : 'tireoide';
     const textos = Array.isArray(corpo.textos) ? corpo.textos.filter(t => t && typeof t.texto === 'string' && t.texto.trim()) : [];
     if (!textos.length) return resp({ erro: 'nenhum texto' }, 400, origem);
     const total = textos.reduce((s, t) => s + t.texto.length, 0);

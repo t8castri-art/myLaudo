@@ -153,28 +153,37 @@ async function antOrganizar(prev,exame,rerender,avisar){
   if(prev.pendente){ prev.pendente=false; antOrganizar(prev,exame,rerender,avisar); }
 }
 // ---------- evolução: lê a lista dos exames anteriores e compara com as lesões de hoje ----------
-// Linhas: "US 06/24:" e "N1 TM LD TIRADS 4: 9 × 6 × 7 mm" (tireoide) ou "N1 MD QSL 10h BIRADS 3: 12 × 8 × 9 mm" (mama)
+// Linhas de lesão: "N1 TM LD TIRADS 4: 9 × 6 × 7 mm", "N1 MD QSL 10h BIRADS 3: 12 × 8 × 9 mm", "LN1 III D: 12 × 8 × 9 mm, suspeito",
+// "M1 intramural posterior FIGO 4: 21 × 18 × 20 mm", "L1 ovário D O-RADS 2: 35 × 30 × 28 mm". Linhas de campo: "Volume: 17,6 cm³", "Próstata: 45 × 38 × 40 mm, 37 g", "Resíduo: 60 mL".
 const ANT_RANK={'0':0,'1':1,'2':2,'3':3,'4':4,'4A':4,'4B':5,'4C':6,'5':7,'6':8};
 function antLer(txt){
   const exames=[]; let ex=null;
   antConserta(txt).split(/\r?\n/).forEach(l0=>{ const l=l0.trim(); if(!l) return;
-    let m=l.match(/^(US|PAAF|CORE|MMG|RM)\s+(?:de\s+)?(?:(\d{1,2})\s*\/\s*(\d{2,4})|sem\s+data)\s*:?\s*(.*)$/i);
-    if(m){ ex={tipo:m[1].toUpperCase(),data:m[2]?String(m[2]).padStart(2,'0')+'/'+String(m[3]).slice(-2):null,nota:m[4]||'',nods:[]}; exames.push(ex); return; }
+    let m=l.match(/^(US|PAAF|CORE|MMG|RM|TC)\s+(?:de\s+)?(?:(\d{1,2})\s*\/\s*(\d{2,4})|sem\s+data)\s*:?\s*(.*)$/i);
+    if(m){ ex={tipo:m[1].toUpperCase(),data:m[2]?String(m[2]).padStart(2,'0')+'/'+String(m[3]).slice(-2):null,nota:m[4]||'',nods:[],campos:{}}; exames.push(ex); return; }
     if(!ex) return;
-    m=l.match(/^([NC]\d+)\s+(.*?)\s*(TI|BI)-?RADS\s*([0-6][ABC]?|NI|não informado)?\s*:\s*([\d.,]+(?:\s*[×x*]\s*[\d.,]+){0,2})\s*(mm|cm)?(.*)$/i);
-    if(!m) return;
-    const loc=m[2].toUpperCase(), un=(m[6]||'mm').toLowerCase(), resto=m[7]||'';
-    const lado=/\b(LD|MD)\b/.test(loc)?'D':/\b(LE|ME)\b/.test(loc)?'E':/ISTMO/.test(loc)?'I':null;
-    const cat=/^[0-6][ABC]?$/i.test(m[4]||'')?m[4].toUpperCase():null;
-    const beth=resto.match(/bethesda\s*([IVX]+)/i), hist=resto.match(/(histologia|citologia)\s*:\s*([^.;]+)/i);
-    ex.nods.push({rot:m[1].toUpperCase(),lado,loc:m[2].trim(),escala:m[3].toUpperCase(),cat,rank:cat!=null?ANT_RANK[cat]:null,
-      med:m[5].split(/\s*[×x*]\s*/).map(v=>parseFloat(v.replace(',','.'))*(un==='cm'?10:1)),bethesda:beth?beth[1].toUpperCase():null,hist:hist?hist[2].trim():null});
+    m=l.match(/^([A-Z]{1,2}\d+)\s+([^:]*?)\s*:\s*([\d.,]+(?:\s*[×x*]\s*[\d.,]+){0,2})\s*(mm|cm)?\b(.*)$/i);
+    if(m){
+      const loc=m[2].trim(), LOC=loc.toUpperCase(), un=(m[4]||'mm').toLowerCase(), resto=m[5]||'';
+      const lado=/\b(LD|MD)\b|DIREIT/.test(LOC)?'D':/\b(LE|ME)\b|ESQUERD/.test(LOC)?'E':/ISTMO/.test(LOC)?'I':/(^|\s)D(\s|$)/.test(LOC)?'D':/(^|\s)E(\s|$)/.test(LOC)?'E':null;
+      const rads=LOC.match(/(TI|BI|O)-?RADS\s*([0-6][ABC]?|NI)/); const cat=rads&&/^[0-6]/.test(rads[2])?rads[2]:null;
+      let rank=cat!=null?(rads[1]==='O'?+cat[0]:ANT_RANK[cat]):null;
+      if(rank==null) rank=/suspeit|atipic/i.test(resto)&&!/sem\s+(crit|susp)|n[aã]o\s+susp/i.test(resto)?1:0;
+      const beth=resto.match(/bethesda\s*([IVX]+)/i), hist=resto.match(/(histologia|citologia)\s*:\s*([^.;]+)/i), figo=LOC.match(/FIGO\s*(\d)/);
+      ex.nods.push({rot:m[1].toUpperCase(),lado,loc,escala:rads?rads[1]:null,cat,rank,figo:figo?+figo[1]:null,
+        med:m[3].split(/\s*[×x*]\s*/).map(v=>parseFloat(v.replace(',','.'))*(un==='cm'?10:1)),bethesda:beth?beth[1].toUpperCase():null,hist:hist?hist[2].trim():null});
+      return;
+    }
+    m=l.match(/^([A-Za-zÀ-ÿ³ ]+?)(?:\s+\d{1,2}\/\d{2,4})?\s*:\s*(.+)$/);
+    if(m){ const k=m[1].trim().toLowerCase(), v=m[2].trim(); const u=ex.nods[ex.nods.length-1];
+      if(u&&(k==='citologia'||k==='histologia')){ const b=v.match(/bethesda\s*([IVX]+)/i); if(b) u.bethesda=b[1].toUpperCase(); else u.hist=v; }
+      else ex.campos[k]=v; }
   });
   return exames;
 }
 const antMeses=(d,hoje)=>{ if(!d) return null; const [mm,aa]=d.split('/').map(Number); return (hoje.getFullYear()-(2000+aa))*12+(hoje.getMonth()+1-mm); };
 const antCm=mm=>(mm/10).toFixed(1).replace('.',',');
-// atuais: [{rot:'N1', lado:'D', tag:'TI-RADS 5', rank:7, med:[mm,mm,mm], nome:'N1 MD'}]; exame: 'tireoide' | 'mamas'
+// atuais: [{rot:'N1', lado:'D', nome:'N1 MD', tag:'TI-RADS 5', rank:7, med:[mm,mm,mm]}]; exame: tireoide | mamas | cervical | transvaginal
 function antEvolucao(txt,atuais,hoje,exame){
   hoje=hoje||new Date(); exame=exame||'tireoide'; const exames=antLer(txt); if(!exames.length||!atuais.length) return '';
   const frases=[], estaveis=[], sem=[];
@@ -184,22 +193,34 @@ function antEvolucao(txt,atuais,hoje,exame){
     const proc=hist.filter(h=>h.bethesda||h.hist).pop();
     const ant=hist.filter(h=>h.med&&h.med.filter(isFinite).length).pop();
     const agora=n.med.filter(isFinite), nome=n.nome||n.rot;
-    if(!ant||!agora.length){ if(!hist.length) sem.push(nome); return; }
+    const destaque=i===0&&ordem.length>1&&(n.rank||0)>0?'o mais suspeito':'';
+    const quem=nome+((n.tag||destaque)?` (${[n.tag,destaque].filter(Boolean).join(', ')})`:'');
+    if(!ant||!agora.length){ if(!hist.length) sem.push(quem); return; }
     const maxA=Math.max(...ant.med), maxN=Math.max(...agora), d=Math.round((maxN-maxA)*10)/10, meses=antMeses(ant.data,hoje);
     const rel=maxA?(maxN-maxA)/maxA:0;
     let volP=null; if(ant.med.length===3&&agora.length===3) volP=Math.round((agora.reduce((x,y)=>x*y,1)/ant.med.reduce((x,y)=>x*y,1)-1)*100);
     let signif, rapido=false, rotulo;
-    if(exame==='mamas'){ signif=rel>=0.2&&d>=2; rotulo=signif?(meses!=null&&meses<=6?', aumento ≥ 20% na maior medida em até 6 meses':', aumento ≥ 20% na maior medida'):''; }
-    else { let dims=0; if(ant.med.length===agora.length) agora.forEach((v,k)=>{ if(v-ant.med[k]>=2&&v>=ant.med[k]*1.2) dims++; });
+    if(exame==='tireoide'){ let dims=0; if(ant.med.length===agora.length) agora.forEach((v,k)=>{ if(v-ant.med[k]>=2&&v>=ant.med[k]*1.2) dims++; });
       signif=dims>=2||(volP!=null&&volP>=50); rapido=d>=4&&meses!=null&&meses<=6; rotulo=rapido?', crescimento rápido':signif&&d>0?', crescimento significativo pelo ACR':''; }
-    const quem=`${nome}${n.tag?` (${n.tag}${i===0&&ordem.length>1?', o mais suspeito':''})`:''}`;
+    else { signif=rel>=0.2&&d>=2; rotulo=signif?(meses!=null&&meses<=6?', aumento ≥ 20% na maior medida em até 6 meses':', aumento ≥ 20% na maior medida'):''; }
     const prazo=meses!=null?` em ${meses} ${meses===1?'mês':'meses'}`:'';
     const pf=proc?`; ${proc.tipo} em ${proc.data||'data não informada'}: ${proc.bethesda?'Bethesda '+proc.bethesda:proc.hist}`:'';
     if(Math.abs(d)<=2&&!signif){ if(i===0||pf) frases.push(`${quem}: estável (${antCm(maxA)} → ${antCm(maxN)} cm${prazo})${pf}.`); else estaveis.push(nome); return; }
-    frases.push(`${quem}: ${d<-2?'redução':'aumento'} de ${antCm(maxA)} para ${antCm(maxN)} cm (${d>0?'+':''}${String(d).replace('.',',')} mm${volP!=null&&exame!=='mamas'?`, volume ${volP>0?'+':''}${volP}%`:''})${prazo}${rotulo}${pf}.`);
+    frases.push(`${quem}: ${d<-2?'redução':'aumento'} de ${antCm(maxA)} para ${antCm(maxN)} cm (${d>0?'+':''}${String(d).replace('.',',')} mm${volP!=null&&exame==='tireoide'?`, volume ${volP>0?'+':''}${volP}%`:''})${prazo}${rotulo}${pf}.`);
   });
   if(estaveis.length) frases.push(`${estaveis.join(', ')}: ${estaveis.length>1?'estáveis':'estável'}.`);
   if(sem.length) frases.push(`${sem.join(', ')}: sem correspondente nos exames anteriores.`);
   return frases.length?'Evolução: '+frases.join(' '):'';
 }
-if(typeof module!=='undefined') module.exports={antLimpar,antLer,antEvolucao};
+// próstata: compara peso e resíduo com o último US anterior que os trouxe
+function antEvolucaoProstata(txt,hojeV,hoje){
+  hoje=hoje||new Date(); const exames=antLer(txt).filter(e=>e.tipo==='US'); const f=[];
+  const num=s=>{ const m=String(s||'').match(/(\d+(?:[.,]\d+)?)/); return m?parseFloat(m[1].replace(',','.')):NaN; };
+  const ultimo=k=>exames.slice().reverse().find(e=>e.campos[k]!=null);
+  const ep=ultimo('próstata'), er=ultimo('resíduo');
+  if(ep&&isFinite(hojeV.peso)){ const g=num((ep.campos['próstata'].match(/(\d+(?:[.,]\d+)?)\s*g\b/)||[])[1]); if(isFinite(g)){ const m=antMeses(ep.data,hoje), p=Math.round((hojeV.peso/g-1)*100);
+    f.push(`próstata ${Math.round(g)} → ${Math.round(hojeV.peso)} g (${p>0?'+':''}${p}%)${m!=null?` em ${m} ${m===1?'mês':'meses'}`:''}`); } }
+  if(er&&isFinite(hojeV.residuo)){ const r=num(er.campos['resíduo']); if(isFinite(r)) f.push(`resíduo ${Math.round(r)} → ${Math.round(hojeV.residuo)} mL`); }
+  return f.length?'Evolução: '+f.join('; ')+'.':'';
+}
+if(typeof module!=='undefined') module.exports={antLimpar,antLer,antEvolucao,antEvolucaoProstata};

@@ -2,6 +2,19 @@
 // A voz vira texto no iPhone; este arquivo reparte o texto nos campos. Nada vai para IA.
 // Ordem esperada da fala: localização + características + medidas em cm por último.
 
+// ---------- erros de código aparecem na tela, para dar para mandar o print ----------
+function ditAviso(m){ if(typeof window==='undefined') return; if(typeof window.toast==='function'){ try{ window.toast(m); return; }catch(e){} }
+  let t=document.getElementById('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.className='toast'; document.body.appendChild(t); } t.textContent=m; t.classList.add('on'); clearTimeout(t._tt); t._tt=setTimeout(()=>t.classList.remove('on'),4000); }
+if(typeof window!=='undefined'){
+  window.addEventListener('error',e=>{ ditAviso('Erro no app: '+(e.message||e.error||'?')); });
+  window.addEventListener('unhandledrejection',e=>{ ditAviso('Erro no app: '+(e.reason&&e.reason.message||e.reason||'?')); });
+}
+// Na tela de início do iPhone (app web) o reconhecimento de voz do Safari não existe (limitação da Apple).
+// Aí o microfone do app abre a caixa e o ditado é feito pelo microfone do teclado.
+const DIT_STANDALONE=typeof navigator!=='undefined'&&(navigator.standalone===true||(typeof matchMedia==='function'&&matchMedia('(display-mode: standalone)').matches));
+function ditSR(){ if(DIT_STANDALONE) return null; return (typeof window!=='undefined')&&(window.SpeechRecognition||window.webkitSpeechRecognition)||null; }
+const DIT_TECLADO='Use o microfone do teclado: toque nele, fale, e depois toque em Concluir.';
+
 // ---------- texto falado → texto com números ----------
 const DITADO_NUM={zero:0,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,catorze:14,quinze:15,dezesseis:16,dezasseis:16,dezessete:17,dezoito:18,dezenove:19,vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90};
 // o iPhone cola as frases ditadas sem ponto ("PeçanhaExame") e gruda número em palavra ("mediu06")
@@ -147,6 +160,7 @@ const DITADO_CSS=`
 .fala::placeholder{color:var(--tx3)}
 .dit-falta{font-size:11.5px;color:var(--tx3);margin-top:8px;line-height:1.45}
 .dit-falta b{color:var(--alert);font-weight:500}
+.dit-tecl{color:var(--acT)}
 .dit-on{outline:1px dashed var(--ac);outline-offset:2px}
 @media (max-width:600px){.fala{font-size:16px}}
 /* mão esquerda: microfone fixo no canto inferior esquerdo, texto num painel acima dele */
@@ -442,7 +456,7 @@ function ditadoCard(item,tipo){
   if(flut){ document.body.classList.add('dit-flut');
     return `<div class="ditpan" id="ditPan"${item.painel?'':' hidden'}><div class="lbl">${T.laudo?'Ditado do exame':'Ditado do item'} <span class="act">fale tudo de uma vez</span></div>
       <textarea class="fala" id="falaTxt" rows="3" placeholder="ex.: ${ditEsc(T.ex)}">${ditEsc(item.fala||'')}</textarea>
-      ${aviso?`<div class="dit-falta">${aviso}</div>`:''}<div class="ditbts"><button type="button" class="ditok" id="ditFechar">Concluir</button><button type="button" class="ditok ditapaga" id="ditApagar">Deletar</button></div></div>
+      ${aviso?`<div class="dit-falta">${aviso}</div>`:''}${ditSR()?'':`<div class="dit-falta dit-tecl">${DIT_TECLADO}</div>`}<div class="ditbts"><button type="button" class="ditok" id="ditFechar">Concluir</button><button type="button" class="ditok ditapaga" id="ditApagar">Deletar</button></div></div>
       <div class="ditfab"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>${item.fala&&!item.painel?'<button type="button" class="ditver" id="ditAbrir">ver ditado</button>':''}</div>`; }
   return `<div class="card"><div class="lbl">${T.laudo?'Ditado do exame':'Ditado'} <span class="act">fale tudo de uma vez</span></div>
     <div class="dit"><button type="button" class="mic" id="micBtn" aria-label="Gravar ditado">${DITADO_MIC}</button>
@@ -473,15 +487,16 @@ function ditadoLigar(item,tipo,attrs,rerender,avisar,alvo){
   box.addEventListener('change',()=>{ item.fala=box.value.trim(); aplicar(); });
   btn.addEventListener('click',()=>{
     if(DITADO_REC){ DITADO_REC.stop(); return; }
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    const SR=ditSR();
     if(pan) pan.hidden=false;
-    if(!SR){ box.focus(); avisar('Toque no microfone do teclado para ditar'); return; }
+    const teclado=()=>{ item.painel=true; if(pan){ pan.hidden=false; if(!pan.querySelector('.dit-tecl')){ const h=document.createElement('div'); h.className='dit-falta dit-tecl'; h.textContent=DIT_TECLADO; pan.insertBefore(h,pan.querySelector('.ditbts')); } } box.focus(); try{ box.setSelectionRange(box.value.length,box.value.length); }catch(e){} avisar(DIT_TECLADO); };
+    if(!SR){ teclado(); return; }
     const rec=new SR(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
     const base=box.value.trim();
     rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; s=s.replace(/\s+/g,' ').trim(); box.value=base&&s?base+' '+s:(base||s); };
-    rec.onerror=e=>{ avisar(e.error==='not-allowed'||e.error==='service-not-allowed'?'Microfone bloqueado aqui. Use o microfone do teclado.':e.error==='no-speech'?'Não ouvi nada. Toque de novo e fale.':'Ditado falhou ('+e.error+'). Use o microfone do teclado.'); if(e.error!=='no-speech') box.focus(); };
+    rec.onerror=e=>{ if(e.error==='no-speech'){ avisar('Não ouvi nada. Toque de novo e fale.'); return; } avisar(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture'?'Microfone do site bloqueado. '+DIT_TECLADO:'Ditado falhou ('+e.error+'). '+DIT_TECLADO); teclado(); };
     rec.onend=()=>{ DITADO_REC=null; btn.classList.remove('on'); btn.innerHTML=DITADO_MIC; const v=box.value.trim(); if(v){ item.fala=v; aplicar(); } };
-    try{ rec.start(); }catch(err){ avisar('Não deu para abrir o microfone. Use o do teclado.'); box.focus(); return; }
+    try{ rec.start(); }catch(err){ avisar('Não deu para abrir o microfone. '+DIT_TECLADO); teclado(); return; }
     DITADO_REC=rec; btn.classList.add('on'); btn.innerHTML=DITADO_STOP; btn.setAttribute('aria-label','Parar ditado');
   });
 }
@@ -497,14 +512,14 @@ function tmicEquipar(){
     c.addEventListener('click',()=>{ if(DITADO_REC) DITADO_REC.abort(); ta.value=''; ta.dispatchEvent(new Event('input',{bubbles:true})); ta.dispatchEvent(new Event('change',{bubbles:true})); });
     b.addEventListener('click',()=>{
       if(DITADO_REC){ DITADO_REC.stop(); return; }
-      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-      if(!SR){ ta.focus(); return; }
+      const SR=ditSR();
+      if(!SR){ ta.focus(); try{ ta.setSelectionRange(ta.value.length,ta.value.length); }catch(e){} ditAviso(DIT_TECLADO.replace(' e depois toque em Concluir','')); return; }
       const rec=new SR(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
       const antes=ta.value, base=ta.value.trim(); let ouviu=false, novo='';
       rec.onresult=e=>{ let s=''; for(let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; s=s.replace(/\s+/g,' ').trim(); if(!s) return; ouviu=true; novo=s; const S=s.charAt(0).toUpperCase()+s.slice(1); ta.value=base?base+(/[.!?]$/.test(base)?' ':'. ')+S:S; ta.dispatchEvent(new Event('input',{bubbles:true})); };
-      rec.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed') ta.focus(); };
+      rec.onerror=e=>{ if(e.error!=='no-speech'){ ta.focus(); ditAviso('Microfone do site falhou. '+DIT_TECLADO.replace(' e depois toque em Concluir','')); } };
       rec.onend=()=>{ DITADO_REC=null; b.classList.remove('on'); if(!ouviu){ ta.value=antes; } else { ta.dataset.ditado='1'; ta.dataset.novo=novo; } ta.dispatchEvent(new Event('change',{bubbles:true})); };
-      try{ rec.start(); }catch(err){ ta.focus(); return; }
+      try{ rec.start(); }catch(err){ ta.focus(); ditAviso(DIT_TECLADO.replace(' e depois toque em Concluir','')); return; }
       DITADO_REC=rec; b.classList.add('on');
     });
   });

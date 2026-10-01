@@ -8,7 +8,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
-const VERSAO = '2026-09-30c';
+const VERSAO = '2026-10-01a';
 
 const INSTRUCOES = {
   tireoide: `Voc\u00ea recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo pr\u00f3prio m\u00e9dico). A identifica\u00e7\u00e3o do paciente foi removida.
@@ -63,6 +63,68 @@ Regras:
 - Nunca escreva valores de refer\u00eancia. Laudo enxuto.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
 - Sem markdown, sem t\u00edtulo, sem coment\u00e1rios.`,
+  cervical: `Voc\u00ea recebe o texto de exames anteriores da regi\u00e3o cervical (ultrassom cervical, de linfonodos ou do leito tireoidiano, PAAF, TC ou RM, de colegas diferentes, ou ditados pelo pr\u00f3prio m\u00e9dico). A identifica\u00e7\u00e3o do paciente foi removida.
+
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada al\u00e9m dele:
+
+US 03/25:
+LN1 III D: 12 \u00d7 8 \u00d7 9 mm, suspeito
+LN2 II E: 8 \u00d7 4 \u00d7 5 mm, reacional
+LT1 leito D: 6 \u00d7 4 \u00d7 5 mm
+
+PAAF 04/25:
+LN1 III D: 12 \u00d7 8 \u00d7 9 mm, Bethesda VI, Tg no lavado 250
+
+Regras:
+- Cabe\u00e7alho: "US mm/aa:", "PAAF mm/aa:", "TC mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames.
+- Linfonodo: "LN" e n\u00famero, n\u00edvel (I a VII), lado (D ou E), dois-pontos, medidas em mm, e depois ", suspeito" ou ", reacional" conforme o laudo disser. Sem r\u00f3tulo, numere na ordem.
+- Les\u00e3o do leito tireoidiano: "LT" e n\u00famero, "leito D", "leito E" ou "leito istmo", dois-pontos, medidas.
+- N\u00f3dulo de gl\u00e2ndula salivar: "LS" e n\u00famero, a gl\u00e2ndula (par\u00f3tida D, par\u00f3tida E, submandibular D, submandibular E), dois-pontos, medidas.
+- Medidas sempre em mm, separadas por " \u00d7 ", v\u00edrgula decimal (1,2 cm = 12 mm).
+- PAAF: o alvo e, na mesma linha, ", Bethesda" em romanos e, se houver, ", Tg no lavado" com o valor.
+- N\u00e3o diga que les\u00f5es de exames diferentes s\u00e3o a mesma. N\u00e3o compare, n\u00e3o conclua, n\u00e3o recomende.
+- Achado relevante fora de les\u00e3o (tireoidectomia, esvaziamento cervical, sialoadenite, sialolit\u00edase): uma linha "Outros: ..." no fim do exame.
+- Nunca escreva valores de refer\u00eancia. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem t\u00edtulo, sem coment\u00e1rios.`,
+  transvaginal: `Voc\u00ea recebe o texto de exames anteriores de ultrassom p\u00e9lvico ou transvaginal (ou RM da pelve), de colegas diferentes, ou ditados pelo pr\u00f3prio m\u00e9dico. A identifica\u00e7\u00e3o do paciente foi removida.
+
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada al\u00e9m dele:
+
+US 03/25:
+M1 intramural posterior FIGO 4: 21 \u00d7 18 \u00d7 20 mm
+L1 ov\u00e1rio D O-RADS 2: 35 \u00d7 30 \u00d7 28 mm, cisto simples
+\u00datero: 59 \u00d7 34 \u00d7 50 mm
+Endom\u00e9trio: 8 mm
+
+Regras:
+- Cabe\u00e7alho: "US mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames.
+- Mioma: "M" e n\u00famero, tipo (submucoso, intramural, subseroso, pediculado), parede (anterior, posterior, fundo, lateral D, lateral E), "FIGO" e o n\u00famero se o laudo trouxer, dois-pontos, medidas.
+- Les\u00e3o anexial: "L" e n\u00famero, "ov\u00e1rio D", "ov\u00e1rio E" ou "anexo D/E", "O-RADS" e o n\u00famero se o laudo trouxer, dois-pontos, medidas, e depois uma descri\u00e7\u00e3o de at\u00e9 4 palavras (cisto simples, hemorr\u00e1gico, endometrioma, dermoide, s\u00f3lido...).
+- Depois das les\u00f5es, "\u00datero:" com as tr\u00eas medidas e "Endom\u00e9trio:" com a espessura em mm, se o laudo trouxer.
+- Medidas sempre em mm, separadas por " \u00d7 ", v\u00edrgula decimal (1,2 cm = 12 mm).
+- N\u00e3o diga que les\u00f5es de exames diferentes s\u00e3o a mesma. N\u00e3o compare, n\u00e3o conclua, n\u00e3o recomende.
+- Achado relevante fora de les\u00e3o (DIU, adenomiose, l\u00edquido livre, histerectomia): uma linha "Outros: ..." no fim do exame.
+- Nunca escreva valores de refer\u00eancia. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem t\u00edtulo, sem coment\u00e1rios.`,
+  prostata: `Voc\u00ea recebe o texto de exames anteriores de pr\u00f3stata (ultrassom abdominal ou transretal, PSA, RM, bi\u00f3psia), de colegas diferentes, ou ditados pelo pr\u00f3prio m\u00e9dico. A identifica\u00e7\u00e3o do paciente foi removida.
+
+Reescreva tudo neste formato exato, exame por exame, do mais antigo para o mais recente, sem nada al\u00e9m dele:
+
+US 03/25:
+Pr\u00f3stata: 45 \u00d7 38 \u00d7 40 mm, 37 g
+Res\u00edduo: 60 mL
+PSA 02/25: 4,2 ng/mL
+
+Regras:
+- Cabe\u00e7alho: "US mm/aa:", "RM mm/aa:" ou "BX mm/aa:" (bi\u00f3psia) ("sem data" se faltar). Uma linha em branco entre exames. PSA isolado vira uma linha "PSA mm/aa: valor ng/mL" dentro do exame mais pr\u00f3ximo ou sozinho.
+- "Pr\u00f3stata:" com as tr\u00eas medidas em mm e, depois da v\u00edrgula, o peso ou volume em g (se o laudo s\u00f3 trouxer mL ou cm\u00b3, use o mesmo n\u00famero em g).
+- "Res\u00edduo:" com o res\u00edduo p\u00f3s-miccional em mL, se o laudo trouxer.
+- Bi\u00f3psia: "Gleason" ou "ISUP" com o resultado em uma linha.
+- Medidas sempre em mm, separadas por " \u00d7 ", v\u00edrgula decimal.
+- N\u00e3o compare, n\u00e3o conclua, n\u00e3o recomende.
+- Achado relevante (protrus\u00e3o intravesical, c\u00e1lculo vesical, hidronefrose, les\u00e3o focal): uma linha "Outros: ..." no fim do exame.
+- Nunca escreva valores de refer\u00eancia. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- Sem markdown, sem t\u00edtulo, sem coment\u00e1rios.`,
 };
 
 function cors(origem) {
@@ -88,7 +150,7 @@ export default {
     try { corpo = await request.json(); } catch { return resp({ erro: 'JSON inv\u00e1lido' }, 400, origem); }
     if (!env.SENHA || corpo.senha !== env.SENHA) return resp({ erro: 'senha incorreta' }, 401, origem);
 
-    const exame = corpo.exame in INSTRUCOES ? corpo.exame : 'tireoide';
+    const exame = Object.prototype.hasOwnProperty.call(INSTRUCOES, corpo.exame) ? corpo.exame : 'tireoide';
     const textos = Array.isArray(corpo.textos) ? corpo.textos.filter(t => t && typeof t.texto === 'string' && t.texto.trim()) : [];
     if (!textos.length) return resp({ erro: 'nenhum texto' }, 400, origem);
     const total = textos.reduce((s, t) => s + t.texto.length, 0);

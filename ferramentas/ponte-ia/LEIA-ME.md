@@ -15,6 +15,7 @@ O app manda para cá só o texto dos exames anteriores **já sem identificação
 
 ## Ajustes
 
+- Exames atendidos: tireoide, mamas, cervical, transvaginal, prostata (instrução própria para cada um em `INSTRUCOES`).
 - Modelo: `claude-opus-5-5`, com esforço baixo (resposta rápida). Para trocar, mude `MODELO` no topo do `worker.js`.
 - Só aceita pedidos vindos do site `t8castri-art.github.io` (e do `localhost:8765` para testes), e com a senha.
 - O pedido e a resposta não ficam gravados na ponte.

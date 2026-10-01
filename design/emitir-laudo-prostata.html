@@ -160,6 +160,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 
 <script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
+<script src="anteriores.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -293,11 +294,7 @@ function render(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard()}
-      <div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
-        <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
-        ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
-        <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou próstata com 48 g e resíduo de 60 mL">${esc(st.prev.txt||'')}</textarea>`:''}
-      </div></div>
+      ${anterioresCard(st.prev,'ex.: US de 03/25: próstata com 37 g e resíduo de 60 mL; PSA 4,2 em 02/25')}
       <div class="card"><div class="lbl">Anamnese</div><div class="form dir">
         <div class="k">PSA</div><div class="in"><input class="cell" inputmode="decimal" data-f="psa" value="${esc(a.psa)}" placeholder="—"><span class="x">ng/mL em</span><input class="cell" style="width:72px" data-f="psadata" value="${esc(a.psaData)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
         <div class="k">Sintomas</div>${chips(SINT,a.sint,'sint',true)}
@@ -342,7 +339,7 @@ function render(){
   </div>`;
   wire(); renderDocs();
 }
-function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
+function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
 async function copiar(t){
   try{ await navigator.clipboard.writeText(t); return true; }catch(e){}
   try{ const ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,t.length); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; }
@@ -355,6 +352,7 @@ function wire(){
   const pc=$('#pac'); if(pc) pc.addEventListener('input',()=>{st.pac=pc.value;renderDocs();$('#phone .top .s').innerHTML=servSub();});
   on('[data-ind]',el=>{st.ind=el.dataset.ind;render();});
   on('[data-prev]',el=>{st.prev.tem=el.dataset.prev;render();});
+  anterioresLigar(st.prev,'prostata',st.pac,render,toast);
   on('[data-sint]',el=>{const v=el.dataset.sint;st.anam.sint.has(v)?st.anam.sint.delete(v):st.anam.sint.add(v);render();});
   on('[data-med]',el=>{st.anam.med=el.dataset.med==='s';render(); if(st.anam.med) $('#medTxt').focus();});
   on('[data-rep]',el=>{st.bx.rep=el.dataset.rep;render();}); on('[data-parasp]',el=>{st.bx.parAsp=el.dataset.parasp;render();});
@@ -394,7 +392,8 @@ document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='
 // medidas digitadas em mm saem em cm no laudo (20 → 2,0)
 const cm=v=>{const s=String(v||'').trim(); if(!s) return '___'; const n=parseFloat(s.replace(',','.')); if(!isFinite(n)) return '___'; return (n/10).toFixed(/[.,]/.test(s)?2:1).replace('.',',');};
 const fraseP=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?:]$/.test(t)?'':'.');};
-const prevLinha=()=>st.prev.tem==='sim'?[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`]:[];
+function prevLinha(){ if(st.prev.tem!=='sim') return []; const t=String(st.prev.txt||'').trim(); if(!t) return [];
+  if(!antLer(t).length) return ['Exames anteriores: '+t]; const e=antEvolucaoProstata(t,{peso:peso(),residuo:residuo()}); return ['Exames anteriores:',t,...(e?[e]:[])]; }
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='prevTxt'){ st.prev.txt=e.target.value; renderDocs(); } });
 // prévia editável: o que você escreve nela é o que vai no Copiar
 const EDITS={}; let RAW=false, INR=false, LAST='docUS';

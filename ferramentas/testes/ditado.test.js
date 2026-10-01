@@ -1,0 +1,36 @@
+// Testes do ditado. Rodar no Mac:
+//   jsc design/ditado.js ferramentas/testes/ditado.test.js
+//   (jsc = /System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc)
+// Cada caso: [função, frase como o iPhone escreveu, campos esperados]. Falha imprime "FALHOU".
+var sh=o=>JSON.stringify(o,(k,v)=>v instanceof Set?[...v].sort():v);
+var CASOS=[
+ ['ditadoNodulo',"Terço superior do lobo direito, nódulo sólido hipoecoico, mais alto que largo, margens irregulares, com microcalcificações, vascularização central e periférica, medindo 2,0 por 1,4 por 1,2 centímetros",
+   {lobo:'D',terco:'superior',comp:'sólida',eco:'hipoecoica',forma:'mais alto que largo',marg:'irregulares',focos:['microcalcificações'],dop:['central','periférica'],med:['20','14','12']}],
+ ['ditadoNodulo',"N1 terço médio lobo esquerdo, sólido hipoecoide de 9 por 7 por 8 mm.",{lobo:'E',terco:'médio',comp:'sólida',eco:'hipoecoica',med:['9','7','8']}],
+ ['ditadoNodulo',"istmo nódulo cístico com cauda de cometa medindo 0,5 x 0,4 x 0,3 cm",{lobo:'I',comp:'cística',eco:'anecoica',focos:['cauda de cometa'],med:['5','4','3']}],
+ ['ditadoNodulo',"Terço médio do lobo direito. Nódulo sólido, hipoecoico, sem microcalcificações, com cauda de cometa. 1.4 x 0.9 x 1.1 cm.",{lobo:'D',terco:'médio',comp:'sólida',eco:'hipoecoica',focos:['cauda de cometa'],med:['14','9','11']}],
+ ['ditadoLinf',"nível três à direita, linfonodo arredondado, sem hilo, cortical espessada, fluxo periférico, 1,2 por 0,8 por 0,9",{nivel:'III',lado:'D',forma:'arredondado',hilo:'apagado',cort:'espessada',dop:'periférica',med:['12','8','9']}],
+ ['ditadoLeito',"leito direito, lesão sólida hipoecoica, margens irregulares, fluxo central, 0,8 por 0,6 por 0,5",{lado:'D',comp:'sólida',eco:'hipoecoica',marg:'irregulares',dop:['central'],med:['8','6','5']}],
+ ['ditadoMama',"Mama esquerda duas horas, três centímetros do mamilo, oito milímetros da pele, nódulo irregular não paralelo com margens espiculadas, hipoecoico, com sombra acústica posterior, com microcalcificações, fluxo central, 2,1 por 1,8 por 1,5",
+   {mama:'E',hora:'2',mamilo:'30',pele:'8',tipo:'nodulo',forma:'irregular',orient:'não paralelo',marg:'espiculadas',eco:'hipoecoico',post:'sombra',calc:'com',dop:['central'],med:['21','18','15']}],
+ ['ditadoMama',"nódulo às 12h, 2 cm do mamilo, profundidade de 12 mm, oval, paralelo, margens indistintas, isoecoico, com reforço acústico posterior, 15 por 10 por 8 mm",{hora:'12',mamilo:'20',pele:'12',tipo:'nodulo',forma:'oval',orient:'paralelo',marg:'indistintas',eco:'isoecoico',post:'reforço',med:['15','10','8']}],
+ ['ditadoLaudoTireoide',"Rotina. Nega história familiar, usa levotiroxina 50 mcg, refere rouquidão e pigarro. Sem exames anteriores. Tireoide simétrica, dimensões aumentadas, heterogênea, vascularização aumentada ao Doppler. Lobo direito 4,7 por 1,8 por 2,0. Lobo esquerdo 4,6 por 1,6 por 1,9. Istmo 0,3.",
+   {ind:'Rotina','prev.tem':'nao','anam.fam':'nao','anam.levo':true,'anam.dose':'50','anam.sint':['pigarro','rouquidão'],'gl.sim':'simétrica','gl.dim':'aumentadas','gl.eco':'heterogênea','gl.dop':'aumentada','med.ld':['47','18','20'],'med.le':['46','16','19'],'med.istmo':['','3','']}],
+ ['ditadoLaudoTireoide',"Nome João Pedro PeçanhaExame de rotinaEle tem nódulo já conhecido de anos atrásNão tem histórico familiar não toma leva tiroxina não tem exames glândulas simétricas dimensões habituaisEstímulo 1.00309 logo direito 15 16 24 mm logo esquerdo 17h21 26 mmPara tireoide visualizadas Estímulo mediu06 por 1.2 por 09 lobo direito 12 14 18 logo esquerdo 19 21 23Tudo em milímetros",
+   {pac:'João Pedro Peçanha',ind:'Rotina','prev.tem':'nao','anam.fam':'nao','anam.conhece':true,'anam.levo':false,'gl.sim':'simétrica','gl.dim':'habituais','med.ld':['12','14','18'],'med.le':['19','21','23'],'med.istmo':['6','12','9'],para:'nao'}],
+ ['ditadoLaudoTireoide',"Paciente Maria Aparecida de Souza Lima, rotina. Exame anterior de 06/25 mostrava nódulo de 1,2 cm no terço médio do lobo direito. Tireoide assimétrica, paratireoide visibilizada",
+   {pac:'Maria Aparecida de Souza Lima',ind:'Rotina','prev.tem':'sim','prev.data':'06/25','prev.txt':'mostrava nódulo de 1,2 cm no terço médio do lobo direito','gl.sim':'assimétrica',para:'sim'}],
+ ['ditadoLaudoTireoide',"LD 47 18 20, LE 46 16 19, istmo 3 milímetros",{'med.ld':['47','18','20'],'med.le':['46','16','19'],'med.istmo':['','3','']}],
+ ['ditadoLaudoTireoide',"tem um nódulo no lobo esquerdo de 2 por 1 por 1, lobo direito 4,7 vezes 1,8 vezes 2",{'med.ld':['47','18','20']}],
+ ['ditadoLaudoCervical',"Vigilância oncológica, tireoidectomia total por carcinoma papilífero, em uso de levotiroxina 112 mcg, glândulas salivares normais",
+   {ind:'Vigilância oncológica','anam.ca':'tireoide','anam.tx':true,'anam.txCa':true,'anam.levo':true,'anam.dose':'112','glst.parD':'habitual','glst.parE':'habitual','glst.subD':'habitual','glst.subE':'habitual'}],
+ ['ditadoLaudoMamas',"Rotina, pós-menopausa sem reposição hormonal, trouxe mamografia BI-RADS 2 de junho de 2026, mãe com câncer de mama, nega biópsia. Mamas heterogêneas com predomínio fibroglandular, sem ectasia, axilas normais",
+   {ind:'Rotina','mmg.feita':'trouxe','mmg.birads':'2','mmg.data':'06/26','anam.fam':true,'anam.famGrau':'1º grau','anam.bx':false,'anam.meno':'pós','anam.trh':false,textura:'heterogênea',predominio:'fibroglandular',ectasia:false,'axila.D':'normal','axila.E':'normal'}],
+ ['ditadoLaudoTransvaginal',"Rotina, DUM 28 de agosto, G2 P2 A0, cesárea. Útero antevertido, contornos regulares, medindo 5,9 por 3,4 por 5,0, miométrio homogêneo. Endométrio 8 mm trilaminar. Ovário direito 2,5 por 1,8 por 1,5 habitual. Ovário esquerdo não visibilizado. Sem líquido livre.",
+   {ind:'Rotina','anam.g':'2','anam.p':'2','anam.a':'0','anam.ces':true,'ut.pos':'anteversão','ut.cont':'regulares','ut.med':['59','34','50'],'ut.mio':'homogêneo','ut.endo':'8','ut.endoAsp':'trilaminar','ov.D.visto':true,'ov.D.med':['25','18','15'],'ov.D.asp':'habitual','ov.E.visto':false,liq:'ausente'}],
+ ['ditadoLaudoProstata',"Sintomas urinários, PSA 4,2 em maio de 2026, noctúria e jato fraco, usa tansulosina 0,4 mg. Bexiga com boa repleção, 9,0 por 8,0 por 7,5, parede regular de 3 mm, conteúdo anecoico. Junções livres. Próstata 4,5 por 3,8 por 4,0, contornos regulares, homogênea, com calcificações periuretrais. Protrusão intravesical de 6 mm. Vesículas seminais habituais. Pós-miccional bexiga 4 por 3 por 2, próstata 4,4 por 3,7 por 4,0",
+   {ind:'Sintomas urinários','anam.psa':'4,2','anam.psaData':'05/26','anam.sint':['jato fraco','noctúria'],'anam.med':true,'anam.medTxt':'tansulosina 0,4 mg','bx.rep':'boa','bx.med':['90','80','75'],'bx.parede':'3','bx.parAsp':'regular','bx.cont':'anecoico','juv.D':'livre','juv.E':'livre','pr.med':['45','38','40'],'pr.cont':'regulares','pr.text':'homogênea','pr.calc':true,'pr.ipp':'6',vs:'habitual','pos.0.bx':['40','30','20'],'pos.0.pr':['44','37','40']}],
+];
+var falhas=0;
+CASOS.forEach(([fn,fala,esp])=>{ var r=this[fn](fala); Object.keys(esp).forEach(k=>{ var a=sh(r[k]), e=sh(esp[k]); if(a!==e){ falhas++; print('FALHOU '+fn+' ['+k+'] esperado '+e+' veio '+a+'\n   frase: '+fala.slice(0,70)); } }); });
+print(falhas?('\n'+falhas+' falha(s)'):('OK: '+CASOS.length+' frases, todos os campos certos'));
