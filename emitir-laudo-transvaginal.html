@@ -150,6 +150,7 @@ header p{margin:4px 0 0;color:var(--tx2);font-size:13px;max-width:80ch}
 
 <script>window.DITADO_FLUT=true;</script>
 <script src="ditado.js"></script>
+<script src="anteriores.js"></script>
 <script>
 const $=(s,el=document)=>el.querySelector(s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -322,11 +323,7 @@ function viewLaudo(){
       ${servCard()}
       <div class="card"><div class="lbl">Indicação</div>${chips(IND,st.ind,'ind')}</div>
       ${equipCard(['e9'])}
-      <div class="card"><div class="lbl">Exames anteriores</div><div class="form dir">
-        <div class="k">Trouxe</div>${segm([['nao','não'],['sim','sim']],st.prev.tem,'prev')}
-        ${st.prev.tem==='sim'?`<div class="k">Data</div><div class="in"><input class="cell" style="width:72px" data-f="prevdata" value="${esc(st.prev.data)}" placeholder="mm/aa" data-mask="mmaa" inputmode="numeric"></div>
-        <textarea class="obs" id="prevTxt" placeholder="ex.: US da clínica X evidenciou mioma intramural de 2,1 cm em parede posterior">${esc(st.prev.txt||'')}</textarea>`:''}
-      </div></div>
+      ${anterioresCard(st.prev,'ex.: US de 03/25: mioma intramural posterior de 2,1 cm; cisto simples no ovário direito de 3,5 cm')}
       <div class="card"><div class="lbl">Anamnese</div><div class="form dir">
         <div class="k">DUM</div><div class="in">${a.meno?'':`<input class="cell" style="width:92px" data-f="dum" value="${esc(a.dum)}" placeholder="dd/mm/aaaa" data-mask="ddmmaaaa" inputmode="numeric">`}<button type="button" class="chip" data-meno="1" aria-pressed="${a.meno}">menopausa</button></div>
         <div class="k">G · P · A</div><div class="in"><input class="cell sm" inputmode="numeric" data-f="g" value="${esc(a.g)}" placeholder="G"><input class="cell sm" inputmode="numeric" data-f="p" value="${esc(a.p)}" placeholder="P"><input class="cell sm" inputmode="numeric" data-f="a" value="${esc(a.a)}" placeholder="A"></div>
@@ -406,7 +403,7 @@ function render(){
   else h=viewLaudo();
   $('#phone').innerHTML=h; wire(); renderDocs();
 }
-function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Técnica|Descrição|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
+function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
 function wire(){
   if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'transvaginal',{"pac": "#pac", "prev.txt": "#prevTxt", "ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.dum": "[data-f=\"dum\"]", "anam.meno": "meno", "anam.g": "[data-f=\"g\"]", "anam.p": "[data-f=\"p\"]", "anam.a": "[data-f=\"a\"]", "anam.ces": "ces", "ut.pos": "upos", "ut.cont": "ucont", "ut.med": "um", "ut.mio": "umio", "ut.endo": "[data-f=\"endo\"]", "ut.endoAsp": "uendo", "ut.colo": "ucolo", "ut.diu": "diu", "ut.diuDist": "[data-f=\"diudist\"]", "ov.D.visto": "ovD", "ov.D.med": "omD", "ov.D.asp": "oaD", "ov.E.visto": "ovE", "ov.E.med": "omE", "ov.E.asp": "oaE", "liq": "liq"},render,toast,st);
   wireServ();
@@ -415,6 +412,7 @@ function wire(){
   on('[data-ind]',el=>{st.ind=el.dataset.ind;render();});
   on('[data-eq]',el=>{const v=el.dataset.eq; if(st.equip.has(v)&&st.equip.size>1) st.equip.delete(v); else st.equip.add(v); render();});
   on('[data-prev]',el=>{st.prev.tem=el.dataset.prev;render();}); on('[data-prevach]',el=>{st.prev.achado=el.dataset.prevach;render();});
+  if(!st.view||st.view==='laudo') anterioresLigar(st.prev,'transvaginal',st.pac,render,toast);
   on('[data-meno]',()=>{st.anam.meno=!st.anam.meno;render();}); on('[data-ces]',el=>{st.anam.ces=el.dataset.ces==='s';render();});
   on('[data-upos]',el=>{st.ut.pos=el.dataset.upos;render();}); on('[data-ucont]',el=>{st.ut.cont=el.dataset.ucont;render();}); on('[data-umio]',el=>{st.ut.mio=el.dataset.umio;render();});
   on('[data-uendo]',el=>{st.ut.endoAsp=el.dataset.uendo;render();}); on('[data-ucolo]',el=>{st.ut.colo=el.dataset.ucolo;render();}); on('[data-diu]',el=>{st.ut.diu=el.dataset.diu==='s';render();});
@@ -450,7 +448,8 @@ document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='
 // medidas digitadas em mm saem em cm no laudo (20 → 2,0)
 const cm=v=>{const s=String(v||'').trim(); if(!s) return '___'; const n=parseFloat(s.replace(',','.')); if(!isFinite(n)) return '___'; return (n/10).toFixed(/[.,]/.test(s)?2:1).replace('.',',');};
 const fraseP=v=>{const t=String(v||'').trim(); if(!t) return '___.'; return t.charAt(0).toUpperCase()+t.slice(1)+(/[.!?:]$/.test(t)?'':'.');};
-const prevLinha=()=>st.prev.tem==='sim'?[`US anterior${st.prev.data?' de '+dataCurta(st.prev.data):''}: ${fraseP(st.prev.txt)}`]:[];
+function prevLinha(){ if(st.prev.tem!=='sim') return []; const t=String(st.prev.txt||'').trim(); if(!t) return [];
+  if(!antLer(t).length) return ['Exames anteriores: '+t]; const e=antEvolucao(t,st.miomas.map((m,i)=>({rot:'M'+(i+1),lado:null,nome:'M'+(i+1),tag:'',rank:0,med:m.med.map(num)})).concat(st.lesoes.map((l,i)=>{const c=+oradsDe(l); return {rot:'L'+(i+1),lado:l.lado,nome:'L'+(i+1),tag:isFinite(c)?'O-RADS '+c:'',rank:isFinite(c)?c:0,med:l.med.map(num)};})),null,'transvaginal'); return ['Exames anteriores:',t,...(e?[e]:[])]; }
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='prevTxt'){ st.prev.txt=e.target.value; renderDocs(); } });
 // prévia editável: o que você escreve nela é o que vai no Copiar
 const EDITS={}; let RAW=false, INR=false, LAST='docUS';
