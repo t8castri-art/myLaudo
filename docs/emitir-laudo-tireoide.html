@@ -286,7 +286,12 @@ function infoClinica(){
 function conclusao(){
   const c=[];
   if(!st.nods.length) c.push('Glândula tireoide sem evidência de nódulos.');
-  st.nods.forEach(n=>{const k=conduta(n).k; c.push(`${rotN(n)}: ACR ${tr(pts(n)).replace('TR','TI-RADS ')} em ${LOBO[n.lobo]}${k==='paaf'&&!st.paaf.on?', com indicação de PAAF':k==='seg'?', com indicação de seguimento por imagem':''}.`);});
+  // um nódulo: "Nódulo TI-RADS 4 em lobo direito." · vários: onde ficam + só o TI-RADS do mais suspeito
+  const onde=l=>l==='I'?'no istmo':'em '+LOBO[l];
+  if(st.nods.length===1){ const n=st.nods[0]; c.push(`Nódulo TI-RADS ${tr(pts(n)).slice(2)} ${onde(n.lobo)}.`); }
+  else if(st.nods.length>1){ const lobos=new Set(st.nods.map(n=>n.lobo)); const local=lobos.has('D')&&lobos.has('E')?'bilaterais':[...lobos].map(onde).join(' e ');
+    const mx=x=>{const v=maior(x.med); return isFinite(v)?v:0;}; const top=st.nods.slice().sort((a,b)=>pts(b)-pts(a)||mx(b)-mx(a))[0];
+    c.push(`Nódulos tireoidianos ${local}, conforme classificação acima, ${rotN(top)} TI-RADS ${tr(pts(top)).slice(2)}.`); }
   if(st.para==='sim'&&st.paraAsp==='alterada') c.push('Formação nodular em topografia de paratireoide. Correlacionar com cálcio e PTH.');
   st.linfs.filter(suspL).forEach(l=>c.push(`${rotL(l)}: linfonodo cervical nível ${l.nivel} à ${l.lado==='D'?'direita':'esquerda'} com critérios ultrassonográficos de suspeição.`));
   return c;

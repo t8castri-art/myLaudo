@@ -300,9 +300,9 @@ const nomeAlvo=x=> x.nivel?`linfonodo cervical nível ${x.nivel} à ${lado(x.lad
 const rotAlvo=x=> x.nivel?rotL(x): x.gl?rotS(x):rotT(x);
 const descrAlvo=x=> x.nivel?descrL(x): x.gl?descrS(x):descrT(x);
 // PAAF enxuta: uma frase no Procedimento, uma na Conclusão
-const MOTIVOS=[['dec','decisão compartilhada'],['onc','histórico oncológico'],['cres','crescimento']];
-const motivoTxt=k=>k==='onc'?`Procedimento indicado devido histórico pessoal de neoplasia ${st.anam.ca==='outro'?'de cabeça e pescoço':'de tireoide'}.`:k==='cres'?'Procedimento indicado devido crescimento da lesão quando comparado com exames anteriores disponíveis.':'Procedimento indicado após orientações e decisão compartilhada.';
-function motivoAuto(){ if(st.anam.ca&&st.anam.ca!=='nao') return 'onc'; if(st.prev.tem==='sim'&&/aumento/.test(antEvolucao(st.prev.txt||'',st.linfs.map(l=>({rot:rotL(l),lado:l.lado,nome:rotL(l),tag:'',rank:suspL(l)?1:0,med:l.med.map(num)})),null,'cervical'))) return 'cres'; return 'dec'; }
+const MOTIVOS=[['dec','decisão compartilhada'],['onc','neoplasia de tireoide']];
+const motivoTxt=k=>k==='onc'?'Procedimento indicado devido histórico de neoplasia maligna de tireoide.':'Procedimento indicado após orientações e decisão compartilhada.';
+function motivoAuto(){ return st.anam.ca==='tireoide'?'onc':'dec'; }
 const motivoAtual=()=>st.paaf.motivo||motivoAuto();
 function paafFrase(){ const A=alvos(), temL=A.some(x=>x.nivel);
   return `Realizada PAAF guiada por ultrassom com agulha ${st.paaf.agulha.replace('x',' × ')}, sem intercorrências imediatas. Material enviado para análise citopatológica em ${laminasTxt(st.paaf.lam)}${temL?', com dosagem de tireoglobulina no lavado':''}. ${motivoTxt(motivoAtual())}`; }
