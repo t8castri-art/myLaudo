@@ -200,7 +200,7 @@ function docUnico(proc,sufixo){
   return [us[0]+' '+sufixo, ...us.slice(1,iC),
     'Procedimento:', get('Procedimento'),'',
     'Conclusão:', ...us.slice(iC+1,iS<0?us.length:iS).filter(Boolean).map(l=>l.replace(', com indicação de PAAF','')), get('Conclusão'),'',
-    `Sugestão: ${get('Sugestão')||'Retorno ao médico assistente com o resultado citopatológico.'}`].join('\n');
+    ...(get('Sugestão')?[`Sugestão: ${get('Sugestão')}`]:[])].join('\n');
 }
 const dataCurta=d=>{const m=String(d||'').trim().match(/^(\d{1,2})\/(\d{2,4})$/); return m?m[1].padStart(2,'0')+'/'+m[2].slice(-2):String(d||'').trim();};
 let seq=1;
@@ -269,7 +269,7 @@ function sugestao(){
   if(q.has('anu')) s.push('Seguimento ecográfico anual.');
   if(q.has('comp')) s.push('Sugere-se estudo com método de imagem complementar (tomografia/ressonância).');
   if(s.length) return s.join(' ');
-  if(st.paaf.on) return 'Retorno ao médico assistente com o resultado citopatológico.';
+  if(st.paaf.on) return '';
   if(st.sal.some(x=>x.tipo==='litiase')||Object.values(st.glst).includes('sialoadenite')) return 'Avaliação com cirurgia de cabeça e pescoço.';
   return 'Acompanhamento com médico assistente.';
 }
@@ -292,7 +292,7 @@ function docUS(){
     ...st.cerv.map(descrC),
     'Planos musculares superficiais preservados, sem coleções.','',
     'Conclusão:',...conclusao(),'',
-    `Sugestão: ${sugestao()}`,
+    ...(sugestao()?[`Sugestão: ${sugestao()}`]:[]),
   ].join('\n');
 }
 function alvos(){ return [...st.paaf.alvos].map(k=>{const id=+k.slice(1); return k[0]==='l'?st.linfs.find(x=>x.id===id):k[0]==='s'?st.sal.find(x=>x.id===id):st.leitoLes.find(x=>x.id===id);}).filter(Boolean); }
@@ -306,10 +306,7 @@ function motivoAuto(){ return st.anam.ca==='tireoide'?'onc':'dec'; }
 const motivoAtual=()=>st.paaf.motivo||motivoAuto();
 function paafFrase(){ const A=alvos(), temL=A.some(x=>x.nivel);
   return `Realizada PAAF guiada por ultrassom com agulha ${st.paaf.agulha.replace('x',' × ')}, sem intercorrências imediatas. Material enviado para análise citopatológica em ${laminasTxt(st.paaf.lam)}${temL?', com dosagem de tireoglobulina no lavado':''}. ${motivoTxt(motivoAtual())}`; }
-function paafConclusao(){ const A=alvos(), q=sugAtual();
-  const seg=q.has('sem')?' Recomenda-se seguimento ecográfico semestral.':q.has('anu')?' Recomenda-se seguimento ecográfico anual.':'';
-  const comp=q.has('comp')?' Sugere-se estudo com método de imagem complementar (tomografia/ressonância).':'';
-  return `Realizada PAAF de ${A.map(rotAlvo).join(' e ')}.${seg}${comp}`; }
+function paafConclusao(){ return `Realizada PAAF de ${alvos().map(rotAlvo).join(' e ')}.`; }
 function docPAAF(){
   const A=alvos(); if(!A.length) return 'Marque os alvos puncionados na tela do laudo (cartão Procedimento).';
   return [
@@ -320,7 +317,7 @@ function docPAAF(){
     ...A.map(x=>`Alvo: ${descrAlvo(x)}`),'',
     `Procedimento: ${paafFrase()}`,'',
     `Conclusão: ${paafConclusao()}`,
-    'Sugestão: Retorno ao médico assistente com o resultado citopatológico.',
+    ...(sugestao()?[`Sugestão: ${sugestao()}`]:[]),
   ].join('\n');
 }
 

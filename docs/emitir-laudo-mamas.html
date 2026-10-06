@@ -220,7 +220,7 @@ function docUnico(proc,sufixo){
   return [us[0]+' '+sufixo, ...us.slice(1,iC),
     'Procedimento:', get('Procedimento'),'',
     'Conclusão:', ...us.slice(iC+1,iS<0?us.length:iS).filter(Boolean).map(l=>l.replace(', com indicação de PAAF','')), get('Conclusão'),'',
-    `Sugestão: ${get('Sugestão')||'Retorno ao médico assistente com o resultado histopatológico.'}`].join('\n');
+    ...(get('Sugestão')?[`Sugestão: ${get('Sugestão')}`]:[])].join('\n');
 }
 let seq=1;
 const novoNod = (mama, tipo='nodulo') => ({ id:seq++, mama, tipo, hora:'10', mamilo:'', pele:'', med:['','',''], eco:'hipoecoico', forma:'oval', orient:'paralelo', marg:'circunscritas', post:'nenhuma', calc:'sem', dop:new Set(['ausente']), cisto:'simples' });
@@ -301,7 +301,7 @@ function sugestaoBase(){
   if(mx===2) return 'Controle ecográfico em 6 meses.';
   return 'Estudo histopatológico por biópsia percutânea guiada por ultrassonografia.';
 }
-const sugestao=()=>(st.core.on?'Retorno ao médico assistente com o resultado histopatológico.':sugestaoBase())+(st.sugMmg?' Complementação com mamografia.':'');
+const sugestao=()=>((st.core.on?'':sugestaoBase())+(st.sugMmg?' Complementação com mamografia.':'')).trim();
 function docUS(){
   const mamaTxt = m => { const ls=lesoesDe(m); return `Mama ${lado(m)}:\n` + (ls.length? ls.map(descr).join('\n') : 'Não há evidência de nódulos, cistos ou distorções arquiteturais.'); };
   const ax = m => `Cadeia linfonodal axilar ${lado(m)}: ${Object.fromEntries(AXILA)[st.axila[m]]}`;
@@ -321,7 +321,7 @@ function docUS(){
     ax('D'), ax('E'), 'Cadeias paraesternais: não há evidência de linfonodomegalias.','',
     'Conclusão:',
     ambas ? 'Exame ecográfico dentro dos padrões de normalidade. BI-RADS US 1 bilateralmente.' : fraseConclusao('D')+'\n'+fraseConclusao('E'),'',
-    `Sugestão: ${sugestao()}`,
+    ...(sugestao()?[`Sugestão: ${sugestao()}`]:[]),
   ].join('\n');
 }
 const MOTIVOS=[['dec','decisão compartilhada'],['fam','história familiar'],['cres','crescimento']];
@@ -340,7 +340,6 @@ function docCORE(){
     `Alvo: ${descr(n)}`,'',
     `Procedimento: Realizada core biopsy guiada por ultrassom com agulha ${st.core.agulha}, sem intercorrências imediatas. Material enviado para análise histopatológica em ${fragTxt(st.core.frag)}${st.core.lab==='entregue'?', entregue à paciente':''}. ${MOTIVO_TXT[motivoAtual()]}`,'',
     `Conclusão: Realizada core biopsy de ${rotulo(n)} (mama ${lado(n.mama)}).`,
-    'Sugestão: Retorno ao médico assistente com o resultado histopatológico.',
   ].join('\n');
 }
 
