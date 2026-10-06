@@ -231,7 +231,7 @@ const st = {
   mmg:{ feita:'trouxe', birads:'2', data:'06/2026' }, prev:{tem:'nao',txt:''},
   anam:{ fam:true, famGrau:'1º grau', pessoal:false, bx:true, bxRes:'benigna', cir:false, meno:'pós', trh:false, palp:false, desc:false, gest:false, lact:false },
   lesoes:[], axila:{D:'normal',E:'normal'}, birads:{D:null,E:null},
-  core:{on:false, alvo:null, agulha:'14G', frag:'5', lab:'próprio',motivo:null},
+  core:{on:false, alvo:null, agulha:'14G', frag:'4', lab:'próprio',motivo:null},
 };
 // amostra: o nódulo do seu modelo, na posição do seu exemplo
 const n1=novoNod('D'); Object.assign(n1,{hora:'10',mamilo:'40',pele:'15',med:['9,5','13','6']}); st.lesoes.push(n1);
@@ -338,8 +338,8 @@ function docCORE(){
     `Indicação: Nódulo mamário BI-RADS US ${c} em mama ${lado(n.mama)}.`,
     ...(infoClinica()?[`Informações clínicas: ${infoClinica()}`]:[]), ...prevLinhasM(),'',
     `Alvo: ${descr(n)}`,'',
-    `Procedimento: Realizada core biopsy guiada por ultrassom com agulha ${st.core.agulha}, sem intercorrências imediatas. Material enviado para análise histopatológica em ${fragTxt(st.core.frag)}${st.core.lab==='entregue'?', entregue à paciente':''}. ${MOTIVO_TXT[motivoAtual()]}`,'',
-    `Conclusão: Realizada core biopsy de ${rotulo(n)} (mama ${lado(n.mama)}).`,
+    `Procedimento: Realizada biópsia por agulha grossa (core biopsy) guiada por ultrassom com agulha ${st.core.agulha}. ${MOTIVO_TXT[motivoAtual()]}`,'',
+    `Conclusão: Realizada biópsia por agulha grossa (CORE-BIOPSY) de ${rotulo(n)}, sem intercorrências imediatas, enviado para análise ${fragTxt(st.core.frag)} imersos em formol a 10%${st.core.lab==='entregue'?', entregues à paciente':''}.`,
   ].join('\n');
 }
 
@@ -491,7 +491,7 @@ function wire(){
   ph.querySelectorAll('input[data-f="frag"]').forEach(inp=>inp.addEventListener('input',()=>{ st.core.frag=inp.value; renderDocs(); }));
 }
 let tt; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),1800); }
-function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),textura:'heterogênea',predominio:'fibroglandular',ectasia:false,mmg:{feita:'nao',birads:'2',data:''},prev:{tem:'nao',txt:''},sugMmg:false,anam:{fam:false,famGrau:'1º grau',pessoal:false,bx:false,bxRes:'benigna',cir:false,meno:'pré',trh:false,palp:false,desc:false,gest:false,lact:false},lesoes:[],axila:{D:'normal',E:'normal'},birads:{D:null,E:null},core:{on:false,alvo:null,agulha:'14G',frag:'5',lab:'próprio',motivo:null},pac:''}); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),textura:'heterogênea',predominio:'fibroglandular',ectasia:false,mmg:{feita:'nao',birads:'2',data:''},prev:{tem:'nao',txt:''},sugMmg:false,anam:{fam:false,famGrau:'1º grau',pessoal:false,bx:false,bxRes:'benigna',cir:false,meno:'pré',trh:false,palp:false,desc:false,gest:false,lact:false},lesoes:[],axila:{D:'normal',E:'normal'},birads:{D:null,E:null},core:{on:false,alvo:null,agulha:'14G',frag:'4',lab:'próprio',motivo:null},pac:''}); }
 // ---------- padrões do app: pular para o próximo campo e máscara de data ----------
 function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
 document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;
