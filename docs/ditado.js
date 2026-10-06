@@ -46,7 +46,7 @@ function ditNumRun(tk,i){
 function ditadoTexto(s){
   let t=ditPrep(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   t=t.replace(/(\d)\s*[x×*]\s*(?=\d)/g,'$1 por ').replace(/(\d)h(\d)/g,'$1 $2').replace(/[;:!?]/g,' , ')
-    .replace(/\b(?:logo|lobu|loba|lóbulo|lobulo)\s+(direito|esquerdo)/g,'lobo $1').replace(/\b(?:estimulo|estimo|istimo|ismo|itsmo)\b/g,'istmo')
+    .replace(/\b(?:logo|lobu|loba|lóbulo|lobulo)\s+(direito|esquerdo)/g,'lobo $1').replace(/\b(?:estimul\w*|estimo|estima|istimo|istmus|ismo|itsmo|is\s+timo|es\s+timo|isto\s+mo|istimos|estimos)\b/g,'istmo')
     .replace(/\bpara\s+tireoides?\b/g,'paratireoide')
     .replace(/\b(?:thats|that's|tai\s*rads?|ti\s*-?\s*rads?|tirades|tiradis|tirad|thirads|tyrads|tirats)\b/g,'tirads')
     .replace(/\b(?:pf|paf|pa\s*-?\s*af|p\s+a\s+a\s+f|puncao\s+aspirativa(?:\s+(?:por|com)\s+agulha\s+fina)?)\b/g,'paaf')
@@ -241,7 +241,7 @@ const ditSemItens=(t,re,ate)=>t.replace(new RegExp('('+re.source+')[\\s\\S]*?(?=
 function ditNum(t,re,padraoMm){
   const m=t.match(new RegExp(re.source+'[^0-9]{0,25}?(\\d+(?:[.,]\\d+)?)\\s*(mm|milimetros?|cm|centimetros?)?')); if(!m) return null;
   let v=parseFloat(m[m.length-2].replace(',','.')); const u=m[m.length-1]||'';
-  if(/^c/.test(u)||(!u&&!padraoMm&&v<5&&/[.,]/.test(m[m.length-2]))) v=v*10;
+  if(/^c/.test(u)) v=v*10;   // sem unidade = mm
   v=Math.round(v*10)/10; return Number.isInteger(v)?String(v):String(v).replace('.',',');
 }
 // "06/25", "junho de 2025", "junho de 25" → mm/aa
@@ -575,7 +575,7 @@ function tmicEquipar(){
 }
 if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',()=>{ const ph=document.getElementById('phone'); if(!ph) return; tmicEquipar(); new MutationObserver(tmicEquipar).observe(ph,{childList:true,subtree:true}); });
 // número de lâminas por extenso ("quatro lâminas")
-function laminasTxt(n){ const v=parseInt(n,10), ext=['','uma lâmina','duas lâminas','três lâminas','quatro lâminas','cinco lâminas','seis lâminas','sete lâminas','oito lâminas','nove lâminas']; if(!isFinite(v)||v<1) return '___ lâminas'; return v<10?ext[v]:v+' lâminas'; }
+function laminasTxt(n){ const v=parseInt(n,10); if(!isFinite(v)||v<1) return '___ lâminas'; return v===1?'1 lâmina':v+' lâminas'; }
 // ---------- copiar laudo: texto puro + HTML com os cabeçalhos em negrito ----------
 const LAUDO_SECOES=/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Medidas|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/;
 const LAUDO_ITEM=/^((?:N|C|LN|LT|LS|LC|M|L)\d+(?:,| ·)[^:\n]{0,90}:)/;

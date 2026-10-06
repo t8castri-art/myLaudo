@@ -235,7 +235,7 @@ const st={
   gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},
   med:{istmo:['19','5','11,5'],ld:['47','18','20'],le:['46','16','19']},
   nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,
-  paaf:{on:false,alvos:new Set(),lam:'4',agulha:'25x6',lab:'próprio'},
+  paaf:{on:false,alvos:new Set(),lam:'4',agulha:'25x6',lab:'próprio',motivo:null},
 };
 const n1=novoNod(); n1.med=['16','11','13']; st.nods.push(n1);
 
@@ -321,7 +321,7 @@ function docUS(){
     `Ao estudo Doppler: ${g.dop==='sem alterações'?'sem alterações detectáveis':'aumento difuso da vascularização parenquimatosa'}.`,'',
     ...(st.nods.length?st.nods.flatMap(n=>[descrN(n),'']):['Sem evidência de formações nodulares.','']),
     'Medidas:',
-    (m.istmo.filter(v=>String(v).trim()).length===1?`Istmo: ${cm(m.istmo.find(v=>String(v).trim()))} cm de espessura.`:`Istmo: ${m.istmo.map(cm).join(' × ')} cm.`),
+    ...(m.istmo.some(v=>String(v).trim())?[m.istmo.filter(v=>String(v).trim()).length===1?`Istmo: ${cm(m.istmo.find(v=>String(v).trim()))} cm de espessura.`:`Istmo: ${m.istmo.map(cm).join(' × ')} cm.`]:[]),   // sem medida do istmo, a linha não sai
     `Lobo direito: ${m.ld.map(cm).join(' × ')} cm.`,
     `Lobo esquerdo: ${m.le.map(cm).join(' × ')} cm.`,
     `Volume total: ~${fmt(vd+ve,0)} mL.`,'',
@@ -335,12 +335,16 @@ function alvos(){ return [...st.paaf.alvos].map(k=>k[0]==='n'?st.nods.find(x=>x.
 // PAAF enxuta: uma frase no Procedimento, uma na Conclusão
 const paafNome=x=>x.lobo?`nódulo ACR ${tr(pts(x)).replace('TR','TI-RADS ')} em ${LOBO[x.lobo]}`:`linfonodo nível ${x.nivel} à ${x.lado==='D'?'direita':'esquerda'}`;
 const paafRot=x=>x.lobo?rotN(x):rotL(x);
+const MOTIVOS=[['dec','decisão compartilhada'],['fam','história familiar'],['cres','crescimento']];
+const MOTIVO_TXT={dec:'Procedimento indicado após orientações e decisão compartilhada.',fam:'Procedimento indicado devido histórico familiar positivo para neoplasias de tireoide.',cres:'Procedimento indicado devido crescimento do nódulo quando comparado com exames anteriores disponíveis.'};
+function motivoAuto(){ if(st.anam.fam&&st.anam.fam!=='nao') return 'fam'; if(st.prev.tem==='sim'&&/aumento/.test(antEvolucao(st.prev.txt||'',nodsAtuais()))) return 'cres'; return 'dec'; }
+const motivoAtual=()=>st.paaf.motivo||motivoAuto();
 function paafFrase(){ const A=alvos(), temL=A.some(x=>!x.lobo);
-  return `Realizada PAAF guiada por ultrassom de ${A.map(paafRot).join(' e ')}, com agulha ${st.paaf.agulha.replace('x',' × ')}, sem intercorrências imediatas. Material enviado para análise citopatológica em ${laminasTxt(st.paaf.lam)}${temL?', com dosagem de tireoglobulina no lavado':''}${st.paaf.lab==='entregue'?', entregue ao(à) paciente':''}.`; }
+  return `Realizada PAAF guiada por ultrassom com agulha ${st.paaf.agulha.replace('x',' × ')}, sem intercorrências imediatas. Material enviado para análise citopatológica em ${laminasTxt(st.paaf.lam)}${temL?', com dosagem de tireoglobulina no lavado':''}. ${MOTIVO_TXT[motivoAtual()]}`; }
 function paafConclusao(){ const A=alvos(), q=sugAtual();
   const seg=q.has('sem')?' Recomenda-se seguimento ecográfico semestral.':q.has('anu')?' Recomenda-se seguimento ecográfico anual.':'';
   const comp=q.has('comp')?' Sugere-se estudo com método de imagem complementar (tomografia/ressonância).':'';
-  return `Realizada PAAF de ${A.map(x=>`${paafRot(x)} (${paafNome(x)})`).join(' e ')}.${seg}${comp}`; }
+  return `Realizada PAAF de ${A.map(paafRot).join(' e ')}.${seg}${comp}`; }
 function docPAAF(){
   const A=alvos(); if(!A.length) return 'Marque os nódulos e linfonodos puncionados na tela do laudo (cartão Procedimento).';
   return [
@@ -410,6 +414,7 @@ function viewLaudo(){
           <div class="k">Puncionados</div>${alvoChips.length?chips(alvoChips,st.paaf.alvos,'alvo',true):'<div class="empty">Adicione um nódulo ou linfonodo primeiro.</div>'}
           <div class="k">Lâminas</div><div class="in"><input class="cell" inputmode="numeric" data-f="lam" value="${esc(st.paaf.lam)}" placeholder="—"></div>
           <div class="k">Agulha</div>${segm([['40x8','40 × 8'],['30x7','30 × 7'],['25x6','25 × 6']],st.paaf.agulha,'agulha')}
+          <div class="k">Motivo</div>${chips(MOTIVOS,motivoAtual(),'motivo')}
           <div class="k">Material</div>${segm([['próprio','laboratório'],['entregue','entregue ao paciente']],st.paaf.lab,'lab')}
         </div>`:''}
       </div>
@@ -500,7 +505,7 @@ function wire(){
   const pt=document.getElementById('paraTxt'); if(pt) pt.addEventListener('input',()=>{st.paraTxt=pt.value;renderDocs();});
   const ps=$('#paafSw'); if(ps) ps.addEventListener('click',()=>{st.paaf.on=!st.paaf.on; st.sug=null; if(st.paaf.on&&!st.paaf.alvos.size){const f=st.nods.find(n=>conduta(n).k==='paaf')||st.nods[0]; if(f) st.paaf.alvos.add('n'+f.id); st.doc='paaf';} render();});
   on('[data-alvo]',el=>{const k=el.dataset.alvo;st.paaf.alvos.has(k)?st.paaf.alvos.delete(k):st.paaf.alvos.add(k);render();});
-  on('[data-agulha]',el=>{st.paaf.agulha=el.dataset.agulha;render();});on('[data-lab]',el=>{st.paaf.lab=el.dataset.lab;render();});
+  on('[data-agulha]',el=>{st.paaf.agulha=el.dataset.agulha;render();});on('[data-motivo]',el=>{st.paaf.motivo=el.dataset.motivo;render();});on('[data-lab]',el=>{st.paaf.lab=el.dataset.lab;render();});
   inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value; if(k==='prevdata')st.prev.data=v;else if(k==='prevn')st.prev.n=v;else if(k==='prevmaior')st.prev.maior=v;else if(k==='dose')st.anam.dose=v;else if(k==='lam')st.paaf.lam=v; renderDocs();});
   const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{const uni=st.serv==='inst'&&st.paaf.on; const t=uni?docUnico(docPAAF,'COM PAAF GUIADA'):docUS()+(st.paaf.on?'\n\n'+'='.repeat(40)+'\n\n'+docPAAF():''); toast(await copiarLaudo(t)?(st.paaf.on&&!uni?'2 laudos copiados':'Laudo copiado'):'Não deu para copiar aqui; o texto está ao lado');});
   on('[data-back]',()=>{st.view='laudo';st.edit=null;render();});
@@ -524,7 +529,7 @@ function wire(){
 }
 function refreshVol(){const t=$('#volTot');if(t)t.textContent='~ '+fmt(vol(st.med.ld)+vol(st.med.le),0)+' mL';}
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800);}
-function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,paaf:{on:false,alvos:new Set(),lam:'4',agulha:'25x6',lab:'próprio'},pac:''}); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,paaf:{on:false,alvos:new Set(),lam:'4',agulha:'25x6',lab:'próprio',motivo:null},pac:''}); }
 // ---------- padrões do app: pular para o próximo campo e máscara de data ----------
 function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
 document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;
