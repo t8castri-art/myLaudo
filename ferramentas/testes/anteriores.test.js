@@ -1,5 +1,5 @@
 // Testes dos exames anteriores (leitura da lista e evolução). Rodar no Mac:
-//   jsc -e "var document={createElement:()=>({}),head:{appendChild(){}}}; var TextDecoder=function(){}; TextDecoder.prototype.decode=function(u){ return decodeURIComponent(Array.from(u).map(x=>'%'+x.toString(16)).join('')); };" design/anteriores.js ferramentas/testes/anteriores.test.js
+//   jsc -e "var document={createElement:()=>({}),head:{appendChild(){}}}; var TextDecoder=function(){}; TextDecoder.prototype.decode=function(u){ return decodeURIComponent(Array.from(u).map(x=>'%'+x.toString(16)).join('')); };" docs/anteriores.js ferramentas/testes/anteriores.test.js
 var falhas=0; function eq(nome,a,e){ if(a!==e){ falhas++; print('FALHOU '+nome+'\n   esperado: '+e+'\n   veio:     '+a); } }
 
 // limpeza da identificação

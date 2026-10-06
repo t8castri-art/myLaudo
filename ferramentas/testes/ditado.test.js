@@ -1,5 +1,5 @@
 // Testes do ditado. Rodar no Mac:
-//   jsc design/ditado.js ferramentas/testes/ditado.test.js
+//   jsc docs/ditado.js ferramentas/testes/ditado.test.js
 //   (jsc = /System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc)
 // Cada caso: [função, frase como o iPhone escreveu, campos esperados]. Falha imprime "FALHOU".
 var sh=o=>JSON.stringify(o,(k,v)=>v instanceof Set?[...v].sort():v);

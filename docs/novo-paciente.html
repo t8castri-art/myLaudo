@@ -154,7 +154,7 @@ function wire(){
   const pt=document.getElementById('prevTxt'); if(pt) pt.addEventListener('input',()=>{ st.prev.txt=pt.value; ficha(); });
   anterioresLigar(st.prev,null,st.nome,render,toast);
   ditadoLigar(st.dit,'paciente',{nome:'#nome',nasc:'#nasc',sexo:'sexo',serv:'serv',zap:'#zap',email:'#email',envio:'envio',prevTxt:'#prevTxt',prevNao:'prev'},render,toast,st);
-  $('#iniciar').onclick=()=>{ salvar(); location.href=APP?'index.html':'mylaudo.html'; };
+  $('#iniciar').onclick=()=>{ salvar(); location.href='index.html'; };
   $('#salvar').onclick=()=>{ salvar(); toast('Paciente salvo neste aparelho'); };
 }
 // o ditado escreve prevTxt/prevNao; aqui viram o cartão de exames anteriores

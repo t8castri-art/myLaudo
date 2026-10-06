@@ -5,8 +5,8 @@ Leia isto antes de mexer em qualquer tela. É o estado atual das decisões do Dr
 ## O que é
 App **pessoal** para gerar laudos de ultrassom no celular (iPhone). Não é produto, não é público. O fluxo é marcar chips, conferir o texto, **Copiar** e colar no sistema oficial (Zanno, sistema do Instituto ou HMC) ou mandar por WhatsApp ou e-mail.
 
-- Site no ar: https://t8castri-art.github.io/myLaudo/ (repositório público `t8castri-art/myLaudo`, GitHub Pages, branch `main`, raiz)
-- Este repositório (`mylaudo-dev`, privado) guarda as fontes, o laboratório do ícone e este contexto.
+- Site no ar: https://t8castri-art.github.io/myLaudo/, servido pelo GitHub Pages a partir da pasta `docs/` deste repositório (`t8castri-art/myLaudo`, **público** desde 06/10/2026, branch `main`). Um `git push` publica em 1 ou 2 minutos. O repositório antigo do site virou `myLaudo-antigo` (arquivado).
+- Este repositório guarda as fontes (`docs/`), o laboratório do ícone, a ponte da IA e este contexto. Como é público, nunca gravar aqui senha, chave ou dado de paciente.
 - Ele instala o site no iPhone: Safari → Compartilhar → Adicionar à Tela de Início, com **"Abrir como App Web" DESLIGADO**. Motivo: o reconhecimento de voz do Safari **não existe dentro de app web da tela de início** (limitação da Apple, bug WebKit 225298 aberto desde 2021). Com o toggle desligado o ícone abre o site no Safari, onde o microfone do app funciona com um toque. Se abrir como app web, o microfone do app cai sozinho para o **microfone do teclado** (o app detecta e abre a caixa com a dica).
 - Qualquer erro de código aparece como aviso na tela ("Erro no app: …"), para ele mandar o print.
 
@@ -23,7 +23,7 @@ Se esquecer o pull e der conflito, não force nada: pare e resolva arquivo por a
 
 **Quando mudar alguma regra do app** (texto do laudo, comportamento de tela, decisão de design), atualize este CONTEXTO.md na mesma sessão. É ele que ensina a próxima conversa, na outra máquina.
 
-**Publicar o site** continua sendo à parte: copie de `design/` para o repositório público `t8castri-art/myLaudo` (`mylaudo.html` vira `index.html`) e dê push lá também.
+**Publicar o site** é o próprio `git push`: o GitHub Pages serve a pasta `docs/`. Não existe mais cópia para outro repositório. Se o clone local ainda apontar para `mylaudo-dev`, troque: `git remote set-url origin https://github.com/t8castri-art/myLaudo.git`.
 
 ## Como trabalhar com ele
 - **Ritmo devagar.** Mostre, pergunte, e só então empilhe a próxima decisão.
@@ -34,17 +34,19 @@ Se esquecer o pull e der conflito, não force nada: pare e resolva arquivo por a
 
 ## Estrutura
 ```
-design/               fontes das telas (é aqui que se edita)
+docs/                 fontes das telas = site publicado (é aqui que se edita)
   ditado.js           ditado por item: fala → chips e medidas (vai junto para o site)
-  mylaudo.html        início: serviço, + novo paciente, lista de exames  → vira site/index.html
+  index.html          início: serviço, + novo paciente, lista de exames
   novo-paciente.html  cadastro: microfone flutuante (ditado real) e exames anteriores com scanner
   emitir-laudo-*.html tireoide, mamas, transvaginal, cervical, prostata
   laboratorio-*.html  laboratórios de cor/layout e do ícone
   modelos.js          31 rascunhos de modelos (sintaxe {a|b|c} = chips, ___ = lacuna)
 ferramentas/icone/    script que gera o laboratório do ícone + recortes da logo
+ferramentas/ponte-ia/ código da ponte (Cloudflare Worker) e versão para colar
+ferramentas/testes/   testes do ditado e dos exames anteriores (rodar com jsc)
 exigencias-laudo-us.md  normas (CFM 2.381/2024, CBR/PADI 2025, SBEM etc.)
 ```
-**Publicar uma mudança:** edite em `design/`, copie para o repositório do site (`mylaudo.html` → `index.html`, e as outras telas com o mesmo nome), faça commit e push em `t8castri-art/myLaudo`. O Pages republica em 1 ou 2 minutos.
+**Publicar uma mudança:** edite em `docs/`, rode os testes, `git commit` e `git push`. O Pages republica em 1 ou 2 minutos. Para conferir se já subiu: `curl -s https://t8castri-art.github.io/myLaudo/ditado.js | grep <algo novo>`.
 
 ## Visual (travado)
 - Só tema escuro, o mais escuro possível. Estilo discreto, "Batman".
@@ -124,7 +126,7 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para uma IA (ditado ou scanner), o app remove nome, nascimento, CPF, telefone e e-mail; a IA recebe só achados. Os dados ficam no aparelho.
 
 ## Próximos passos combinados
-1. **Ditado** (no ar desde 24–25/09, código em `design/ditado.js`, compartilhado pelas telas; reconhecimento por regras, no aparelho, sem IA; "sem X" / "nega X" anulam X).
+1. **Ditado** (no ar desde 24–25/09, código em `docs/ditado.js`, compartilhado pelas telas; reconhecimento por regras, no aparelho, sem IA; "sem X" / "nega X" anulam X).
    - **Ditado do exame**: cartão no topo das 5 telas. Preenche indicação, anamnese, exames anteriores, órgão e medidas. Ignora nódulos e lesões.
    - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical), nódulo e cisto de mama (mama, horário, distância do mamilo e da pele, descritores BI-RADS; o ditado pode trocar a mama e o tipo nódulo/cisto). Frase corrida: localização + características + **medidas em cm por último**.
    - Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm.
@@ -136,6 +138,6 @@ Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para um
    - Se o microfone do site falhar, usa-se o do teclado na mesma caixa.
    - Testes automáticos em `ferramentas/testes/` (rodar com `jsc`, ver cabeçalho de cada arquivo); rodar antes de publicar mudança no ditado ou nos exames anteriores.
    - Falta ditado de item em: mioma, lesão anexial, lesão salivar e lesão cervical.
-2. **Ícone**: laboratório em `design/laboratorio-do-icone.html` (gerado por `ferramentas/icone/lab_icone.py`). Decidido: calipers em **X**, traço fino, rosa + sálvia, degradê esfumaçado que termina em preto. Reprovados: feixe, colchetes, logo dele no ícone, Saturno, traçado livre, cruz "+". Na mesa: nódulo medido, só os calipers, elipse medida, Doppler de 1 e de 2 ondas (subida sistólica rápida), campo trapezoidal e **campo minimalista** (fundo preto, degradê só dentro do feixe, nódulo medido dentro). Falta ele escolher; depois gerar `apple-touch-icon.png` 180×180 e ligar no `index.html`.
+2. **Ícone**: laboratório em `docs/laboratorio-do-icone.html` (gerado por `ferramentas/icone/lab_icone.py`). Decidido: calipers em **X**, traço fino, rosa + sálvia, degradê esfumaçado que termina em preto. Reprovados: feixe, colchetes, logo dele no ícone, Saturno, traçado livre, cruz "+". Na mesa: nódulo medido, só os calipers, elipse medida, Doppler de 1 e de 2 ondas (subida sistólica rápida), campo trapezoidal e **campo minimalista** (fundo preto, degradê só dentro do feixe, nódulo medido dentro). Falta ele escolher; depois gerar `apple-touch-icon.png` 180×180 e ligar no `index.html`.
 3. Exames que faltam para cobrir o HMC: rins e vias, carótidas, depois abdome superior e total.
 4. Depois (não agora): agenda (Google Calendar do Instituto e do particular) e integração DICOM com o aparelho.

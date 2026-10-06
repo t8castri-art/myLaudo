@@ -1,7 +1,7 @@
 import base64, os
 sp = os.path.dirname(os.path.abspath(__file__))
 mask = base64.b64encode(open(os.path.join(sp, 'mono_mask.png'), 'rb').read()).decode()
-dest = os.path.join(sp, "..", "..", "design", "laboratorio-do-icone.html")
+dest = os.path.join(sp, "..", "..", "docs", "laboratorio-do-icone.html")
 
 html = """<meta charset="utf-8">
 <title>Laboratório do Ícone</title>
