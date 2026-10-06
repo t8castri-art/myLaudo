@@ -48,6 +48,9 @@ function ditadoTexto(s){
   t=t.replace(/(\d)\s*[x×*]\s*(?=\d)/g,'$1 por ').replace(/(\d)h(\d)/g,'$1 $2').replace(/[;:!?]/g,' , ')
     .replace(/\b(?:logo|lobu|loba|lóbulo|lobulo)\s+(direito|esquerdo)/g,'lobo $1').replace(/\b(?:estimulo|estimo|istimo|ismo|itsmo)\b/g,'istmo')
     .replace(/\bpara\s+tireoides?\b/g,'paratireoide')
+    .replace(/\b(?:thats|that's|tai\s*rads?|ti\s*-?\s*rads?|tirades|tiradis|tirad|thirads|tyrads|tirats)\b/g,'tirads')
+    .replace(/\b(?:pf|paf|pa\s*-?\s*af|p\s+a\s+a\s+f|puncao\s+aspirativa(?:\s+(?:por|com)\s+agulha\s+fina)?)\b/g,'paaf')
+    .replace(/\b(?:betesda|betesta|bethesta|betezda|betsda)\b/g,'bethesda').replace(/\b(?:bi\s*-?\s*rads?|bi\s*hads|birades|bi\s*rats)\b/g,'birads').replace(/\b(?:o\s*-?\s*rads?|o\s*hads)\b/g,'orads')
     .replace(/\bclassificac(ao|oes)\s+(?=periferic|anelar|em\s+anel|em\s+casca|grosseir|grossa|puntiform|punctiform|pontiform)/g,'calcificac$1 ')
     .replace(/\bmicro\s*-?\s*(?:classificac|calcificac)/g,'microcalcificac').replace(/\bmacro\s*-?\s*(?:classificac|calcificac)/g,'macrocalcificac')
     .replace(/\b(hipo|hiper|iso|an)\s*-?\s*(?:e\s*)?(?:iko|ico|eco|eko|ecoide|ecoid|ecogenic\w*|ecoic\w*)\b/g,'$1ecoico').replace(/\b(?:leva|levo)\s+tiroxina/g,'levotiroxina').replace(/\bti\s*-?\s*rads?\b|\btirades\b|\btiradis\b/g,'tirads');
@@ -571,6 +574,8 @@ function tmicEquipar(){
   });
 }
 if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',()=>{ const ph=document.getElementById('phone'); if(!ph) return; tmicEquipar(); new MutationObserver(tmicEquipar).observe(ph,{childList:true,subtree:true}); });
+// número de lâminas por extenso ("quatro lâminas")
+function laminasTxt(n){ const v=parseInt(n,10), ext=['','uma lâmina','duas lâminas','três lâminas','quatro lâminas','cinco lâminas','seis lâminas','sete lâminas','oito lâminas','nove lâminas']; if(!isFinite(v)||v<1) return '___ lâminas'; return v<10?ext[v]:v+' lâminas'; }
 // ---------- copiar laudo: texto puro + HTML com os cabeçalhos em negrito ----------
 const LAUDO_SECOES=/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Medidas|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/;
 const LAUDO_ITEM=/^((?:N|C|LN|LT|LS|LC|M|L)\d+(?:,| ·)[^:\n]{0,90}:)/;

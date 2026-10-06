@@ -82,7 +82,10 @@ exigencias-laudo-us.md  normas (CFM 2.381/2024, CBR/PADI 2025, SBEM etc.)
 | Caráter (eletivo/urgência) | não | não | sim, dentro da técnica |
 | US + PAAF/CORE | **1 laudo só** (US + bloco Procedimento) | 2 laudos | 2 laudos |
 
-PAAF (tireoide e cervical): agulha **40 × 8, 30 × 7 ou 25 × 6** (padrão 25 × 6) e número de **lâminas** (padrão 3); o laudo diz "com agulha 25 × 6, técnica de capilaridade, confeccionadas N lâminas".
+**PAAF enxuta** (tireoide e cervical, desde 06/10): agulha **40 × 8, 30 × 7 ou 25 × 6** (padrão 25 × 6) e número de **lâminas** (padrão 4, sai por extenso).
+- Procedimento (uma frase): "Realizada PAAF guiada por ultrassom de N1, com agulha 25 × 6, sem intercorrências imediatas. Material enviado para análise citopatológica em quatro lâminas[, com dosagem de tireoglobulina no lavado]."
+- Conclusão: "Realizada PAAF de N1 (nódulo ACR TI-RADS 4 em lobo direito). Recomenda-se seguimento ecográfico semestral." (o intervalo vem dos chips de Sugestão: ligar a PAAF marca "semestral", ele troca para anual; TC/RM entra como frase extra). Sugestão: "Retorno ao médico assistente com o resultado citopatológico."
+- Saíram Consentimento, Técnica longa, Intercorrências e Orientações. No Instituto tudo isso entra no laudo único (bloco Procedimento); fora dele, o laudo da PAAF é o segundo documento e o laudo de US fica com a sugestão de seguimento.
 
 Para ele, "particular" é tudo que não é SUS. Aparelho: **Samsung HM70 EVO**, transdutores linear 3–16 MHz, minilinear 2–22 MHz, convexo 2–8 MHz, endocavitário 2–9 MHz.
 
@@ -133,10 +136,10 @@ Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para um
 1. **Ditado** (no ar desde 24–25/09, código em `docs/ditado.js`, compartilhado pelas telas; reconhecimento por regras, no aparelho, sem IA; "sem X" / "nega X" anulam X).
    - **Ditado do exame**: cartão no topo das 5 telas. Preenche indicação, anamnese, exames anteriores, órgão e medidas. Ignora nódulos e lesões.
    - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical), nódulo e cisto de mama (mama, horário, distância do mamilo e da pele, descritores BI-RADS; o ditado pode trocar a mama e o tipo nódulo/cisto). Frase corrida: localização + características + **medidas em cm por último**.
-   - **Regra única (06/10): medida ditada é em milímetros** ("18 por 12 por 16"), igual à digitada. Só vira cm se ele disser "centímetros". Distâncias da mama (mamilo, pele) idem.
+   - **Regra única (06/10): medida ditada é em milímetros** ("18 por 12 por 16"), igual à digitada; **o laudo converte sozinho para cm** ("Mediu 1,8 × 1,2 × 1,6 cm"). Só vira cm no ditado se ele disser "centímetros". Distâncias da mama (mamilo, pele) idem. A lista dos exames anteriores fica em mm, como ele pediu.
    - A última menção de um lobo vale (correção falada). Um decimal menor que 2 ao lado de inteiros ("06 por 1.2 por 09") é lido como erro do iPhone e vira 12.
    - Paratireoide: plural ("visibilizadas") sem "não" conta como **não visibilizadas**, porque o iPhone às vezes engole o "não"; só o singular marca visibilizada.
-   - O iPhone erra previsivelmente, e o app corrige: frases coladas sem ponto ("PeçanhaExame"), "Estímulo/istimo" = istmo, "logo direito" = lobo direito, "para tireoide" = paratireoide, "leva tiroxina" = levotiroxina, "hipo iko"/"hipoecoide" = hipoecoico, "classificação periférica" = calcificação periférica, "foco ecogênico puntiforme" = microcalcificação, "calcificação" sozinha = macrocalcificação, "17h21" entre números = 17 21, "mediu06" = mediu 06. Medidas também com "vezes", só números em sequência ("47 18 20"), "LD/LE". Istmo com um número só = espessura.
+   - O iPhone erra previsivelmente, e o app corrige: frases coladas sem ponto ("PeçanhaExame"), "Estímulo/istimo" = istmo, "logo direito" = lobo direito, "para tireoide" = paratireoide, "leva tiroxina" = levotiroxina, "hipo iko"/"hipoecoide" = hipoecoico, "classificação periférica" = calcificação periférica, "foco ecogênico puntiforme" = microcalcificação, "calcificação" sozinha = macrocalcificação, "THATS"/"tirades"/"tai rads" = TI-RADS, "PF"/"PAF" = PAAF, "betesda" = Bethesda, "bi hads" = BI-RADS (o mesmo dicionário está na instrução da ponte), "17h21" entre números = 17 21, "mediu06" = mediu 06. Medidas também com "vezes", só números em sequência ("47 18 20"), "LD/LE". Istmo com um número só = espessura.
    - Para depurar: pedir ao médico o **texto exato da caixa** (o que o iPhone escreveu) e testar o parser em cima dele.
    - **Tracejado = veio do ditado e já está no laudo.** Não precisa tocar para confirmar; só toca para trocar. O que não foi dito fica no padrão, que conta como ausente. O aviso só aparece quando falta o essencial do item (nódulo: lobo, terço, composição, ecogenicidade, medidas).
    - Se o microfone do site falhar, usa-se o do teclado na mesma caixa.

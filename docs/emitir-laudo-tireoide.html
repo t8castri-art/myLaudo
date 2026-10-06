@@ -218,9 +218,9 @@ function docUnico(proc,sufixo){
   const us=docUS().split('\n'), get=k=>{const l=p.find(x=>x.startsWith(k+':'));return l?l.slice(k.length+2):'';};
   const iC=us.indexOf('Conclusão:'), iS=us.findIndex(l=>l.startsWith('Sugestão:'));
   return [us[0]+' '+sufixo, ...us.slice(1,iC),
-    'Procedimento:', get('Consentimento e preparo'), get('Técnica'), (get('Intercorrências')+' '+get('Orientações')).trim(),'',
+    'Procedimento:', get('Procedimento'),'',
     'Conclusão:', ...us.slice(iC+1,iS<0?us.length:iS).filter(Boolean).map(l=>l.replace(', com indicação de PAAF','')), get('Conclusão'),'',
-    `Sugestão: ${get('Sugestão')||'Retorno ao médico assistente com o resultado histopatológico.'}`].join('\n');
+    `Sugestão: ${get('Sugestão')||'Retorno ao médico assistente com o resultado citopatológico.'}`].join('\n');
 }
 const dataCurta=d=>{const m=String(d||'').trim().match(/^(\d{1,2})\/(\d{2,4})$/); return m?m[1].padStart(2,'0')+'/'+m[2].slice(-2):String(d||'').trim();};
 let seq=1;
@@ -235,7 +235,7 @@ const st={
   gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},
   med:{istmo:['19','5','11,5'],ld:['47','18','20'],le:['46','16','19']},
   nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,
-  paaf:{on:false,alvos:new Set(),lam:'3',agulha:'25x6',lab:'próprio'},
+  paaf:{on:false,alvos:new Set(),lam:'4',agulha:'25x6',lab:'próprio'},
 };
 const n1=novoNod(); n1.med=['16','11','13']; st.nods.push(n1);
 
@@ -286,7 +286,7 @@ function infoClinica(){
 function conclusao(){
   const c=[];
   if(!st.nods.length) c.push('Glândula tireoide sem evidência de nódulos.');
-  st.nods.forEach(n=>{const k=conduta(n).k; c.push(`${rotN(n)}: ACR ${tr(pts(n)).replace('TR','TI-RADS ')} em ${LOBO[n.lobo]}${k==='paaf'?', com indicação de PAAF':k==='seg'?', com indicação de seguimento por imagem':''}.`);});
+  st.nods.forEach(n=>{const k=conduta(n).k; c.push(`${rotN(n)}: ACR ${tr(pts(n)).replace('TR','TI-RADS ')} em ${LOBO[n.lobo]}${k==='paaf'&&!st.paaf.on?', com indicação de PAAF':k==='seg'?', com indicação de seguimento por imagem':''}.`);});
   if(st.para==='sim'&&st.paraAsp==='alterada') c.push('Formação nodular em topografia de paratireoide. Correlacionar com cálcio e PTH.');
   st.linfs.filter(suspL).forEach(l=>c.push(`${rotL(l)}: linfonodo cervical nível ${l.nivel} à ${l.lado==='D'?'direita':'esquerda'} com critérios ultrassonográficos de suspeição.`));
   return c;
@@ -294,16 +294,16 @@ function conclusao(){
 // sugestão: só quatro opções; o app marca a que as regras indicam e o médico troca
 const SUGS=[['paaf','PAAF'],['sem','seguimento semestral'],['anu','seguimento anual'],['comp','TC/RM']];
 const alvosPaaf=()=>st.nods.filter(n=>conduta(n).k==='paaf').map(rotN).concat(st.linfs.filter(suspL).map(rotL));
-function sugAuto(){ const s=new Set(); if(alvosPaaf().length) s.add('paaf'); else if(st.nods.some(n=>conduta(n).k==='seg')) s.add('anu'); return s; }
+function sugAuto(){ const s=new Set(); if(st.paaf.on) s.add('sem'); else if(alvosPaaf().length) s.add('paaf'); else if(st.nods.some(n=>conduta(n).k==='seg')) s.add('anu'); return s; }
 const sugAtual=()=>st.sug||sugAuto();
 function sugestao(){
   const q=sugAtual(), s=[];
-  if(q.has('paaf')){ let p=alvosPaaf(); if(!p.length&&st.nods.length){ const mx=Math.max(...st.nods.map(n=>pts(n))); p=st.nods.filter(n=>pts(n)===mx).map(rotN); }
+  if(q.has('paaf')&&!st.paaf.on){ let p=alvosPaaf(); if(!p.length&&st.nods.length){ const mx=Math.max(...st.nods.map(n=>pts(n))); p=st.nods.filter(n=>pts(n)===mx).map(rotN); }
     s.push(p.length?`PAAF de ${p.join(' e ')}${st.linfs.some(suspL)?', com tireoglobulina no lavado do linfonodo':''}.`:'PAAF.'); }
   if(q.has('sem')) s.push('Seguimento ecográfico semestral.');
   if(q.has('anu')) s.push('Seguimento ecográfico anual.');
   if(q.has('comp')) s.push('Sugere-se estudo com método de imagem complementar (tomografia/ressonância).');
-  return s.length?s.join(' '):'Acompanhamento com médico assistente.';
+  return s.length?s.join(' '):st.paaf.on?'Retorno ao médico assistente com o resultado citopatológico.':'Acompanhamento com médico assistente.';
 }
 function docUS(){
   const g=st.gl,m=st.med,vd=vol(m.ld),ve=vol(m.le);
@@ -332,22 +332,26 @@ function docUS(){
   ].join('\n');
 }
 function alvos(){ return [...st.paaf.alvos].map(k=>k[0]==='n'?st.nods.find(x=>x.id===+k.slice(1)):st.linfs.find(x=>x.id===+k.slice(1))).filter(Boolean); }
+// PAAF enxuta: uma frase no Procedimento, uma na Conclusão
+const paafNome=x=>x.lobo?`nódulo ACR ${tr(pts(x)).replace('TR','TI-RADS ')} em ${LOBO[x.lobo]}`:`linfonodo nível ${x.nivel} à ${x.lado==='D'?'direita':'esquerda'}`;
+const paafRot=x=>x.lobo?rotN(x):rotL(x);
+function paafFrase(){ const A=alvos(), temL=A.some(x=>!x.lobo);
+  return `Realizada PAAF guiada por ultrassom de ${A.map(paafRot).join(' e ')}, com agulha ${st.paaf.agulha.replace('x',' × ')}, sem intercorrências imediatas. Material enviado para análise citopatológica em ${laminasTxt(st.paaf.lam)}${temL?', com dosagem de tireoglobulina no lavado':''}${st.paaf.lab==='entregue'?', entregue ao(à) paciente':''}.`; }
+function paafConclusao(){ const A=alvos(), q=sugAtual();
+  const seg=q.has('sem')?' Recomenda-se seguimento ecográfico semestral.':q.has('anu')?' Recomenda-se seguimento ecográfico anual.':'';
+  const comp=q.has('comp')?' Sugere-se estudo com método de imagem complementar (tomografia/ressonância).':'';
+  return `Realizada PAAF de ${A.map(x=>`${paafRot(x)} (${paafNome(x)})`).join(' e ')}.${seg}${comp}`; }
 function docPAAF(){
   const A=alvos(); if(!A.length) return 'Marque os nódulos e linfonodos puncionados na tela do laudo (cartão Procedimento).';
-  const nome=x=>x.lobo?`nódulo tireoidiano ACR ${tr(pts(x)).replace('TR','TI-RADS ')} em ${LOBO[x.lobo]}`:`linfonodo cervical nível ${x.nivel} à ${x.lado==='D'?'direita':'esquerda'}`;
-  const temL=A.some(x=>!x.lobo);
   return [
     'PUNÇÃO ASPIRATIVA POR AGULHA FINA GUIADA POR ULTRASSONOGRAFIA','',
     ...linhaTopo(),
-    `Indicação: ${A.map(nome).join('; ')}.`,
-    'Consentimento e preparo: Paciente esclarecido(a) sobre o procedimento, riscos e benefícios, com termo de consentimento assinado. Antissepsia da região cervical com clorexidina alcoólica.',
-    `Técnica: Sob orientação ultrassonográfica em tempo real com transdutor linear de alta frequência, sem anestesia, com agulha ${st.paaf.agulha.replace('x',' × ')}, técnica de capilaridade, confeccionadas ${st.paaf.lam||'___'} lâminas. Material em lâminas e em meio líquido${temL?', com coleta de lavado da agulha para dosagem de tireoglobulina no linfonodo':''}, identificado e encaminhado ao laboratório${st.paaf.lab==='entregue'?' escolhido pelo(a) paciente, com termo de entrega de amostra':''}.`,
+    `Indicação: ${A.map(paafNome).join('; ')}.`,
     `Informações clínicas: ${infoClinica()}`,'',
     ...A.map(x=>`Alvo: ${x.lobo?descrN(x):descrL(x)}`),'',
-    'Intercorrências: Procedimento realizado sem intercorrências.',
-    'Orientações: Paciente liberado(a) em bom estado geral, orientado(a) sobre compressão local, sinais de alerta e retorno com o resultado citológico ao médico assistente.','',
-    `Conclusão: Realizada PAAF guiada por ultrassonografia de ${A.map(x=>x.lobo?rotN(x):rotL(x)).join(' e ')} (${A.map(nome).join('; ')}), sem intercorrências. Material encaminhado para citologia.`,
-    'Sugestão: Retorno ao médico assistente com o resultado citológico (Bethesda).',
+    `Procedimento: ${paafFrase()}`,'',
+    `Conclusão: ${paafConclusao()}`,
+    'Sugestão: Retorno ao médico assistente com o resultado citopatológico.',
   ].join('\n');
 }
 
@@ -494,7 +498,7 @@ function wire(){
   on('[data-sug]',el=>{ const v=el.dataset.sug, q=new Set(sugAtual()); if(q.has(v)) q.delete(v); else { q.add(v); if(v==='sem') q.delete('anu'); if(v==='anu') q.delete('sem'); } st.sug=q; render(); });
   on('[data-paraasp]',el=>{st.paraAsp=el.dataset.paraasp;st.paraTxt='';render();});
   const pt=document.getElementById('paraTxt'); if(pt) pt.addEventListener('input',()=>{st.paraTxt=pt.value;renderDocs();});
-  const ps=$('#paafSw'); if(ps) ps.addEventListener('click',()=>{st.paaf.on=!st.paaf.on; if(st.paaf.on&&!st.paaf.alvos.size){const f=st.nods.find(n=>conduta(n).k==='paaf')||st.nods[0]; if(f) st.paaf.alvos.add('n'+f.id); st.doc='paaf';} render();});
+  const ps=$('#paafSw'); if(ps) ps.addEventListener('click',()=>{st.paaf.on=!st.paaf.on; st.sug=null; if(st.paaf.on&&!st.paaf.alvos.size){const f=st.nods.find(n=>conduta(n).k==='paaf')||st.nods[0]; if(f) st.paaf.alvos.add('n'+f.id); st.doc='paaf';} render();});
   on('[data-alvo]',el=>{const k=el.dataset.alvo;st.paaf.alvos.has(k)?st.paaf.alvos.delete(k):st.paaf.alvos.add(k);render();});
   on('[data-agulha]',el=>{st.paaf.agulha=el.dataset.agulha;render();});on('[data-lab]',el=>{st.paaf.lab=el.dataset.lab;render();});
   inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value; if(k==='prevdata')st.prev.data=v;else if(k==='prevn')st.prev.n=v;else if(k==='prevmaior')st.prev.maior=v;else if(k==='dose')st.anam.dose=v;else if(k==='lam')st.paaf.lam=v; renderDocs();});
@@ -520,7 +524,7 @@ function wire(){
 }
 function refreshVol(){const t=$('#volTot');if(t)t.textContent='~ '+fmt(vol(st.med.ld)+vol(st.med.le),0)+' mL';}
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800);}
-function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,paaf:{on:false,alvos:new Set(),lam:'3',agulha:'25x6',lab:'próprio'},pac:''}); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{fam:'nao',conhece:false,tx:false,txCa:false,levo:false,dose:'',sint:new Set()},gl:{sim:'simétrica',dim:'habituais',sup:'regular',eco:'homogênea',dop:'sem alterações'},med:{istmo:['','',''],ld:['','',''],le:['','','']},nods:[],linfs:[],para:'nao',paraAsp:'normal',paraTxt:'',sug:null,paaf:{on:false,alvos:new Set(),lam:'4',agulha:'25x6',lab:'próprio'},pac:''}); }
 // ---------- padrões do app: pular para o próximo campo e máscara de data ----------
 function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
 document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;

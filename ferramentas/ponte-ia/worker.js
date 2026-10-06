@@ -7,7 +7,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
-const VERSAO = '2026-10-06a';
+const VERSAO = '2026-10-06b';
 
 const INSTRUCOES = {
   tireoide: `Você recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
@@ -36,6 +36,7 @@ Regras:
 - Achado relevante fora de nódulo (linfonodo suspeito, tireoidite, tireoidectomia): uma linha "Outros: ..." antes do volume.
 - Nunca escreva valores de referência ("VR", "referência", "normal até ..."). Laudo enxuto.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- O texto pode vir do ditado com erros do reconhecimento de voz do iPhone: "THATS", "tirades", "tai rads" = TI-RADS; "PF", "PAF", "pá-af" = PAAF; "betesda" = Bethesda; "bi hads", "birades" = BI-RADS; "hipo iko", "hipoecoide" = hipoecoico; "estímulo" = istmo; "logo direito" = lobo direito; "classificação periférica" = calcificação periférica; "para tireoide" = paratireoide. Corrija em silêncio.
 - Sem markdown, sem título, sem comentários.`,
   mamas: `Você recebe o texto de exames anteriores de mama (ultrassom, mamografia, core biopsy ou PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
 
@@ -61,6 +62,7 @@ Regras:
 - Achado relevante fora de nódulo (linfonodo axilar suspeito, ectasia, prótese, cirurgia): uma linha "Outros: ..." no fim do exame.
 - Nunca escreva valores de referência. Laudo enxuto.
 - Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- O texto pode vir do ditado com erros do reconhecimento de voz do iPhone: "THATS", "tirades", "tai rads" = TI-RADS; "PF", "PAF", "pá-af" = PAAF; "betesda" = Bethesda; "bi hads", "birades" = BI-RADS; "hipo iko", "hipoecoide" = hipoecoico; "estímulo" = istmo; "logo direito" = lobo direito; "classificação periférica" = calcificação periférica; "para tireoide" = paratireoide. Corrija em silêncio.
 - Sem markdown, sem título, sem comentários.`,
   cervical: `Você recebe o texto de exames anteriores da região cervical (ultrassom cervical, de linfonodos ou do leito tireoidiano, PAAF, TC ou RM, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
 
@@ -84,6 +86,7 @@ Regras:
 - Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
 - Achado relevante fora de lesão (tireoidectomia, esvaziamento cervical, sialoadenite, sialolitíase): uma linha "Outros: ..." no fim do exame.
 - Nunca escreva valores de referência. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- O texto pode vir do ditado com erros do reconhecimento de voz do iPhone: "THATS", "tirades", "tai rads" = TI-RADS; "PF", "PAF", "pá-af" = PAAF; "betesda" = Bethesda; "bi hads", "birades" = BI-RADS; "hipo iko", "hipoecoide" = hipoecoico; "estímulo" = istmo; "logo direito" = lobo direito; "classificação periférica" = calcificação periférica; "para tireoide" = paratireoide. Corrija em silêncio.
 - Sem markdown, sem título, sem comentários.`,
   transvaginal: `Você recebe o texto de exames anteriores de ultrassom pélvico ou transvaginal (ou RM da pelve), de colegas diferentes, ou ditados pelo próprio médico. A identificação do paciente foi removida.
 
@@ -104,6 +107,7 @@ Regras:
 - Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
 - Achado relevante fora de lesão (DIU, adenomiose, líquido livre, histerectomia): uma linha "Outros: ..." no fim do exame.
 - Nunca escreva valores de referência. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- O texto pode vir do ditado com erros do reconhecimento de voz do iPhone: "THATS", "tirades", "tai rads" = TI-RADS; "PF", "PAF", "pá-af" = PAAF; "betesda" = Bethesda; "bi hads", "birades" = BI-RADS; "hipo iko", "hipoecoide" = hipoecoico; "estímulo" = istmo; "logo direito" = lobo direito; "classificação periférica" = calcificação periférica; "para tireoide" = paratireoide. Corrija em silêncio.
 - Sem markdown, sem título, sem comentários.`,
   prostata: `Você recebe o texto de exames anteriores de próstata (ultrassom abdominal ou transretal, PSA, RM, biópsia), de colegas diferentes, ou ditados pelo próprio médico. A identificação do paciente foi removida.
 
@@ -123,6 +127,7 @@ Regras:
 - Não compare, não conclua, não recomende.
 - Achado relevante (protrusão intravesical, cálculo vesical, hidronefrose, lesão focal): uma linha "Outros: ..." no fim do exame.
 - Nunca escreva valores de referência. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
+- O texto pode vir do ditado com erros do reconhecimento de voz do iPhone: "THATS", "tirades", "tai rads" = TI-RADS; "PF", "PAF", "pá-af" = PAAF; "betesda" = Bethesda; "bi hads", "birades" = BI-RADS; "hipo iko", "hipoecoide" = hipoecoico; "estímulo" = istmo; "logo direito" = lobo direito; "classificação periférica" = calcificação periférica; "para tireoide" = paratireoide. Corrija em silêncio.
 - Sem markdown, sem título, sem comentários.`,
 };
 
