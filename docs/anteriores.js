@@ -165,8 +165,9 @@ const ANT_RANK={'0':0,'1':1,'2':2,'3':3,'4':4,'4A':4,'4B':5,'4C':6,'5':7,'6':8};
 function antLer(txt){
   const exames=[]; let ex=null;
   antConserta(txt).split(/\r?\n/).forEach(l0=>{ const l=l0.trim(); if(!l) return;
-    let m=l.match(/^(US|PAAF|CORE|MMG|RM|TC)\s+(?:de\s+)?(?:(\d{1,2})\s*\/\s*(\d{2,4})|sem\s+data)\s*:?\s*(.*)$/i);
-    if(m){ ex={tipo:m[1].toUpperCase(),data:m[2]?String(m[2]).padStart(2,'0')+'/'+String(m[3]).slice(-2):null,nota:m[4]||'',nods:[],campos:{}}; exames.push(ex); return; }
+    let m=l.match(/^(US|PAAF|CORE|MMG|RM|TC|BX)\s+(?:de\s+)?(?:(?:(\d{1,2})\s*\/\s*)?(\d{1,2})\s*\/\s*(\d{2,4})|sem\s+data)(?:\s+([^:]*?))?\s*(?::\s*(.*))?$/i);
+    if(m){ const mmaa=m[3]?String(m[3]).padStart(2,'0')+'/'+String(m[4]).slice(-2):null;
+      ex={tipo:m[1].toUpperCase(),data:mmaa,dataFull:mmaa?(m[2]?String(m[2]).padStart(2,'0')+'/':'')+mmaa:null,origem:(m[5]||'').trim(),nota:m[6]||'',nods:[],campos:{}}; exames.push(ex); return; }
     if(!ex) return;
     m=l.match(/^([A-Z]{1,2}\d+)\s+([^:]*?)\s*:\s*([\d.,]+(?:\s*[×x*]\s*[\d.,]+){0,2})\s*(mm|cm)?\b(.*)$/i);
     if(m){
@@ -195,7 +196,7 @@ function antEvolucao(txt,atuais,hoje,exame){
   const frases=[], estaveis=[], sem=[];
   const ordem=atuais.slice().sort((a,b)=>(b.rank||0)-(a.rank||0));
   ordem.forEach((n,i)=>{
-    const hist=[]; exames.forEach(e=>e.nods.forEach(p=>{ if(p.rot===n.rot&&(!p.lado||!n.lado||p.lado===n.lado)) hist.push({...p,data:e.data,tipo:e.tipo}); }));
+    const hist=[]; exames.forEach(e=>e.nods.forEach(p=>{ if(p.rot===n.rot&&(!p.lado||!n.lado||p.lado===n.lado)) hist.push({...p,data:e.data,dataFull:e.dataFull,tipo:e.tipo}); }));
     const proc=hist.filter(h=>h.bethesda||h.hist).pop();
     const ant=hist.filter(h=>h.med&&h.med.filter(isFinite).length).pop();
     const agora=n.med.filter(isFinite), nome=n.nome||n.rot;
@@ -210,7 +211,7 @@ function antEvolucao(txt,atuais,hoje,exame){
       signif=dims>=2||(volP!=null&&volP>=50); rapido=d>=4&&meses!=null&&meses<=6; rotulo=rapido?', crescimento rápido':signif&&d>0?', crescimento significativo pelo ACR':''; }
     else { signif=rel>=0.2&&d>=2; rotulo=signif?(meses!=null&&meses<=6?', aumento ≥ 20% na maior medida em até 6 meses':', aumento ≥ 20% na maior medida'):''; }
     const prazo=meses!=null?` em ${meses} ${meses===1?'mês':'meses'}`:'';
-    const pf=proc?`; ${proc.tipo} em ${proc.data||'data não informada'}: ${proc.bethesda?'Bethesda '+proc.bethesda:proc.hist}`:'';
+    const pf=proc?`; ${proc.tipo} em ${proc.dataFull||proc.data||'data não informada'}: ${proc.bethesda?'Bethesda '+proc.bethesda:proc.hist}`:'';
     if(Math.abs(d)<=2&&!signif){ if(i===0||pf) frases.push(`${quem}: estável (${antCm(maxA)} → ${antCm(maxN)} cm${prazo})${pf}.`); else estaveis.push(nome); return; }
     frases.push(`${quem}: ${d<-2?'redução':'aumento'} de ${antCm(maxA)} para ${antCm(maxN)} cm (${d>0?'+':''}${String(d).replace('.',',')} mm${volP!=null&&exame==='tireoide'?`, volume ${volP>0?'+':''}${volP}%`:''})${prazo}${rotulo}${pf}.`);
   });

@@ -7,7 +7,7 @@
 
 const ORIGENS = ['https://t8castri-art.github.io', 'http://localhost:8765'];
 const MODELO = 'claude-opus-5-5';
-const VERSAO = '2026-10-01a';
+const VERSAO = '2026-10-06a';
 
 const INSTRUCOES = {
   tireoide: `Você recebe o texto de exames anteriores de tireoide (laudos de ultrassom e de PAAF, de colegas diferentes, ou ditados pelo próprio médico). A identificação do paciente foi removida.
@@ -24,12 +24,12 @@ PAAF 06/25:
 N2 TI LD TIRADS 5: 19 × 21 × 24 mm, Bethesda III
 
 Regras:
-- Cabeçalho: "US mm/aa:" ou "PAAF mm/aa:" ("US sem data:" se faltar). Uma linha em branco entre exames.
+- Cabeçalho: "US dd/mm/aa:" quando o dia for conhecido, senão "US mm/aa:" (idem PAAF; "US sem data:" se faltar). Se o laudo disser a clínica ou o serviço de origem, entre a data e os dois-pontos, em uma palavra: "US 29/08/26 Cliniprev:". Uma linha em branco entre exames.
 - Uma linha por nódulo: rótulo, terço (TS superior, TM médio, TI inferior; omita se o laudo não disser), lado (LD, LE ou istmo), "TIRADS" e o número, dois-pontos, medidas.
 - Ordem das linhas: LD de cima para baixo (TS, TM, TI), depois LE, depois istmo.
 - Rótulo: o que o laudo usou (N1, N2...). Sem rótulo, numere na ordem em que aparece.
 - TIRADS: só o número escrito no laudo. Se não tiver, "TIRADS NI". Não calcule.
-- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm). O médico dita em mm: "18 por 12 por 16" é 18 × 12 × 16 mm.
 - PAAF: o nódulo puncionado e, na mesma linha, ", Bethesda" em algarismos romanos.
 - Não diga que nódulos de exames diferentes são o mesmo. Não compare, não conclua, não recomende.
 - Última linha de cada US: "Volume: X cm³" com o volume total da tireoide que o laudo trouxer (mL = cm³, vírgula decimal). Se o laudo só trouxer volume por lobo, some os dois. Se não trouxer volume, omita a linha. Só o número: sem "aumentado", sem "normal".
@@ -51,11 +51,11 @@ CORE 07/24:
 N1 MD QSL 10h BIRADS 4A: 13 × 8 × 9 mm, histologia: fibroadenoma
 
 Regras:
-- Cabeçalho: "US mm/aa:", "MMG mm/aa:", "CORE mm/aa:", "PAAF mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames. Mamografia sem nódulo descrito fica numa linha só: "MMG mm/aa: BIRADS n" e, se houver, um achado curto.
+- Cabeçalho: "US", "MMG", "CORE", "PAAF" ou "RM" + data "dd/mm/aa" quando o dia for conhecido, senão "mm/aa" ("sem data" se faltar); clínica de origem opcional em uma palavra antes dos dois-pontos ("US 29/08/26 Cliniprev:"). Uma linha em branco entre exames. Mamografia sem nódulo descrito fica numa linha só: "MMG mm/aa: BIRADS n" e, se houver, um achado curto.
 - Uma linha por lesão: rótulo (N para nódulo, C para cisto; o que o laudo usou, ou numere por mama na ordem), mama (MD ou ME), quadrante, horário se houver, "BIRADS" e a categoria, dois-pontos, medidas.
 - Quadrante só nas quatro siglas clássicas: QSL, QSM, QIL, QIM. Se o laudo der só o horário: na MD, 10-11h QSL, 1-2h QSM, 7-8h QIL, 4-5h QIM; na ME, 1-2h QSL, 10-11h QSM, 4-5h QIL, 7-8h QIM. Lesão em 12h, 3h, 6h ou 9h (na linha entre quadrantes) ou em união de quadrantes: sem sigla, só o horário. Atrás do mamilo: "retroareolar" por extenso. Se quadrante e horário faltarem, omita.
 - BIRADS: a categoria escrita no laudo (0 a 6, 4A/4B/4C). Se não tiver, "BIRADS NI". Não calcule.
-- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm). O médico dita em mm: "18 por 12 por 16" é 18 × 12 × 16 mm.
 - CORE/PAAF: a lesão biopsiada e, na mesma linha, ", histologia: ..." ou ", citologia: ..." curtos.
 - Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
 - Achado relevante fora de nódulo (linfonodo axilar suspeito, ectasia, prótese, cirurgia): uma linha "Outros: ..." no fim do exame.
@@ -75,11 +75,11 @@ PAAF 04/25:
 LN1 III D: 12 × 8 × 9 mm, Bethesda VI, Tg no lavado 250
 
 Regras:
-- Cabeçalho: "US mm/aa:", "PAAF mm/aa:", "TC mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames.
+- Cabeçalho: "US", "PAAF", "TC" ou "RM" + data "dd/mm/aa" quando o dia for conhecido, senão "mm/aa" ("sem data" se faltar); clínica de origem opcional em uma palavra antes dos dois-pontos. Uma linha em branco entre exames.
 - Linfonodo: "LN" e número, nível (I a VII), lado (D ou E), dois-pontos, medidas em mm, e depois ", suspeito" ou ", reacional" conforme o laudo disser. Sem rótulo, numere na ordem.
 - Lesão do leito tireoidiano: "LT" e número, "leito D", "leito E" ou "leito istmo", dois-pontos, medidas.
 - Nódulo de glândula salivar: "LS" e número, a glândula (parótida D, parótida E, submandibular D, submandibular E), dois-pontos, medidas.
-- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm). O médico dita em mm: "18 por 12 por 16" é 18 × 12 × 16 mm.
 - PAAF: o alvo e, na mesma linha, ", Bethesda" em romanos e, se houver, ", Tg no lavado" com o valor.
 - Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
 - Achado relevante fora de lesão (tireoidectomia, esvaziamento cervical, sialoadenite, sialolitíase): uma linha "Outros: ..." no fim do exame.
@@ -96,11 +96,11 @@ L1 ovário D O-RADS 2: 35 × 30 × 28 mm, cisto simples
 Endométrio: 8 mm
 
 Regras:
-- Cabeçalho: "US mm/aa:" ou "RM mm/aa:" ("sem data" se faltar). Uma linha em branco entre exames.
+- Cabeçalho: "US" ou "RM" + data "dd/mm/aa" quando o dia for conhecido, senão "mm/aa" ("sem data" se faltar); clínica de origem opcional em uma palavra antes dos dois-pontos. Uma linha em branco entre exames.
 - Mioma: "M" e número, tipo (submucoso, intramural, subseroso, pediculado), parede (anterior, posterior, fundo, lateral D, lateral E), "FIGO" e o número se o laudo trouxer, dois-pontos, medidas.
 - Lesão anexial: "L" e número, "ovário D", "ovário E" ou "anexo D/E", "O-RADS" e o número se o laudo trouxer, dois-pontos, medidas, e depois uma descrição de até 4 palavras (cisto simples, hemorrágico, endometrioma, dermoide, sólido...).
 - Depois das lesões, "Útero:" com as três medidas e "Endométrio:" com a espessura em mm, se o laudo trouxer.
-- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm).
+- Medidas sempre em mm, separadas por " × ", vírgula decimal (1,2 cm = 12 mm). O médico dita em mm: "18 por 12 por 16" é 18 × 12 × 16 mm.
 - Não diga que lesões de exames diferentes são a mesma. Não compare, não conclua, não recomende.
 - Achado relevante fora de lesão (DIU, adenomiose, líquido livre, histerectomia): uma linha "Outros: ..." no fim do exame.
 - Nunca escreva valores de referência. Ignore qualquer nome, documento ou dado pessoal que tenha sobrado.
@@ -115,7 +115,7 @@ Resíduo: 60 mL
 PSA 02/25: 4,2 ng/mL
 
 Regras:
-- Cabeçalho: "US mm/aa:", "RM mm/aa:" ou "BX mm/aa:" (biópsia) ("sem data" se faltar). Uma linha em branco entre exames. PSA isolado vira uma linha "PSA mm/aa: valor ng/mL" dentro do exame mais próximo ou sozinho.
+- Cabeçalho: "US", "RM" ou "BX" (biópsia) + data "dd/mm/aa" quando o dia for conhecido, senão "mm/aa" ("sem data" se faltar); clínica de origem opcional em uma palavra antes dos dois-pontos. Uma linha em branco entre exames. PSA isolado vira uma linha "PSA mm/aa: valor ng/mL" dentro do exame mais próximo ou sozinho.
 - "Próstata:" com as três medidas em mm e, depois da vírgula, o peso ou volume em g (se o laudo só trouxer mL ou cm³, use o mesmo número em g).
 - "Resíduo:" com o resíduo pós-miccional em mL, se o laudo trouxer.
 - Biópsia: "Gleason" ou "ISUP" com o resultado em uma linha.

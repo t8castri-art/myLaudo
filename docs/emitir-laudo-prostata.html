@@ -339,9 +339,9 @@ function render(){
   </div>`;
   wire(); renderDocs();
 }
-function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
+function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão):/gm,'<b>$1:</b>').replace(/^((?:N|C|LN|LT|LS|LC|M|L)\d+(?:,| ·)[^:\n]{0,90}:)/gm,'<b>$1</b>'); }
 async function copiar(t){
-  try{ await navigator.clipboard.writeText(t); return true; }catch(e){}
+  return copiarLaudo(t);
   try{ const ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,t.length); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; }
 }
 function wire(){

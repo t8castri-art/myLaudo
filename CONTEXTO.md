@@ -82,6 +82,8 @@ exigencias-laudo-us.md  normas (CFM 2.381/2024, CBR/PADI 2025, SBEM etc.)
 | Caráter (eletivo/urgência) | não | não | sim, dentro da técnica |
 | US + PAAF/CORE | **1 laudo só** (US + bloco Procedimento) | 2 laudos | 2 laudos |
 
+PAAF (tireoide e cervical): agulha **40 × 8, 30 × 7 ou 25 × 6** (padrão 25 × 6) e número de **lâminas** (padrão 3); o laudo diz "com agulha 25 × 6, técnica de capilaridade, confeccionadas N lâminas".
+
 Para ele, "particular" é tudo que não é SUS. Aparelho: **Samsung HM70 EVO**, transdutores linear 3–16 MHz, minilinear 2–22 MHz, convexo 2–8 MHz, endocavitário 2–9 MHz.
 
 ## Ordem do laudo (todas as telas)
@@ -92,7 +94,8 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
   - Fora do HMC: "Exame realizado em aparelho Samsung HM70 EVO, com transdutor convexo 2–8 MHz, por via suprapúbica, …"
   - Tireoide, cervical, mama e transvaginal sempre com "estudo Doppler colorido e PowerDoppler".
 - **Exames anteriores**: "sim" abre data `mm/aa` e uma caixa de texto. No laudo: `US anterior de 06/25: <texto>.` Sem exame: "Sem exames anteriores para comparação." (em Informações clínicas).
-- Cada nódulo, mioma, ovário e lesão em **parágrafo próprio**.
+- Cada nódulo, mioma, ovário e lesão em **parágrafo próprio**, com o cabeçalho (rótulo, localização e os dois-pontos) em **negrito** na prévia; o Copiar leva texto puro e também HTML com os negritos, para sistemas que aceitam formatação.
+- Na tireoide, "Ao estudo Doppler: …" da glândula sai em linha própria, depois de "móvel à deglutição."
 
 ## Regras por exame
 - **Tireoide**: descreve TODOS os nódulos, de qualquer tamanho. ACR TI-RADS 2017 (não existe "2025"); pontos escondidos. No texto entram a composição e só o que pontua, mais o Doppler do nódulo (ausente / central / periférica, combináveis). **Focos ecogênicos são multi-seleção e os pontos somam.** Sugestão curta: "PAAF de N1." (com linfonodo: "PAAF de N1 e LN1, com tireoglobulina no lavado do linfonodo."). Cartão **Sugestão** só com quatro opções (PAAF · seguimento semestral · seguimento anual · TC/RM = "Sugere-se estudo com método de imagem complementar (tomografia/ressonância)."); o app marca a indicada pelo TI-RADS e o médico troca; semestral e anual se excluem. Conduta pela MAIOR medida (TR3 PAAF ≥ 2,5, seguimento ≥ 1,5; TR4 ≥ 1,5 / ≥ 1,0; TR5 ≥ 1,0 / ≥ 0,5 cm). Só volume total. Anamnese: história familiar (não / sim / sim 1º grau), conhece nódulos, tireoidectomia (por câncer?), levotiroxina + dose, sintomas (pigarro, rouquidão, disfagia, falta de ar). TSH e anticorpos não entram.
@@ -111,6 +114,7 @@ Título → Paciente (fora do HMC) → Indicação → **Técnica** → Informa�
 - **Não há botão "organizar"**: agrupar por lobo e terço é a instrução da IA. Terminou de ler os arquivos, ou terminou de transcrever/ditar na caixa, vai sozinho para a IA e volta agrupado. Correção à mão no resumo não é reenviada.
 - O texto é lido **no iPhone** (PDF com texto direto; foto ou PDF escaneado pela leitura de imagem), e o app **apaga as linhas de identificação** (nome, nascimento, idade, CPF, telefone, e-mail, convênio, atendimento, médicos) antes de qualquer envio. O nome da ficha também é apagado se aparecer solto.
 - Só o texto limpo vai para a **ponte** (`ferramentas/ponte-ia/`, Cloudflare Worker com a chave da Anthropic e uma senha). A IA só **reescreve no formato fixo**, exame por exame, do mais antigo ao mais recente, sem comparar:
+  - Cabeçalho com **dd/mm/aa** quando o dia é conhecido (`US 29/08/26 Cliniprev:`, clínica opcional), senão `mm/aa`.
   - Tireoide: `US 06/24:` e uma linha por nódulo `N1 TM LD TIRADS 4: 9 × 6 × 7 mm` (TS/TM/TI, LD/LE/istmo); `PAAF 06/25:` com `…, Bethesda III` na linha. Última linha de cada US: `Volume: 17,6 cm³` (só o número, sem referência).
   - Mamas (tela de US e laudo do Core): `MMG 05/24: BIRADS 2`, `US 06/24:` e `N1 MD QSL 10h BIRADS 3: 12 × 8 × 9 mm` (N nódulo, C cisto; só as 4 siglas clássicas QSL/QSM/QIL/QIM; em 12/3/6/9h só o horário; "retroareolar" por extenso); `CORE 07/24:` com `…, histologia: …`.
   - Cervical: `US 03/25:` / `LN1 III D: 12 × 8 × 9 mm, suspeito` / `LT1 leito D: …` / `LS1 parótida D: …`; `PAAF 04/25:` com `…, Bethesda VI, Tg no lavado 250`. Evolução por rótulo (LN/LT), regra ≥ 20% e ≥ 2 mm.
@@ -129,10 +133,10 @@ Nada identificável sai do celular. Antes de qualquer texto ou imagem ir para um
 1. **Ditado** (no ar desde 24–25/09, código em `docs/ditado.js`, compartilhado pelas telas; reconhecimento por regras, no aparelho, sem IA; "sem X" / "nega X" anulam X).
    - **Ditado do exame**: cartão no topo das 5 telas. Preenche indicação, anamnese, exames anteriores, órgão e medidas. Ignora nódulos e lesões.
    - **Ditado do item**: nódulo e linfonodo (tireoide), linfonodo e lesão do leito (cervical), nódulo e cisto de mama (mama, horário, distância do mamilo e da pele, descritores BI-RADS; o ditado pode trocar a mama e o tipo nódulo/cisto). Frase corrida: localização + características + **medidas em cm por último**.
-   - Medida sem unidade vale cm; com "milímetros" ou valor ≥ 10, vale mm.
-   - "Tudo em milímetros" (ou "medidas em milímetros") vale para a frase inteira. A última menção de um lobo vale (correção falada).
+   - **Regra única (06/10): medida ditada é em milímetros** ("18 por 12 por 16"), igual à digitada. Só vira cm se ele disser "centímetros". Distâncias da mama (mamilo, pele) idem.
+   - A última menção de um lobo vale (correção falada). Um decimal menor que 2 ao lado de inteiros ("06 por 1.2 por 09") é lido como erro do iPhone e vira 12.
    - Paratireoide: plural ("visibilizadas") sem "não" conta como **não visibilizadas**, porque o iPhone às vezes engole o "não"; só o singular marca visibilizada.
-   - O iPhone erra previsivelmente, e o app corrige: frases coladas sem ponto ("PeçanhaExame"), "Estímulo/istimo" = istmo, "logo direito" = lobo direito, "para tireoide" = paratireoide, "leva tiroxina" = levotiroxina, "17h21" entre números = 17 21, "mediu06" = mediu 06. Medidas também com "vezes", só números em sequência ("47 18 20"), "LD/LE". Istmo com um número só = espessura.
+   - O iPhone erra previsivelmente, e o app corrige: frases coladas sem ponto ("PeçanhaExame"), "Estímulo/istimo" = istmo, "logo direito" = lobo direito, "para tireoide" = paratireoide, "leva tiroxina" = levotiroxina, "hipo iko"/"hipoecoide" = hipoecoico, "classificação periférica" = calcificação periférica, "foco ecogênico puntiforme" = microcalcificação, "calcificação" sozinha = macrocalcificação, "17h21" entre números = 17 21, "mediu06" = mediu 06. Medidas também com "vezes", só números em sequência ("47 18 20"), "LD/LE". Istmo com um número só = espessura.
    - Para depurar: pedir ao médico o **texto exato da caixa** (o que o iPhone escreveu) e testar o parser em cima dele.
    - **Tracejado = veio do ditado e já está no laudo.** Não precisa tocar para confirmar; só toca para trocar. O que não foi dito fica no padrão, que conta como ausente. O aviso só aparece quando falta o essencial do item (nódulo: lobo, terço, composição, ecogenicidade, medidas).
    - Se o microfone do site falhar, usa-se o do teclado na mesma caixa.

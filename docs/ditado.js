@@ -47,7 +47,10 @@ function ditadoTexto(s){
   let t=ditPrep(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   t=t.replace(/(\d)\s*[x×*]\s*(?=\d)/g,'$1 por ').replace(/(\d)h(\d)/g,'$1 $2').replace(/[;:!?]/g,' , ')
     .replace(/\b(?:logo|lobu|loba|lóbulo|lobulo)\s+(direito|esquerdo)/g,'lobo $1').replace(/\b(?:estimulo|estimo|istimo|ismo|itsmo)\b/g,'istmo')
-    .replace(/\bpara\s+tireoides?\b/g,'paratireoide').replace(/\b(?:leva|levo)\s+tiroxina/g,'levotiroxina').replace(/\bti\s*-?\s*rads?\b|\btirades\b|\btiradis\b/g,'tirads');
+    .replace(/\bpara\s+tireoides?\b/g,'paratireoide')
+    .replace(/\bclassificac(ao|oes)\s+(?=periferic|anelar|em\s+anel|em\s+casca|grosseir|grossa|puntiform|punctiform|pontiform)/g,'calcificac$1 ')
+    .replace(/\bmicro\s*-?\s*(?:classificac|calcificac)/g,'microcalcificac').replace(/\bmacro\s*-?\s*(?:classificac|calcificac)/g,'macrocalcificac')
+    .replace(/\b(hipo|hiper|iso|an)\s*-?\s*(?:e\s*)?(?:iko|ico|eco|eko|ecoide|ecoid|ecogenic\w*|ecoic\w*)\b/g,'$1ecoico').replace(/\b(?:leva|levo)\s+tiroxina/g,'levotiroxina').replace(/\bti\s*-?\s*rads?\b|\btirades\b|\btiradis\b/g,'tirads');
   const tk=t.split(/\s+/).filter(Boolean), out=[];
   for(let i=0;i<tk.length;i++){
     const r=ditNumRun(tk,i);
@@ -64,14 +67,14 @@ function ditadoTexto(s){
 function ditadoNeg(txt,i){ const pre=txt.slice(Math.max(0,i-40),i); const m=[...pre.matchAll(/\b(sem|nao|nega|ausencia de)\b/g)].pop(); if(!m) return false; return !/[,.]|\bcom\b/.test(pre.slice(m.index+m[0].length)); }
 function ditadoTem(re,txt){ for(const m of txt.matchAll(new RegExp(re.source,'g'))) if(!ditadoNeg(txt,m.index)) return true; return false; }
 // medidas: a última sequência "a por b por c"; cm por padrão, mm se disser ou se passar de 10
-function ditadoMedidas(t,primeira){
+function ditadoMedidas(t,primeira,lesao){
   const N='(\\d+(?:[.,]\\d+)?)', U='\\s*(cm|centimetros?|mm|milimetros?)?', S='\\s*(?:por|x|×|vezes|\\*)\\s*';
   const all=[...t.matchAll(new RegExp(N+U+S+N+U+'(?:'+S+N+U+')?','g'))], ms=primeira?all[0]:all.pop();
   if(!ms) return null;
   const v=[ms[1],ms[3],ms[5]].filter(Boolean).map(x=>parseFloat(x.replace(',','.')));
   const un=[ms[2],ms[4],ms[6]].filter(Boolean).join(' ');
-  const emMm=/\bm/.test(un)?true:/c/.test(un)?false:ditMMGlobal||v.some(x=>x>=10);
-  if(emMm&&ditMMGlobal&&!/c/.test(un)) v.forEach((x,i)=>{ if(x<10&&!Number.isInteger(x)) v[i]=x*10; });  // "1.2" ditado em mm = 12
+  const emMm=!/c/.test(un);   // regra única: medida ditada é em mm; só vira cm se disser "centímetros"
+  if(emMm&&!un){ const temInteiro=v.some(x=>Number.isInteger(x)&&x>=4); v.forEach((x,i)=>{ if(temInteiro&&!Number.isInteger(x)&&x<2) v[i]=x*10; }); }   // "06 por 1.2 por 09": o iPhone pôs um ponto em "12"
   return [0,1,2].map(i=>{ if(v[i]==null) return ''; const mm=Math.round((emMm?v[i]:v[i]*10)*10)/10; return Number.isInteger(mm)?String(mm):String(mm).replace('.',','); });
 }
 const ditadoLado=t=>/\bdireit[oa]\b/.test(t)?'D':/\besquerd[oa]\b/.test(t)?'E':null;
@@ -114,12 +117,12 @@ function ditadoNodulo(fala){
   else if(/\blisa|\bregulares\b|bem\s+(definid|delimitad)|circunscrit/.test(t)) r.marg='lisas';
   const f=new Set();
   if(ditadoTem(/cometa/,t)) f.add('cauda de cometa');
-  if(ditadoTem(/microcalcific|puntiform/,t)) f.add('microcalcificações');
+  if(ditadoTem(/microcalcific|punt\w*iform|punct\w*iform|pontiform/,t)) f.add('microcalcificações');
   if(ditadoTem(/calcificac\w*\s+periferic|casca\s+de\s+ovo|calcificac\w*\s+(anelar|em\s+anel)/,t)) f.add('calcificação periférica');
-  if(ditadoTem(/macrocalcific|calcificac\w*\s+grosseir|calcificac\w*\s+grossa/,t)) f.add('macrocalcificações');
+  if(ditadoTem(/macrocalcific|calcificac\w*\s+grosseir|calcificac\w*\s+grossa|\bcalcificac(?:ao|oes)\b(?!\s+(?:periferic|anelar|em\s+anel|em\s+casca|punt|punct|pont))/,t)) f.add('macrocalcificações');
   if(f.size) r.focos=f; else if(/\bsem\s+(focos|calcific|microcalcific)/.test(t)) r.focos=new Set(['nenhum']);
   const d=ditadoDopNod(t); if(d) r.dop=d;
-  const m=ditadoMedidas(t); if(m) r.med=m;
+  const m=ditadoMedidas(t,false,true); if(m) r.med=m;
   return r;
 }
 
@@ -141,7 +144,7 @@ function ditadoLinf(fala){
   const td=t.replace(/(areas?|degeneracao|componente)\s+cistic\w*\s+periferic\w*/g,' ');
   const hil=/\bhilar|\bcentral\b/.test(td), per=/periferic|capsular/.test(td);
   if(/(vasculariz\w*|fluxo|padrao)(\s+\w+)?\s+mist/.test(td)||(hil&&per)) r.dop='mista'; else if(per) r.dop='periférica'; else if(hil) r.dop='hilar';
-  const m=ditadoMedidas(t); if(m) r.med=m;
+  const m=ditadoMedidas(t,false,true); if(m) r.med=m;
   return r;
 }
 
@@ -158,17 +161,17 @@ function ditadoLeito(fala){
   else if(/mal\s+(definid|delimitad)|imprecis/.test(t)) r.marg='mal definidas';
   else if(/\blisa|\bregulares\b|bem\s+(definid|delimitad)|circunscrit/.test(t)) r.marg='regulares';
   const d=ditadoDopNod(t); if(d) r.dop=d;
-  const m=ditadoMedidas(t); if(m) r.med=m;
+  const m=ditadoMedidas(t,false,true); if(m) r.med=m;
   return r;
 }
 
 // ---------- tela: cartão de ditado ----------
 const DITADO_NOMES={mama:'mama',hora:'horário',mamilo:'distância do mamilo',pele:'distância da pele',lobo:'lobo',terco:'terço',comp:'composição',eco:'ecogenicidade',forma:'forma',marg:'margens',focos:'focos ecogênicos',dop:'Doppler',med:'medidas',nivel:'nível',lado:'lado',hilo:'hilo',cort:'cortical',extra:'microcalcificações / cístico'};
 const DITADO_TIPOS={
-  nod:{parse:ditadoNodulo,campos:['lobo','terco','comp','eco','med'],ex:'terço superior do lobo direito, nódulo sólido hipoecoico, margens irregulares, com microcalcificações, vascularização central, 2,0 por 1,4 por 1,2'},
-  linf:{parse:ditadoLinf,campos:['nivel','lado','med'],ex:'nível três à direita, linfonodo arredondado, sem hilo, cortical espessada, fluxo periférico, 1,2 por 0,8 por 0,9'},
-  mama:{parse:ditadoMama,campos:['mama','hora','mamilo','pele','med'],ex:'mama direita, às 10 horas, a 4 cm do mamilo e 1,5 cm da pele, nódulo oval, paralelo, circunscrito, hipoecoico, sem calcificações, sem fluxo, 1,3 por 0,9 por 0,6'},
-  leito:{parse:ditadoLeito,campos:['lado','comp','med'],ex:'leito direito, lesão sólida hipoecoica, margens irregulares, fluxo central, 0,8 por 0,6 por 0,5'},
+  nod:{parse:ditadoNodulo,campos:['lobo','terco','comp','eco','med'],ex:'terço superior do lobo direito, nódulo sólido hipoecoico, margens irregulares, com microcalcificações, vascularização central, 20 por 14 por 12'},
+  linf:{parse:ditadoLinf,campos:['nivel','lado','med'],ex:'nível três à direita, linfonodo arredondado, sem hilo, cortical espessada, fluxo periférico, 12 por 8 por 9'},
+  mama:{parse:ditadoMama,campos:['mama','hora','mamilo','pele','med'],ex:'mama direita, às 10 horas, a 40 do mamilo e 15 da pele, nódulo oval, paralelo, circunscrito, hipoecoico, sem calcificações, sem fluxo, 13 por 9 por 6'},
+  leito:{parse:ditadoLeito,campos:['lado','comp','med'],ex:'leito direito, lesão sólida hipoecoica, margens irregulares, fluxo central, 8 por 6 por 5'},
 };
 const DITADO_CSS=`
 .dit{display:flex;gap:10px;align-items:flex-start}
@@ -433,7 +436,7 @@ function ditDist(t,re,depoisPrimeiro){
   const antes=[...t.slice(Math.max(0,m.index-30),m.index).matchAll(N)].pop(), depois=t.slice(m.index+m[0].length,m.index+m[0].length+25).match(/^\D{0,12}?(\d+(?:[.,]\d+)?)\s*(cm|centimetros?|mm|milimetros?)?/);
   const x=depoisPrimeiro?(depois||antes):(antes||depois); if(!x) return null;
   let v=parseFloat(x[1].replace(',','.')); const u=x[2]||'';
-  if(/^c/.test(u)||(!u&&v<16)) v*=10;
+  if(/^c/.test(u)) v*=10;   // sem unidade = mm
   v=Math.round(v*10)/10; return Number.isInteger(v)?String(v):String(v).replace('.',',');
 }
 function ditadoMama(fala){
@@ -457,7 +460,7 @@ function ditadoMama(fala){
   else if(/sem\s+(alteracao|efeito|fenomeno|artefato)s?\s+acustic|sem\s+sombra|sem\s+reforco/.test(t)) r.post='nenhuma';
   if(ditadoTem(/calcific|microcalcific/,t)) r.calc='com'; else if(/sem\s+(\w+\s+)?(calcific|microcalcific)/.test(t)) r.calc='sem';
   const d=ditadoDopNod(t); if(d) r.dop=d;
-  const m=ditadoMedidas(t); if(m) r.med=m;
+  const m=ditadoMedidas(t,false,true); if(m) r.med=m;
   return r;
 }
 // ---------- cadastro do paciente ----------
@@ -483,11 +486,11 @@ function ditadoPaciente(fala){
 // ---------- tipos do ditado ----------
 Object.assign(DITADO_TIPOS,{
   paciente:{laudo:true,parse:ditadoPaciente,ex:'Maria Aparecida de Souza Lima, nascida em 12 de março de 1972, feminino, Instituto, WhatsApp 65 99912-3456; trouxe US de tireoide de 03/25 com nódulo no lobo direito de 1,2 cm'},
-  tireoide:{laudo:true,parse:ditadoLaudoTireoide,ex:'rotina, nega história familiar, tireoide assimétrica, dimensões habituais, homogênea; lobo direito 4,7 por 1,8 por 2,0; lobo esquerdo 4,6 por 1,6 por 1,9; istmo 0,3'},
+  tireoide:{laudo:true,parse:ditadoLaudoTireoide,ex:'rotina, nega história familiar, tireoide assimétrica, dimensões habituais, homogênea; lobo direito 47 por 18 por 20; lobo esquerdo 46 por 16 por 19; istmo 3'},
   cervical:{laudo:true,parse:ditadoLaudoCervical,ex:'vigilância oncológica, tireoidectomia por câncer, levotiroxina 112, glândulas salivares normais'},
   mamas:{laudo:true,parse:ditadoLaudoMamas,ex:'rotina, pós-menopausa, trouxe mamografia BI-RADS 2 de 06/26, mamas heterogêneas com predomínio fibroglandular, axilas normais'},
-  transvaginal:{laudo:true,parse:ditadoLaudoTransvaginal,ex:'rotina, DUM 28/08/2026, G2 P2 A0 cesárea, útero antevertido 5,9 por 3,4 por 5,0, endométrio 8 mm trilaminar, ovário direito 2,5 por 1,8 por 1,5, sem líquido livre'},
-  prostata:{laudo:true,parse:ditadoLaudoProstata,ex:'sintomas urinários, PSA 4,2 de 05/26, noctúria e jato fraco; bexiga boa repleção 9,0 por 8,0 por 7,5; próstata 4,5 por 3,8 por 4,0 homogênea; pós-miccional bexiga 4 por 3 por 2'},
+  transvaginal:{laudo:true,parse:ditadoLaudoTransvaginal,ex:'rotina, DUM 28/08/2026, G2 P2 A0 cesárea, útero antevertido 59 por 34 por 50, endométrio 8 trilaminar, ovário direito 25 por 18 por 15, sem líquido livre'},
+  prostata:{laudo:true,parse:ditadoLaudoProstata,ex:'sintomas urinários, PSA 4,2 de 05/26, noctúria e jato fraco; bexiga boa repleção 90 por 80 por 75; próstata 45 por 38 por 40 homogênea; pós-miccional bexiga 40 por 30 por 20'},
 });
 
 // ---------- tela: cartões de ditado ----------
@@ -568,4 +571,14 @@ function tmicEquipar(){
   });
 }
 if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',()=>{ const ph=document.getElementById('phone'); if(!ph) return; tmicEquipar(); new MutationObserver(tmicEquipar).observe(ph,{childList:true,subtree:true}); });
+// ---------- copiar laudo: texto puro + HTML com os cabeçalhos em negrito ----------
+const LAUDO_SECOES=/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Medidas|Vesículas seminais|Pós-miccional \d+|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/;
+const LAUDO_ITEM=/^((?:N|C|LN|LT|LS|LC|M|L)\d+(?:,| ·)[^:\n]{0,90}:)/;
+function laudoHtml(t){ const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return t.split('\n').map((l,i)=>{ let h=esc(l); if(i===0&&/^[A-ZÇÃÕÉÍÓÚÂÊÔ ]{8,}/.test(l)) h='<b>'+h+'</b>'; else h=h.replace(LAUDO_SECOES,'<b>$1:</b>').replace(LAUDO_ITEM,'<b>$1</b>'); return h; }).join('<br>'); }
+async function copiarLaudo(t){
+  try{ if(navigator.clipboard&&window.ClipboardItem){ await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([t],{type:'text/plain'}),'text/html':new Blob([laudoHtml(t)],{type:'text/html'})})]); return true; } }catch(e){}
+  try{ await navigator.clipboard.writeText(t); return true; }catch(e){}
+  try{ const ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,t.length); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; }
+}
 if(typeof module!=='undefined') module.exports={ditadoNodulo,ditadoLinf,ditadoLeito,ditadoTexto};

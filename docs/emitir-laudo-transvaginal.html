@@ -403,7 +403,7 @@ function render(){
   else h=viewLaudo();
   $('#phone').innerHTML=h; wire(); renderDocs();
 }
-function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão):/gm,'<b>$1:</b>'); }
+function renderDocs(){ $('#docOut').innerHTML=esc(docUS()).replace(/^(ULTRASSONOGRAFIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão):/gm,'<b>$1:</b>').replace(/^((?:N|C|LN|LT|LS|LC|M|L)\d+(?:,| ·)[^:\n]{0,90}:)/gm,'<b>$1</b>'); }
 function wire(){
   if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'transvaginal',{"pac": "#pac", "prev.txt": "#prevTxt", "ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.dum": "[data-f=\"dum\"]", "anam.meno": "meno", "anam.g": "[data-f=\"g\"]", "anam.p": "[data-f=\"p\"]", "anam.a": "[data-f=\"a\"]", "anam.ces": "ces", "ut.pos": "upos", "ut.cont": "ucont", "ut.med": "um", "ut.mio": "umio", "ut.endo": "[data-f=\"endo\"]", "ut.endoAsp": "uendo", "ut.colo": "ucolo", "ut.diu": "diu", "ut.diuDist": "[data-f=\"diudist\"]", "ov.D.visto": "ovD", "ov.D.med": "omD", "ov.D.asp": "oaD", "ov.E.visto": "ovE", "ov.E.med": "omE", "ov.E.asp": "oaE", "liq": "liq"},render,toast,st);
   wireServ();
@@ -424,7 +424,7 @@ function wire(){
   on('[data-remove]',el=>{const k=el.dataset.remove; if(k[0]==='m') st.miomas=st.miomas.filter(x=>x.id!==+k.slice(1)); else st.lesoes=st.lesoes.filter(x=>x.id!==+k.slice(1)); st.view='laudo';render();});
   on('[data-back]',()=>{st.view='laudo';st.edit=null;render();});
   inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value; if(k==='prevdata')st.prev.data=v; else if(k==='dum')st.anam.dum=v; else if(k==='g')st.anam.g=v; else if(k==='p'){st.anam.p=v;} else if(k==='a')st.anam.a=v; else if(k==='endo')st.ut.endo=v; else if(k==='diudist')st.ut.diuDist=v; else if(st.view==='mioma'){const m=st.miomas.find(x=>x.id===st.edit); if(m) m[k]=v;} renderDocs(); refreshTxt();});
-  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(docUS());toast('Laudo copiado');}catch(e){toast('Não deu para copiar aqui; o texto está ao lado');}});
+  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{toast(await copiarLaudo(docUS())?'Laudo copiado':'Não deu para copiar aqui; o texto está ao lado');});
   // mioma
   const m=st.view==='mioma'&&st.miomas.find(x=>x.id===st.edit);
   if(m){ on('[data-parede]',el=>{m.parede=el.dataset.parede;render();}); on('[data-mtipo]',el=>{m.tipo=el.dataset.mtipo;m.figo=null;render();}); on('[data-meco]',el=>{m.eco=el.dataset.meco;render();}); on('[data-figo] button',el=>{m.figo=el.dataset.cat===FIGO_SUG[m.tipo]?null:el.dataset.cat;render();}); inp('input[data-mm]',el=>{m.med[+el.dataset.mm]=el.value;renderDocs();refreshTxt();}); }

@@ -34,4 +34,5 @@ eq('tv.evol',antEvolucao(tv,[{rot:'M1',lado:null,nome:'M1',tag:'',rank:0,med:[30
 // próstata
 var pr="US 03/25:\nPróstata: 45 × 38 × 40 mm, 37 g\nResíduo: 60 mL\nPSA 02/25: 4,2 ng/mL\n\nUS 09/25:\nPróstata: 48 × 40 × 42 mm, 42 g\nResíduo: 20 mL";
 eq('pr.evol',antEvolucaoProstata(pr,{peso:48,residuo:15},new Date(2026,2,15)),"Evolução: próstata 42 → 48 g (+14%) em 6 meses; resíduo 20 → 15 mL.");
+var dd=antLer("US 29/08/26 Cliniprev:\nN1 TM LD TIRADS 4: 9 × 6 × 7 mm")[0]; eq('cab.data',dd.data,'08/26'); eq('cab.full',dd.dataFull,'29/08/26'); eq('cab.origem',dd.origem,'Cliniprev'); eq('cab.nod',dd.nods.length,1);
 print(falhas?('\n'+falhas+' falha(s)'):'OK: exames anteriores');

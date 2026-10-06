@@ -216,7 +216,7 @@ const st={
   anam:{ca:'tireoide',tx:true,txCa:true,levo:true,dose:'112',sint:new Set()},
   leito:'limpo', linfs:[], sal:[], leitoLes:[], cerv:[], sug:null,
   glst:{parD:'habitual',parE:'habitual',subD:'habitual',subE:'habitual'},
-  paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},
+  paaf:{on:false,alvos:new Set(),lam:'3',agulha:'25x6',lab:'próprio'},
 };
 const l1=novoLinf(); Object.assign(l1,{nivel:'III',lado:'D',med:['12','8','9'],forma:'arredondado',hilo:'apagado'}); st.linfs.push(l1);
 
@@ -306,7 +306,7 @@ function docPAAF(){
     ...linhaTopo(),
     `Indicação: ${A.map(nomeAlvo).join('; ')}.`,
     'Consentimento e preparo: Paciente esclarecido(a) sobre o procedimento, riscos e benefícios, com termo de consentimento assinado. Antissepsia da região cervical com clorexidina alcoólica.',
-    `Técnica: Sob orientação ultrassonográfica em tempo real com transdutor linear de alta frequência, sem anestesia, realizadas ${st.paaf.punc||'___'} punções por alvo com agulha fina ${st.paaf.agulha}, técnica de capilaridade. Material distribuído em lâminas e em meio líquido${temL?', com coleta de lavado da agulha para dosagem de tireoglobulina no linfonodo':''}, identificado e encaminhado ao laboratório${st.paaf.lab==='entregue'?' escolhido pelo(a) paciente, com termo de entrega de amostra':''}.`,
+    `Técnica: Sob orientação ultrassonográfica em tempo real com transdutor linear de alta frequência, sem anestesia, com agulha ${st.paaf.agulha.replace('x',' × ')}, técnica de capilaridade, confeccionadas ${st.paaf.lam||'___'} lâminas. Material em lâminas e em meio líquido${temL?', com coleta de lavado da agulha para dosagem de tireoglobulina no linfonodo':''}, identificado e encaminhado ao laboratório${st.paaf.lab==='entregue'?' escolhido pelo(a) paciente, com termo de entrega de amostra':''}.`,
     `Informações clínicas: ${infoClinica()}`,'',
     ...A.map(x=>`Alvo: ${descrAlvo(x)}`),'',
     'Intercorrências: Procedimento realizado sem intercorrências.',
@@ -359,8 +359,8 @@ function viewLaudo(){
       <div class="card"><div class="toggle"><div><div class="lbl" style="margin:0">Procedimento</div><div class="p">PAAF realizada neste atendimento</div></div><button type="button" class="sw" id="paafSw" aria-pressed="${st.paaf.on}" aria-label="PAAF"></button></div>
         ${st.paaf.on?`<div class="form dir" style="margin-top:12px">
           <div class="k">Puncionados</div>${alvoChips.length?chips(alvoChips,st.paaf.alvos,'alvo',true):'<div class="empty">Adicione um linfonodo, nódulo salivar ou lesão do leito.</div>'}
-          <div class="k">Punções</div><div class="in"><input class="cell" inputmode="numeric" data-f="punc" value="${esc(st.paaf.punc)}" placeholder="—"><span class="x">por alvo</span></div>
-          <div class="k">Agulha</div>${segm([['25G','25G'],['23G','23G'],['27G','27G']],st.paaf.agulha,'agulha')}
+          <div class="k">Lâminas</div><div class="in"><input class="cell" inputmode="numeric" data-f="lam" value="${esc(st.paaf.lam)}" placeholder="—"></div>
+          <div class="k">Agulha</div>${segm([['40x8','40 × 8'],['30x7','30 × 7'],['25x6','25 × 6']],st.paaf.agulha,'agulha')}
           <div class="k">Material</div>${segm([['próprio','laboratório'],['entregue','entregue ao paciente']],st.paaf.lab,'lab')}
         </div>`:''}
       </div>
@@ -401,7 +401,7 @@ function renderDocs(){
   $('#docTabs').innerHTML=tabs.map(t=>`<button type="button" data-doc="${t[0]}" aria-pressed="${st.doc===t[0]}">${t[1]}</button>`).join('');
   $('#docTabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{st.doc=b.dataset.doc;renderDocs();}));
   const t=uni?docUnico(docPAAF,'COM PAAF GUIADA'):st.doc==='paaf'?docPAAF():docUS();
-  $('#docOut').innerHTML=esc(t).replace(/^(ULTRASSONOGRAFIA[^\n]*|PUNÇÃO[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/gm,'<b>$1:</b>');
+  $('#docOut').innerHTML=esc(t).replace(/^(ULTRASSONOGRAFIA[^\n]*|PUNÇÃO[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações):/gm,'<b>$1:</b>').replace(/^((?:N|C|LN|LT|LS|LC|M|L)\d+(?:,| ·)[^:\n]{0,90}:)/gm,'<b>$1</b>');
 }
 function wire(){
   if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'cervical',{"pac": "#pac", "prev.txt": "#prevTxt", "ind": "ind", "prev.tem": "prev", "prev.data": "[data-f=\"prevdata\"]", "anam.ca": "ca", "anam.tx": "tx", "anam.txCa": "txca", "anam.levo": "levo", "anam.dose": "[data-f=\"dose\"]", "anam.sint": "sint", "glst.parD": "glparD", "glst.parE": "glparE", "glst.subD": "glsubD", "glst.subE": "glsubE"},render,toast,st);
@@ -418,7 +418,7 @@ function wire(){
   on('[data-add]',el=>{const k=el.dataset.add; let x; if(k==='l'){x=novoLinf();st.linfs.push(x);st.view='linf';} if(k==='s'){x=novaSal();st.sal.push(x);st.view='sal';} if(k==='t'){x=novoLeito();st.leitoLes.push(x);st.view='leito';} if(k==='c'){x=novaCerv();st.cerv.push(x);st.view='cerv';} st.edit=x.id;render();});
   const ps=$('#paafSw'); if(ps) ps.addEventListener('click',()=>{st.paaf.on=!st.paaf.on; if(st.paaf.on&&!st.paaf.alvos.size){const f=st.linfs.find(suspL); if(f) st.paaf.alvos.add('l'+f.id); st.doc='paaf';} render();});
   set('alvo',v=>{st.paaf.alvos.has(v)?st.paaf.alvos.delete(v):st.paaf.alvos.add(v);}); set('agulha',v=>st.paaf.agulha=v); set('lab',v=>st.paaf.lab=v);
-  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{const uni=st.serv==='inst'&&st.paaf.on; const t=uni?docUnico(docPAAF,'COM PAAF GUIADA'):docUS()+(st.paaf.on?'\n\n'+'='.repeat(40)+'\n\n'+docPAAF():''); try{await navigator.clipboard.writeText(t);toast(st.paaf.on&&!uni?'2 laudos copiados':'Laudo copiado');}catch(e){toast('Não deu para copiar aqui; o texto está ao lado');}});
+  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{const uni=st.serv==='inst'&&st.paaf.on; const t=uni?docUnico(docPAAF,'COM PAAF GUIADA'):docUS()+(st.paaf.on?'\n\n'+'='.repeat(40)+'\n\n'+docPAAF():''); toast(await copiarLaudo(t)?(st.paaf.on&&!uni?'2 laudos copiados':'Laudo copiado'):'Não deu para copiar aqui; o texto está ao lado');});
   on('[data-back]',()=>{st.view='laudo';st.edit=null;render();});
   on('[data-remove]',el=>{const k=el.dataset.remove,id=+k.slice(1); if(k[0]==='l') st.linfs=st.linfs.filter(x=>x.id!==id); if(k[0]==='s') st.sal=st.sal.filter(x=>x.id!==id); if(k[0]==='t') st.leitoLes=st.leitoLes.filter(x=>x.id!==id); if(k[0]==='c') st.cerv=st.cerv.filter(x=>x.id!==id); st.paaf.alvos.delete(k); st.view='laudo';render();});
   const cur = st.view==='linf'?st.linfs.find(x=>x.id===st.edit): st.view==='sal'?st.sal.find(x=>x.id===st.edit): st.view==='leito'?st.leitoLes.find(x=>x.id===st.edit): st.view==='cerv'?st.cerv.find(x=>x.id===st.edit):null;
@@ -433,10 +433,10 @@ function wire(){
     if(st.view==='leito') ditadoLigar(cur,'leito',{lado:'tlado',comp:'tcomp',eco:'teco',marg:'tmarg',dop:'tdop',med:'tm'},render,toast);
     ['lm','sm','tm','cm'].forEach(a=>inp(`input[data-${a}]`,el=>{cur.med[+el.dataset[a]]=el.value;refresh();}));
   }
-  inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value; if(k==='prevdata')st.prev.data=v; else if(k==='dose')st.anam.dose=v; else if(k==='punc')st.paaf.punc=v; else if(k==='mm'&&cur)cur.mm=v; refresh();});
+  inp('input[data-f]',el=>{const k=el.dataset.f,v=el.value; if(k==='prevdata')st.prev.data=v; else if(k==='dose')st.anam.dose=v; else if(k==='lam')st.paaf.lam=v; else if(k==='mm'&&cur)cur.mm=v; refresh();});
 }
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800);}
-function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{ca:'nao',tx:false,txCa:false,levo:false,dose:'',sint:new Set()},linfs:[],sal:[],leitoLes:[],cerv:[],sug:null,glst:{parD:'habitual',parE:'habitual',subD:'habitual',subE:'habitual'},paaf:{on:false,alvos:new Set(),punc:'3',agulha:'25G',lab:'próprio'},pac:''}); }
+function limpar(){ Object.assign(st,{ind:'Rotina',equip:new Set(['l16']),prev:{tem:'nao',data:'',txt:''},anam:{ca:'nao',tx:false,txCa:false,levo:false,dose:'',sint:new Set()},linfs:[],sal:[],leitoLes:[],cerv:[],sug:null,glst:{parD:'habitual',parE:'habitual',subD:'habitual',subE:'habitual'},paaf:{on:false,alvos:new Set(),lam:'3',agulha:'25x6',lab:'próprio'},pac:''}); }
 // ---------- padrões do app: pular para o próximo campo e máscara de data ----------
 function proximo(el){ const all=[...document.querySelectorAll('#phone input, #phone textarea')].filter(e=>e.offsetParent!==null&&!e.disabled); const i=all.indexOf(el); if(i>=0&&all[i+1]){ all[i+1].focus(); if(all[i+1].select) try{all[i+1].select();}catch(_){} } }
 document.addEventListener('input',e=>{ const el=e.target; if(!el||el.tagName!=='INPUT'||!el.closest('#phone')) return;

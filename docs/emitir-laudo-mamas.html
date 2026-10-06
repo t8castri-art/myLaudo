@@ -437,7 +437,7 @@ function renderDocs(){
   $('#docTabs').innerHTML = tabs.map(t=>`<button type="button" data-doc="${t[0]}" aria-pressed="${st.doc===t[0]}">${t[1]}</button>`).join('');
   $('#docTabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ st.doc=b.dataset.doc; renderDocs(); }));
   const txt = uni ? docUnico(docCORE,'COM BIÓPSIA POR AGULHA GROSSA (CORE)') : st.doc==='core' ? docCORE() : docUS();
-  $('#docOut').innerHTML = esc(txt).replace(/^(ULTRASSONOGRAFIA[^\n]*|BIÓPSIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações|Mama direita|Mama esquerda):/gm,'<b>$1:</b>');
+  $('#docOut').innerHTML = esc(txt).replace(/^(ULTRASSONOGRAFIA[^\n]*|BIÓPSIA[^\n]*)$/m,'<b>$1</b>').replace(/^(Paciente|Caráter|Transdutor|Procedimento|Indicação|Equipamento|Informações clínicas|Exames anteriores|Evolução|Técnica|Descrição|Conclusão|Sugestão|Consentimento e preparo|Alvo|Intercorrências|Orientações|Mama direita|Mama esquerda):/gm,'<b>$1:</b>').replace(/^((?:N|C|LN|LT|LS|LC|M|L)\d+(?:,| ·)[^:\n]{0,90}:)/gm,'<b>$1</b>');
 }
 function wire(){
   if(!st.view||st.view==='laudo') ditadoLigar(st.dit,'mamas',{"pac": "#pac", "prev.txt": "#prevTxt", "ind": "ind", "mmg.feita": "mmg", "mmg.birads": "mmgb", "mmg.data": "[data-f=\"mmgdata\"]", "anam.fam": "[data-an=\"fam\"]", "anam.pessoal": "[data-an=\"pessoal\"]", "anam.bx": "[data-an=\"bx\"]", "anam.cir": "[data-an=\"cir\"]", "anam.palp": "[data-an=\"palp\"]", "anam.desc": "[data-an=\"desc\"]", "anam.gest": "[data-an=\"gest\"]", "anam.lact": "[data-an=\"lact\"]", "anam.famGrau": "famgrau", "anam.bxRes": "bxres", "anam.meno": "meno", "anam.trh": "trh", "textura": "textura", "predominio": "predominio", "ectasia": "ectasia", "axila.D": "axd", "axila.E": "axe"},render,toast,st);
@@ -470,7 +470,7 @@ function wire(){
   on('[data-alvo]', el=>{ st.core.alvo=Number(el.dataset.alvo); render(); });
   on('[data-agulha]', el=>{ st.core.agulha=el.dataset.agulha; render(); });
   on('[data-lab]', el=>{ st.core.lab=el.dataset.lab; render(); });
-  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{ const uni=st.serv==='inst'&&st.core.on; const t = uni ? docUnico(docCORE,'COM BIÓPSIA POR AGULHA GROSSA (CORE)') : docUS() + (st.core.on ? '\n\n' + '='.repeat(40) + '\n\n' + docCORE() : ''); try{ await navigator.clipboard.writeText(t); toast(st.core.on&&!uni?'2 laudos copiados':'Laudo copiado'); }catch(e){ toast('Não deu para copiar aqui; o texto está ao lado'); } });
+  const cp=$('#copiar'); if(cp) cp.addEventListener('click',async()=>{ const uni=st.serv==='inst'&&st.core.on; const t = uni ? docUnico(docCORE,'COM BIÓPSIA POR AGULHA GROSSA (CORE)') : docUS() + (st.core.on ? '\n\n' + '='.repeat(40) + '\n\n' + docCORE() : ''); toast(await copiarLaudo(t)?(st.core.on&&!uni?'2 laudos copiados':'Laudo copiado'):'Não deu para copiar aqui; o texto está ao lado'); });
   // nódulo
   on('[data-back]', ()=>{ st.view='laudo'; st.edit=null; render(); });
   on('[data-remove]', el=>{ st.lesoes=st.lesoes.filter(l=>l.id!==Number(el.dataset.remove)); if(st.core.alvo===Number(el.dataset.remove)) st.core.alvo=null; st.view='laudo'; render(); });
